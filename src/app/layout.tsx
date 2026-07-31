@@ -15,10 +15,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className="h-full">
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-300">
         <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <main className="flex-1 p-8">{children}</main>
+        {/* <Footer /> */}
       </body>
     </html>
   );
