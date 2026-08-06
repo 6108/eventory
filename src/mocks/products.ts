@@ -7,7 +7,7 @@ export const mockProducts: Product[] = [
     artistId: "artist_001",
 
     category: "ACRYLIC",
-    type: "KEYRING",
+    subCategory: "KEYRING",
 
     mainImage: "/images/logo.png",
     sampleImages: ["/images/logo.png"],
@@ -30,7 +30,7 @@ export const mockProducts: Product[] = [
     artistId: "artist_002",
 
     category: "STICKER",
-    type: "SHEET",
+    subCategory: "SHEET",
 
     mainImage: "/images/logo.png",
     sampleImages: [],
@@ -48,7 +48,7 @@ export const mockProducts: Product[] = [
     artistId: "artist_001",
 
     category: "BOOK",
-    type: "ARTBOOK",
+    subCategory: "ARTBOOK",
 
     mainImage: "/images/logo.png",
     sampleImages: ["/images/logo.png"],
@@ -66,7 +66,7 @@ export const mockProducts: Product[] = [
     artistId: "artist_002",
 
     category: "PAPER",
-    type: "POSTCARD",
+    subCategory: "POSTCARD",
 
     mainImage: "/images/logo.png",
     sampleImages: [],
@@ -83,7 +83,7 @@ export const mockProducts: Product[] = [
     artistId: "artist_001",
 
     category: "ETC",
-    type: "BADGE",
+    subCategory: "BADGE",
 
     mainImage: "/images/logo.png",
     sampleImages: [],
@@ -101,7 +101,7 @@ export const mockProducts: Product[] = [
     artistId: "artist_002",
 
     category: "ACRYLIC",
-    type: "STAND",
+    subCategory: "STAND",
 
     mainImage: "/images/logo.png",
     sampleImages: [],
@@ -119,7 +119,7 @@ export const mockProducts: Product[] = [
     artistId: "artist_004",
 
     category: "STICKER",
-    type: "DIE_CUT",
+    subCategory: "DIE_CUT",
 
     mainImage: "/images/logo.png",
     sampleImages: [],
@@ -137,7 +137,7 @@ export const mockProducts: Product[] = [
     artistId: "artist_005",
 
     category: "PAPER",
-    type: "PHOTOCARD",
+    subCategory: "PHOTOCARD",
 
     mainImage: "/images/logo.png",
     sampleImages: ["/images/logo.png"],
@@ -160,7 +160,7 @@ export const mockProducts: Product[] = [
     artistId: "artist_008",
 
     category: "BOOK",
-    type: "COMIC",
+    subCategory: "COMIC",
 
     mainImage: "/images/logo.png",
     sampleImages: [],
@@ -178,7 +178,7 @@ export const mockProducts: Product[] = [
     artistId: "artist_003",
 
     category: "ACRYLIC",
-    type: "MAGNET",
+    subCategory: "MAGNET",
 
     mainImage: "/images/logo.png",
     sampleImages: [],

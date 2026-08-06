@@ -1,5 +1,4 @@
-import ProductList from "@/src/component/booth/ProductList";
-import ProductListItem from "@/src/component/booth/ProductListItem";
+import ProductList from "@/src/component/product/ProductList";
 import { mockBooths } from "@/src/mocks/booths";
 import { mockProducts } from "@/src/mocks/products";
 import { mockArtists } from "@/src/mocks/user";

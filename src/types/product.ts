@@ -3,60 +3,83 @@ export type ProductOption = {
   quantity: number;
 };
 
-type ProductCategoryType =
-  | {
-    category: "ACRYLIC"; // 아크릴 굿즈
-    type: "KEYRING" | "STAND" | "MAGNET" | "SHAKER" | "CLIP" | "COROTTO";
-  }
-  | {
-    category: "STICKER"; // 스티커
-    type: "SHEET" | "CUT" | "DIE_CUT" | "ROLL";
-  }
-  | {
-    category: "PAPER"; // 인쇄물
-    type: "POSTCARD" | "PHOTOCARD" | "POSTER";
-  }
-  | {
-    category: "BOOK"; // 인쇄 출판물
-    type: "COMIC" | "NOVEL" | "ARTBOOK";
-  }
-  | {
-    category: "ETC"; // 기타
-    type: "CLOTH" | "BADGE";
-  };
+export const productCategories = [
+  {
+    value: "ACRYLIC",
+    label: "아크릴",
+    types: [
+      { value: "KEYRING", label: "키링" },
+      { value: "STAND", label: "스탠드" },
+      { value: "MAGNET", label: "자석" },
+      { value: "SHAKER", label: "쉐이커" },
+      { value: "CLIP", label: "집게" },
+      { value: "COROTTO", label: "코롯토" },
+    ],
+  },
+  {
+    value: "STICKER",
+    label: "스티커",
+    types: [
+      { value: "SHEET", label: "인스" },
+      { value: "CUT", label: "반칼" },
+      { value: "DIE_CUT", label: "완칼" },
+      { value: "ROLL", label: "롤" },
+    ],
+  },
+  {
+    value: "PAPER",
+    label: "인쇄물",
+    types: [
+      { value: "POSTCARD", label: "엽서" },
+      { value: "PHOTOCARD", label: "포토카드" },
+      { value: "POSTER", label: "포스터" },
+    ],
+  },
+  {
+    value: "BOOK",
+    label: "회지",
+    types: [
+      { value: "COMIC", label: "만화책" },
+      { value: "NOVEL", label: "소설" },
+      { value: "ARTBOOK", label: "아트북" },
+    ],
+  },
+  {
+    value: "ETC",
+    label: "기타",
+    types: [
+      { value: "CLOTH", label: "천 굿즈" },
+      { value: "BADGE", label: "뱃지" },
+    ],
+  },
+] as const;
 
-export const productCategoryLabel = {
-  ACRYLIC: "아크릴",
-  STICKER: "스티커",
-  PAPER: "인쇄물",
-  BOOK: "회지",
-  ETC: "기타",
-};
+export type ProductCategory =
+  | "ACRYLIC"
+  | "STICKER"
+  | "PAPER"
+  | "BOOK"
+  | "ETC";
 
-export const productTypeLabel = {
-  KEYRING: "키링",
-  STAND: "스탠드",
-  MAGNET: "자석",
-  SHAKER: "쉐이커",
-  CLIP: "집게",
-  COROTTO: "코롯토",
-
-  SHEET: "시트",
-  CUT: "컷팅",
-  DIE_CUT: "다이컷",
-  ROLL: "롤",
-
-  POSTCARD: "엽서",
-  PHOTOCARD: "포토카드",
-  POSTER: "포스터",
-
-  COMIC: "만화책",
-  NOVEL: "소설",
-  ARTBOOK: "아트북",
-
-  CLOTH: "천 굿즈",
-  BADGE: "뱃지",
-};
+export type ProductSubCategory =
+  | "KEYRING"
+  | "STAND"
+  | "MAGNET"
+  | "SHAKER"
+  | "CLIP"
+  | "COROTTO"
+  | "SHEET"
+  | "CUT"
+  | "DIE_CUT"
+  | "ROLL"
+  | "POSTCARD"
+  | "PHOTOCARD"
+  | "POSTER"
+  | "COMIC"
+  | "NOVEL"
+  | "ARTBOOK"
+  | "CLOTH"
+  | "BADGE";
 
 export type Product = {
   id: string;
@@ -70,4 +93,7 @@ export type Product = {
   purchaseLimit?: number;
   description: string;
   options?: ProductOption[];
-} & ProductCategoryType;
+
+  category: ProductCategory;
+  subCategory: ProductSubCategory;
+} 

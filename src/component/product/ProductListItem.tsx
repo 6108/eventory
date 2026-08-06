@@ -1,11 +1,10 @@
-import { Product, productCategoryLabel, productTypeLabel } from "@/src/types/product";
+import { Product, productCategories } from "@/src/types/product";
 import { EVENT_ID as eventId } from "@/src/constants/event";
 import { mockBooths } from "@/src/mocks/booths";
 import { mockArtists } from "@/src/mocks/user";
 import Image from "next/image";
 import Link from "next/link";
-import Badge from "./Badge";
-import { Heart } from "lucide-react";
+import Badge from "../booth/Badge";
 import Like from "./Like";
 
 interface ProductListItemProps {
@@ -21,6 +20,14 @@ export default function ProductListItem({
 
   const artist = mockArtists.find(
     (artist) => artist.id === productInfo.artistId
+  );
+
+  const category = productCategories.find(
+    (item) => item.value === productInfo.category
+  );
+
+  const subCategory = category?.types.find(
+    (item) => item.value === productInfo.subCategory
   );
 
   return (
@@ -49,9 +56,9 @@ export default function ProductListItem({
         <div className="flex flex-col justify-center w-full">
           <span className="text-xs text-zinc-500">
             <span>
-              {productCategoryLabel[productInfo.category]}
+              {category?.label}
               {" > "}
-              {productTypeLabel[productInfo.type]}
+              {subCategory?.label}
             </span>
           </span>
           <div className="flex min-w-0 truncate text-sm text-zinc-400">
