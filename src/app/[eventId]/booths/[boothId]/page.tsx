@@ -1,3 +1,4 @@
+import ProductExplorer from "@/src/component/product/ProductExplorer";
 import ProductList from "@/src/component/product/ProductList";
 import { mockBooths } from "@/src/mocks/booths";
 import { mockProducts } from "@/src/mocks/products";
@@ -31,11 +32,10 @@ export default async function Page({
         작가: {artists.map((artist) => artist.name).join(", ")}
       </p>
       <p>구분: {booth.category}</p>
+      <p>선입금 링크: </p>
+      <h2 className="pt-24">판매 제품</h2>
 
-      <h2>판매 제품</h2>
-
-      <ProductList products={products} />
-
+      <ProductExplorer products={products} />
     </div>
   );
 }
