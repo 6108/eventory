@@ -3,6 +3,7 @@ import ProductList from "@/src/component/product/ProductList";
 import { mockBooths } from "@/src/mocks/booths";
 import { mockProducts } from "@/src/mocks/products";
 import { mockArtists } from "@/src/mocks/user";
+import { Suspense } from "react";
 
 export default async function Page({
   params,
@@ -35,7 +36,9 @@ export default async function Page({
       <p>선입금 링크: </p>
       <h2 className="pt-24">판매 제품</h2>
 
-      <ProductExplorer products={products} />
+      <Suspense fallback={<div>불러오는 중...</div>}>
+        <ProductExplorer products={products} />
+      </Suspense>
     </div>
   );
 }

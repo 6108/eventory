@@ -2,6 +2,7 @@ import Image from "next/image";
 import { mockProducts } from "@/src/mocks/products";
 import { mockBooths } from "@/src/mocks/booths";
 import { mockArtists } from "@/src/mocks/user";
+import { getCategoryLabel, getSubCategoryLabel } from "@/src/utils/product";
 
 export default async function Page({
   params,
@@ -49,25 +50,19 @@ export default async function Page({
           <span className="max-w-32 truncate">
             {booth?.boothName}
           </span>
-
           <span className="shrink-0">
-            {" > "}
-          </span>
-
-          <span className="shrink-0 max-w-32 truncate">
-            {artists.map((artist) => artist.artistName).join(", ")}
-          </span>
-
-          <span className="shrink-0">
-            {" > "}{product.category}
-            {" > "}{product.subCategory}
+            {" > "}{getCategoryLabel(product.category)}
+            {" > "}{getSubCategoryLabel(product.subCategory)}
           </span>
         </div>
-        <h1>{product.name}</h1>
 
-        <p className="text-lg">
-          {product.price.toLocaleString()}원
-        </p>
+        <div className="flex flex-col gap-1">
+          <p className="text-sm text-zinc-500">
+            {artists.map((a) => a.artistName).join(", ")}
+          </p>
+          <h1 >{product.name}</h1>
+          <p className="text-lg">{product.price.toLocaleString()}원</p>
+        </div>
 
         <p>
           {product.description}

@@ -6,8 +6,8 @@ export const mockProducts: Product[] = [
     boothId: "booth_001",
     artistIds: ["artist_001", "artist_002"],
 
-    category: "ACRYLIC",
-    subCategory: "KEYRING",
+    category: "acrylic",
+    subCategory: "keyring",
 
     mainImage: "/images/logo.png",
     sampleImages: ["/images/logo.png"],
@@ -29,8 +29,8 @@ export const mockProducts: Product[] = [
     boothId: "booth_001",
     artistIds: ["artist_002"],
 
-    category: "STICKER",
-    subCategory: "SHEET",
+    category: "sticker",
+    subCategory: "sheet",
 
     mainImage: "/images/logo.png",
     sampleImages: [],
@@ -47,8 +47,8 @@ export const mockProducts: Product[] = [
     boothId: "booth_001",
     artistIds: ["artist_001"],
 
-    category: "BOOK",
-    subCategory: "ARTBOOK",
+    category: "book",
+    subCategory: "artbook",
 
     mainImage: "/images/logo.png",
     sampleImages: ["/images/logo.png"],
@@ -65,8 +65,8 @@ export const mockProducts: Product[] = [
     boothId: "booth_001",
     artistIds: ["artist_001", "artist_002"], // 두 작가 공동 제작 (회지 등)
 
-    category: "PAPER",
-    subCategory: "POSTCARD",
+    category: "paper",
+    subCategory: "postcard",
 
     mainImage: "/images/logo.png",
     sampleImages: [],
@@ -82,8 +82,8 @@ export const mockProducts: Product[] = [
     boothId: "booth_001",
     artistIds: ["artist_001"],
 
-    category: "ETC",
-    subCategory: "BADGE",
+    category: "etc",
+    subCategory: "badge",
 
     mainImage: "/images/logo.png",
     sampleImages: [],
@@ -100,8 +100,8 @@ export const mockProducts: Product[] = [
     boothId: "booth_001",
     artistIds: ["artist_002"],
 
-    category: "ACRYLIC",
-    subCategory: "STAND",
+    category: "acrylic",
+    subCategory: "stand",
 
     mainImage: "/images/logo.png",
     sampleImages: [],
@@ -118,8 +118,8 @@ export const mockProducts: Product[] = [
     boothId: "booth_003",
     artistIds: ["artist_004"],
 
-    category: "STICKER",
-    subCategory: "DIE_CUT",
+    category: "sticker",
+    subCategory: "die_cut",
 
     mainImage: "/images/logo.png",
     sampleImages: [],
@@ -136,8 +136,8 @@ export const mockProducts: Product[] = [
     boothId: "booth_003",
     artistIds: ["artist_005"],
 
-    category: "PAPER",
-    subCategory: "PHOTOCARD",
+    category: "paper",
+    subCategory: "photocard",
 
     mainImage: "/images/logo.png",
     sampleImages: ["/images/logo.png"],
@@ -159,8 +159,8 @@ export const mockProducts: Product[] = [
     boothId: "booth_005",
     artistIds: ["artist_008", "artist_009"], // 공동 창작 회지
 
-    category: "BOOK",
-    subCategory: "COMIC",
+    category: "book",
+    subCategory: "comic",
 
     mainImage: "/images/logo.png",
     sampleImages: [],
@@ -177,8 +177,8 @@ export const mockProducts: Product[] = [
     boothId: "booth_002",
     artistIds: ["artist_003"],
 
-    category: "ACRYLIC",
-    subCategory: "MAGNET",
+    category: "acrylic",
+    subCategory: "magnet",
 
     mainImage: "/images/logo.png",
     sampleImages: [],

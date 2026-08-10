@@ -1,80 +1,58 @@
 export const productCategories = [
   {
-    value: "ACRYLIC",
+    value: "acrylic",
     label: "아크릴",
     types: [
-      { value: "KEYRING", label: "키링" },
-      { value: "STAND", label: "스탠드" },
-      { value: "MAGNET", label: "자석" },
-      { value: "SHAKER", label: "쉐이커" },
-      { value: "CLIP", label: "집게" },
-      { value: "COROTTO", label: "코롯토" },
+      { value: "keyring", label: "키링" },
+      { value: "stand", label: "스탠드" },
+      { value: "magnet", label: "자석" },
+      { value: "shaker", label: "쉐이커" },
+      { value: "clip", label: "집게" },
+      { value: "corotto", label: "코롯토" },
     ],
   },
   {
-    value: "STICKER",
+    value: "sticker",
     label: "스티커",
     types: [
-      { value: "SHEET", label: "인스" },
-      { value: "CUT", label: "반칼" },
-      { value: "DIE_CUT", label: "완칼" },
-      { value: "ROLL", label: "롤" },
+      { value: "sheet", label: "인스" },
+      { value: "cut", label: "반칼" },
+      { value: "die_cut", label: "완칼" },
+      { value: "roll", label: "롤" },
     ],
   },
   {
-    value: "PAPER",
+    value: "paper",
     label: "인쇄물",
     types: [
-      { value: "POSTCARD", label: "엽서" },
-      { value: "PHOTOCARD", label: "포토카드" },
-      { value: "POSTER", label: "포스터" },
+      { value: "postcard", label: "엽서" },
+      { value: "photocard", label: "포토카드" },
+      { value: "poster", label: "포스터" },
     ],
   },
   {
-    value: "BOOK",
+    value: "book",
     label: "회지",
     types: [
-      { value: "COMIC", label: "만화책" },
-      { value: "NOVEL", label: "소설" },
-      { value: "ARTBOOK", label: "아트북" },
+      { value: "comic", label: "만화책" },
+      { value: "novel", label: "소설" },
+      { value: "artbook", label: "아트북" },
     ],
   },
   {
-    value: "ETC",
+    value: "etc",
     label: "기타",
     types: [
-      { value: "CLOTH", label: "천 굿즈" },
-      { value: "BADGE", label: "뱃지" },
+      { value: "cloth", label: "천 굿즈" },
+      { value: "badge", label: "뱃지" },
     ],
   },
 ] as const;
 
-export type ProductCategory =
-  | "ACRYLIC"
-  | "STICKER"
-  | "PAPER"
-  | "BOOK"
-  | "ETC";
-
-export type ProductSubCategory =
-  | "KEYRING"
-  | "STAND"
-  | "MAGNET"
-  | "SHAKER"
-  | "CLIP"
-  | "COROTTO"
-  | "SHEET"
-  | "CUT"
-  | "DIE_CUT"
-  | "ROLL"
-  | "POSTCARD"
-  | "PHOTOCARD"
-  | "POSTER"
-  | "COMIC"
-  | "NOVEL"
-  | "ARTBOOK"
-  | "CLOTH"
-  | "BADGE";
+// 배열에서 타입을 자동으로 뽑아냄
+type CategoryItem = (typeof productCategories)[number];
+export type ProductCategory = CategoryItem["value"];
+export type ProductSubCategory = CategoryItem["types"][number]["value"];
 
 export type ProductOption = {
   id: string;

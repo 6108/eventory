@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import ProductList from "@/src/component/product/ProductList";
 import CategoryChip from "@/src/component/product/CategoryChip";
 import SubCategoryChip from "@/src/component/product/SubCategoryChip";
@@ -11,8 +12,37 @@ interface ProductExplorerProps {
 }
 
 export default function ProductExplorer({ products }: ProductExplorerProps) {
-  const [category, setCategory] = useState<string>("ALL");
-  const [subCategory, setSubCategory] = useState<string>("ALL");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [category, setCategory] = useState<string>(
+    searchParams.get("category") ?? "ALL"
+  );
+  const [subCategory, setSubCategory] = useState<string>(
+    searchParams.get("subCategory") ?? "ALL"
+  );
+
+  // 상태 바뀔 때마다 URL 쿼리도 같이 갱신
+  const updateQuery = (nextCategory: string, nextSubCategory: string) => {
+    const params = new URLSearchParams();
+    if (nextCategory !== "ALL") params.set("category", nextCategory);
+    if (nextSubCategory !== "ALL") params.set("subCategory", nextSubCategory);
+
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  };
+
+  const handleCategoryClick = (value: string) => {
+    setCategory(value);
+    setSubCategory("ALL");
+    updateQuery(value, "ALL");
+  };
+
+  const handleSubCategoryClick = (value: string) => {
+    setSubCategory(value);
+    updateQuery(category, value);
+  };
 
   const categories = [
     { value: "ALL", label: "전체" },
@@ -59,10 +89,7 @@ export default function ProductExplorer({ products }: ProductExplorerProps) {
             key={item.value}
             label={item.label}
             active={category === item.value}
-            onClick={() => {
-              setCategory(item.value);
-              setSubCategory("ALL");
-            }}
+            onClick={() => handleCategoryClick(item.value)}
           />
         ))}
       </div>
@@ -74,7 +101,7 @@ export default function ProductExplorer({ products }: ProductExplorerProps) {
               key={item.value}
               label={item.label}
               active={subCategory === item.value}
-              onClick={() => setSubCategory(item.value)}
+              onClick={() => handleSubCategoryClick(item.value)}
             />
           ))}
         </div>
