@@ -18,8 +18,8 @@ export default function ProductListItem({
     (booth) => booth.id === productInfo.boothId
   );
 
-  const artist = mockArtists.find(
-    (artist) => artist.id === productInfo.artistId
+  const artists = mockArtists.filter((artist) =>
+    productInfo.artistIds?.includes(artist.id)
   );
 
   const category = productCategories.find(
@@ -66,7 +66,7 @@ export default function ProductListItem({
               {booth?.boothName}
             </span>
             <span className="shrink-0">
-              {" - "}{artist?.name}
+              {" - "}{artists.map((a) => a.artistName).join(', ')}
             </span>
           </div>
           <h3 className="text-base text-zinc-300 line-clamp-2 min-h-20">

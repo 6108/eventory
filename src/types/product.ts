@@ -1,8 +1,3 @@
-export type ProductOption = {
-  name: string;
-  quantity: number;
-};
-
 export const productCategories = [
   {
     value: "ACRYLIC",
@@ -81,10 +76,16 @@ export type ProductSubCategory =
   | "CLOTH"
   | "BADGE";
 
+export type ProductOption = {
+  id: string;
+  name: string;
+  quantity: number;
+};
+
 export type Product = {
   id: string;
   boothId: string;
-  artistId: string;
+  artistIds?: string[]; //공동 창작물(회지 등) 가능
   mainImage: string;
   sampleImages: string[];
   name: string;

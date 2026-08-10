@@ -29,7 +29,7 @@ export default function BoothListItem({ boothInfo }: BoothListItemProps) {
         </span>
 
         <span className="w-1/4 px-2 line-clamp-3">
-          {artists.map((artist) => artist.name).join(", ")}
+          {artists.map((artist) => artist.artistName).join(", ")}
         </span>
 
         <span

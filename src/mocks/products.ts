@@ -4,7 +4,7 @@ export const mockProducts: Product[] = [
   {
     id: "product_001",
     boothId: "booth_001",
-    artistId: "artist_001",
+    artistIds: ["artist_001", "artist_002"],
 
     category: "ACRYLIC",
     subCategory: "KEYRING",
@@ -19,15 +19,15 @@ export const mockProducts: Product[] = [
     description: "달빛 고양이 캐릭터 아크릴 키링입니다.",
 
     options: [
-      { name: "하늘색", quantity: 25 },
-      { name: "보라색", quantity: 25 },
+      { id: "product_001_opt_1", name: "하늘색", quantity: 25 },
+      { id: "product_001_opt_2", name: "보라색", quantity: 25 },
     ],
   },
 
   {
     id: "product_002",
     boothId: "booth_001",
-    artistId: "artist_002",
+    artistIds: ["artist_002"],
 
     category: "STICKER",
     subCategory: "SHEET",
@@ -45,7 +45,7 @@ export const mockProducts: Product[] = [
   {
     id: "product_003",
     boothId: "booth_001",
-    artistId: "artist_001",
+    artistIds: ["artist_001"],
 
     category: "BOOK",
     subCategory: "ARTBOOK",
@@ -63,7 +63,7 @@ export const mockProducts: Product[] = [
   {
     id: "product_004",
     boothId: "booth_001",
-    artistId: "artist_002",
+    artistIds: ["artist_001", "artist_002"], // 두 작가 공동 제작 (회지 등)
 
     category: "PAPER",
     subCategory: "POSTCARD",
@@ -80,7 +80,7 @@ export const mockProducts: Product[] = [
   {
     id: "product_005",
     boothId: "booth_001",
-    artistId: "artist_001",
+    artistIds: ["artist_001"],
 
     category: "ETC",
     subCategory: "BADGE",
@@ -98,7 +98,7 @@ export const mockProducts: Product[] = [
   {
     id: "product_006",
     boothId: "booth_001",
-    artistId: "artist_002",
+    artistIds: ["artist_002"],
 
     category: "ACRYLIC",
     subCategory: "STAND",
@@ -116,7 +116,7 @@ export const mockProducts: Product[] = [
   {
     id: "product_007",
     boothId: "booth_003",
-    artistId: "artist_004",
+    artistIds: ["artist_004"],
 
     category: "STICKER",
     subCategory: "DIE_CUT",
@@ -134,7 +134,7 @@ export const mockProducts: Product[] = [
   {
     id: "product_008",
     boothId: "booth_003",
-    artistId: "artist_005",
+    artistIds: ["artist_005"],
 
     category: "PAPER",
     subCategory: "PHOTOCARD",
@@ -149,15 +149,15 @@ export const mockProducts: Product[] = [
     description: "오리지널 일러스트 포토카드 세트입니다.",
 
     options: [
-      { name: "A 타입", quantity: 50 },
-      { name: "B 타입", quantity: 50 },
+      { id: "product_008_opt_1", name: "A 타입", quantity: 50 },
+      { id: "product_008_opt_2", name: "B 타입", quantity: 50 },
     ],
   },
 
   {
     id: "product_009",
     boothId: "booth_005",
-    artistId: "artist_008",
+    artistIds: ["artist_008", "artist_009"], // 공동 창작 회지
 
     category: "BOOK",
     subCategory: "COMIC",
@@ -175,7 +175,7 @@ export const mockProducts: Product[] = [
   {
     id: "product_010",
     boothId: "booth_002",
-    artistId: "artist_003",
+    artistIds: ["artist_003"],
 
     category: "ACRYLIC",
     subCategory: "MAGNET",

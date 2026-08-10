@@ -25,11 +25,9 @@ export default async function Page({
     (booth) => booth.id === product.boothId
   );
 
-  const artist = mockArtists.find(
-    (artist) => artist.id === product.artistId
+  const artists = mockArtists.filter((artist) =>
+    product.artistIds?.includes(artist.id)
   );
-
-
 
   return (
     <div className="flex flex-col gap-6 px-40">
@@ -56,13 +54,13 @@ export default async function Page({
             {" > "}
           </span>
 
-          <span className="shrink-0">
-            {artist?.name}
+          <span className="shrink-0 max-w-32 truncate">
+            {artists.map((artist) => artist.artistName).join(", ")}
           </span>
 
           <span className="shrink-0">
             {" > "}{product.category}
-            {" > "}{product.type}
+            {" > "}{product.subCategory}
           </span>
         </div>
         <h1>{product.name}</h1>
@@ -83,8 +81,8 @@ export default async function Page({
 
           <ul>
             {product.options.map((option) => (
-              <li key={option.name}>
-                {option.name} ({option.quantity}개)
+              <li key={option.id}>
+                {option.name} ({option.quantity ?? "무제한"}개)
               </li>
             ))}
           </ul>
@@ -106,13 +104,13 @@ export default async function Page({
       )}
 
       {/* 샘플 이미지 */}
-      {product.sampleImages.length > 0 && (
+      {product.sampleImages && product.sampleImages.length > 0 && (
         <div className="flex flex-col gap-4">
           <h2>상세 이미지</h2>
 
-          {product.sampleImages.map((image) => (
+          {product.sampleImages.map((image, index) => (
             <Image
-              key={image}
+              key={`${image}-${index}`}
               src={image}
               alt={product.name}
               width={800}
