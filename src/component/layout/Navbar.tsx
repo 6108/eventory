@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { EVENT_ID as eventId } from "@/src/constants/event";
+import { Login } from "../auth/Login";
 
 export function Navbar() {
   return (
@@ -15,6 +16,7 @@ export function Navbar() {
         <Link href={`/${eventId}/products`} className="cursor-pointer text-primary hover:text-white">
           <span>회지 및 굿즈</span>
         </Link>
+        <Login />
       </div>
     </nav>
   )
