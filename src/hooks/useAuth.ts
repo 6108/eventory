@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/src/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
+import { EVENT_ID as eventId } from "@/src/constants/event";
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -27,10 +28,14 @@ export function useAuth() {
   }, [supabase]);
 
   const login = async () => {
+    const params = new URLSearchParams(window.location.search);
+
+    const next = params.get("next") || `/${eventId}`;
+
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(window.location.pathname)}`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
       },
     });
   };

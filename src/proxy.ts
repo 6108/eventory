@@ -1,7 +1,6 @@
-// src/middleware.ts
+// src/proxy.ts
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "./lib/supabase/middleware";
-
 
 export async function proxy(request: NextRequest) {
   const { response, user } = await updateSession(request);
@@ -10,9 +9,15 @@ export async function proxy(request: NextRequest) {
     !user &&
     request.nextUrl.pathname.endsWith("/booths/register")
   ) {
-    return NextResponse.redirect(
-      new URL("/", request.url)
+    const eventPath = request.nextUrl.pathname.replace(
+      "/booths/register",
+      ""
     );
+
+    const url = new URL(eventPath, request.url);
+    url.searchParams.set("login", "required");
+
+    return NextResponse.redirect(url);
   }
 
   return response;
