@@ -3,6 +3,7 @@ import { mockProducts } from "@/src/mocks/products";
 import { mockBooths } from "@/src/mocks/booths";
 import { mockArtists } from "@/src/mocks/user";
 import { getCategoryLabel, getSubCategoryLabel } from "@/src/utils/product";
+import Link from "next/link";
 
 export default async function Page({
   params,
@@ -12,7 +13,7 @@ export default async function Page({
     productId: string;
   }>;
 }) {
-  const { productId } = await params;
+  const { eventId, productId } = await params;
 
   const product = mockProducts.find(
     (product) => product.id == productId
@@ -47,13 +48,28 @@ export default async function Page({
       {/* 정보 */}
       <div className="flex flex-col gap-2">
         <div className="flex min-w-0 items-center text-sm text-zinc-500">
-          <span className="max-w-32 truncate">
+          <Link
+            href={`/${eventId}/booths/${booth?.id}`}
+            className="max-w-32 truncate hover:underline"
+          >
             {booth?.boothName}
-          </span>
-          <span className="shrink-0">
-            {" > "}{getCategoryLabel(product.category)}
-            {" > "}{getSubCategoryLabel(product.subCategory)}
-          </span>
+          </Link>
+
+          <span className="shrink-0">{" > "}</span>
+
+          <Link
+            href={`/${eventId}/booths/${booth?.id}?category=${product.category}`}
+          >
+            {getCategoryLabel(product.category)}
+          </Link>
+
+          <span className="shrink-0">{" > "}</span>
+
+          <Link
+            href={`/${eventId}/booths/${booth?.id}?category=${product.category}&subCategory=${product.subCategory}`}
+          >
+            {getSubCategoryLabel(product.subCategory)}
+          </Link>
         </div>
 
         <div className="flex flex-col gap-1">
