@@ -1,9 +1,12 @@
-import Image from 'next/image'
-import React from 'react'
+import LoginRequiredToast from "@/src/component/toast/LoginRequiredToast";
+import Image from "next/image";
+
 
 export default function Page() {
   return (
-    <div className='flex w-full items-center justify-center'>
+    <div className="flex w-full items-center justify-center">
+      <LoginRequiredToast />
+
       <Image
         src="/images/logo.png"
         alt="메인 이미지"
@@ -13,5 +16,5 @@ export default function Page() {
         priority
       />
     </div>
-  )
+  );
 }
