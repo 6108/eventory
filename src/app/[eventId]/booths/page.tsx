@@ -6,7 +6,7 @@ import { mockBooths } from "@/src/mocks/booths";
 import Image from "next/image";
 
 
-export default function page() {
+export default function Page() {
   const [category, setCategory] = useState<"ALL" | "ADULT" | "GENERAL">("ALL");
 
   const filteredBooths = mockBooths.filter((booth) => {
