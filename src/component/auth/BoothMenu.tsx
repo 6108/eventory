@@ -37,7 +37,7 @@ export function BoothMenu({
       </UserMenuItem>
 
       <UserMenuItem
-        href={`/${eventId}/booths/${boothId}/products/new`}
+        href={`/${eventId}/booths/${boothId}/manage/products/new`}
         onClick={onNavigate}
       >
         상품 추가

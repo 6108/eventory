@@ -1,3 +1,4 @@
+// src/app/[eventId]/booths/[boothId]/products/new/page.tsx
 import { redirect } from "next/navigation";
 import { createClient } from "@/src/lib/supabase/server";
 import AddProductForm from "@/src/component/form/AddProductForm";
