@@ -1,17 +1,17 @@
 // src/component/form/FormActions.tsx
-type Props = {
+interface FormActionsProps {
   onCancel: () => void;
   loading: boolean;
   submitLabel: string;
   loadingLabel: string;
-};
+}
 
 export function FormActions({
   onCancel,
   loading,
   submitLabel,
   loadingLabel,
-}: Props) {
+}: FormActionsProps) {
   return (
     <div className="flex justify-end gap-2">
       <button

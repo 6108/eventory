@@ -1,11 +1,11 @@
 // src/component/form/FormField.tsx
-type Props = {
+interface FormFieldProps {
   label: string;
   children: React.ReactNode;
   hint?: string;
-};
+}
 
-export function FormField({ label, children, hint }: Props) {
+export function FormField({ label, children, hint }: FormFieldProps) {
   return (
     <div className="flex flex-col gap-2">
       <label className="text-sm text-zinc-400">{label}</label>

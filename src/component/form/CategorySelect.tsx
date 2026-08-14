@@ -3,19 +3,19 @@
 
 import { productCategories } from "@/src/types/product";
 
-type Props = {
+interface CategorySelectProps {
   category: string;
   subCategory: string;
   onCategoryChange: (category: string) => void;
   onSubCategoryChange: (subCategory: string) => void;
-};
+}
 
 export function CategorySelect({
   category,
   subCategory,
   onCategoryChange,
   onSubCategoryChange,
-}: Props) {
+}: CategorySelectProps) {
   const selectedCategory = productCategories.find(
     (item) => item.value === category
   );

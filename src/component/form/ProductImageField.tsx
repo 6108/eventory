@@ -6,19 +6,19 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import imageCompression from "browser-image-compression";
 
-type Props = {
-  initialPreviewUrl?: string | null; // 수정 모드일 때 기존 이미지
+interface ProductImageFieldProps {
+  initialPreviewUrl?: string | null;
   onImageChange: (file: File | null) => void;
   required?: boolean;
   hint?: string;
-};
+}
 
 export function ProductImageField({
   initialPreviewUrl = null,
   onImageChange,
   required = false,
   hint,
-}: Props) {
+}: ProductImageFieldProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(
     initialPreviewUrl
   );

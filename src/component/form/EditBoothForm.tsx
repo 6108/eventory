@@ -1,18 +1,22 @@
+// src/component/form/EditBoothForm.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { FormField } from "./FormField";
+import { FormActions } from "./FormActions";
+import type { BoothFormState } from "@/src/types/form";
 
 type Category = "GENERAL" | "ADULT";
 
-type Props = {
+interface EditBoothFormProps {
   boothId: string;
   eventId: string;
   boothName: string;
   description: string | null;
   category: Category;
-};
+}
 
 export default function EditBoothForm({
   boothId,
@@ -20,14 +24,22 @@ export default function EditBoothForm({
   boothName,
   description,
   category,
-}: Props) {
+}: EditBoothFormProps) {
   const router = useRouter();
 
-  const [name, setName] = useState(boothName);
-  const [desc, setDesc] = useState(description ?? "");
-  const [selectedCategory, setSelectedCategory] =
-    useState<Category>(category);
+  const [form, setForm] = useState<BoothFormState>({
+    name: boothName,
+    description: description ?? "",
+    category,
+  });
   const [loading, setLoading] = useState(false);
+
+  function updateField<K extends keyof BoothFormState>(
+    key: K,
+    value: BoothFormState[K]
+  ) {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -35,13 +47,11 @@ export default function EditBoothForm({
 
     const res = await fetch(`/api/booth/${boothId}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        boothName: name,
-        description: desc,
-        category: selectedCategory,
+        boothName: form.name,
+        description: form.description,
+        category: form.category,
       }),
     });
 
@@ -61,45 +71,35 @@ export default function EditBoothForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <label className="text-sm text-zinc-400">부스명</label>
-
+      <FormField label="부스명">
         <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={form.name}
+          onChange={(e) => updateField("name", e.target.value)}
           required
           className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none focus:border-primary"
         />
-      </div>
+      </FormField>
 
-      <div className="flex flex-col gap-2">
-        <label className="text-sm text-zinc-400">부스 설명</label>
-
+      <FormField label="부스 설명">
         <textarea
-          value={desc}
-          onChange={(e) => setDesc(e.target.value)}
+          value={form.description}
+          onChange={(e) => updateField("description", e.target.value)}
           rows={5}
           className="resize-none rounded border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none focus:border-primary"
         />
-      </div>
+      </FormField>
 
-
-      <div className="flex flex-col gap-2">
-        <label className="text-sm text-zinc-400">
-          부스 유형
-        </label>
-
+      <FormField label="부스 유형">
         <div className="flex gap-3">
           <label className="cursor-pointer">
             <input
               type="radio"
               name="category"
               value="GENERAL"
-              checked={selectedCategory === "GENERAL"}
-              onChange={() => setSelectedCategory("GENERAL")}
+              checked={form.category === "GENERAL"}
+              onChange={() => updateField("category", "GENERAL")}
               className="peer sr-only"
             />
-
             <div className="rounded border border-zinc-800 px-4 py-2 text-sm text-zinc-400 transition peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-white">
               일반
             </div>
@@ -110,37 +110,23 @@ export default function EditBoothForm({
               type="radio"
               name="category"
               value="ADULT"
-              checked={selectedCategory === "ADULT"}
-              onChange={() => setSelectedCategory("ADULT")}
+              checked={form.category === "ADULT"}
+              onChange={() => updateField("category", "ADULT")}
               className="peer sr-only"
             />
-
             <div className="rounded border border-zinc-800 px-4 py-2 text-sm text-zinc-400 transition peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-white">
               성인
             </div>
           </label>
         </div>
-      </div>
+      </FormField>
 
-      <div className="flex justify-end gap-2">
-        <button
-          type="button"
-          onClick={() =>
-            router.push(`/${eventId}/booths/${boothId}/manage`)
-          }
-          className="rounded px-4 py-2 text-sm text-zinc-400 hover:text-white"
-        >
-          취소
-        </button>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded bg-primary px-4 py-2 text-sm text-white disabled:opacity-50"
-        >
-          {loading ? "저장 중..." : "저장"}
-        </button>
-      </div>
+      <FormActions
+        onCancel={() => router.push(`/${eventId}/booths/${boothId}/manage`)}
+        loading={loading}
+        submitLabel="저장"
+        loadingLabel="저장 중..."
+      />
     </form>
   );
 }
