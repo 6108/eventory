@@ -1,8 +1,7 @@
 // src/app/[eventId]/booths/[boothId]/manage/products/page.tsx
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { createClient } from "@/src/lib/supabase/server";
+import ProductManageListItem from "@/src/component/product/ProductManageListItem";
 
 export default async function Page({
   params,
@@ -15,25 +14,6 @@ export default async function Page({
   const { eventId, boothId } = await params;
 
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect(`/${eventId}`);
-  }
-
-  const { data: artist } = await supabase
-    .from("booth_artists")
-    .select("booth_id")
-    .eq("booth_id", boothId)
-    .eq("artist_id", user.id)
-    .maybeSingle();
-
-  if (!artist) {
-    redirect(`/${eventId}/booths`);
-  }
 
   const { data: products } = await supabase
     .from("products")
@@ -59,36 +39,14 @@ export default async function Page({
         <ul className="flex flex-col gap-3">
           {products.map((product, index) => (
             <li key={product.id}>
-              <Link
-                href={`/${eventId}/booths/${boothId}/products/${product.id}/edit`}
-                className="flex items-center gap-3 rounded border border-zinc-800 p-3 hover:bg-zinc-900"
-              >
-                <div className="aspect-square w-full overflow-hidden rounded bg-zinc-900">
-                  {product.main_image_url && (
-                    <Image
-                      src={product.main_image_url}
-                      alt={product.name}
-                      width={300}
-                      height={300}
-                      priority={index < 4} // 처음 4개(첫 줄)만 우선 로드
-                      className="h-full w-full object-cover"
-                    />
-                  )}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <p className="truncate text-sm font-medium text-white">
-                    {product.name}
-                  </p>
-                  <p className="text-sm text-zinc-400">
-                    {product.price.toLocaleString()}원
-                  </p>
-                </div>
-
-                <span className="flex-shrink-0 text-xs text-zinc-500">
-                  재고 {product.total_quantity ?? "-"}
-                </span>
-              </Link>
+              <ProductManageListItem
+                href={`/${eventId}/booths/${boothId}/manage/products/${product.id}/edit`}
+                name={product.name}
+                price={product.price}
+                mainImageUrl={product.main_image_url}
+                totalQuantity={product.total_quantity}
+                priority={index < 4}
+              />
             </li>
           ))}
         </ul>
