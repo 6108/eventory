@@ -5,17 +5,16 @@ import Image from "next/image";
 import Link from "next/link";
 import Badge from "../booth/Badge";
 import Like from "./Like";
-import { createClient } from "@/src/lib/supabase/server";
 
 interface ProductListItemProps {
   productInfo: Product;
+  boothName?: string;
 }
 
-export default async function ProductListItem({
+export default function ProductListItem({
   productInfo,
+  boothName,
 }: ProductListItemProps) {
-
-
   const artists = mockArtists.filter((artist) =>
     productInfo.artistIds?.includes(artist.id)
   );
@@ -27,15 +26,6 @@ export default async function ProductListItem({
   const subCategory = category?.types.find(
     (item) => item.value === productInfo.subCategory
   );
-
-  const supabase = await createClient();
-
-  const { data: boothData } = await supabase
-    .from("booths")
-    .select("booth_name")
-    .eq("id", productInfo.boothId)
-    .single();
-
 
   return (
     <Link href={`/${eventId}/products/${productInfo.id}`}>
@@ -53,29 +43,31 @@ export default async function ProductListItem({
             <span className="absolute top-1 left-1 flex items-center justify-center px-2 py-1 bg-primary text-zinc-300 rounded-sm text-xs font-semibold">
               신상품
             </span>
+
             <Like />
           </div>
-
 
           <Badge />
         </div>
 
         <div className="flex flex-col justify-center w-full">
           <span className="text-xs text-zinc-500">
-            <span>
-              {category?.label}
-              {" > "}
-              {subCategory?.label}
-            </span>
+            {category?.label}
+            {" > "}
+            {subCategory?.label}
           </span>
+
           <div className="flex min-w-0 truncate text-sm text-zinc-400">
             <span className="truncate">
-              {boothData?.booth_name}
+              {boothName}
             </span>
+
             <span className="shrink-0">
-              {" - "}{artists.map((a) => a.artistName).join(', ')}
+              {" - "}
+              {artists.map((a) => a.artistName).join(", ")}
             </span>
           </div>
+
           <h3 className="text-base text-zinc-300 line-clamp-2 min-h-20">
             {productInfo.name}
           </h3>
@@ -85,6 +77,6 @@ export default async function ProductListItem({
           </p>
         </div>
       </div>
-    </Link >
+    </Link>
   );
 }
