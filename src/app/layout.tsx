@@ -4,6 +4,7 @@ import { Navbar } from "../component/layout/Navbar";
 import { Footer } from "../component/layout/Footer";
 import DisableContextMenu from "../component/common/DisableContextMenu";
 import { Toaster } from "react-hot-toast";
+import ConfirmModal from "../component/common/ConfirmModal";
 
 export const metadata: Metadata = {
   title: "프로젝트 이름",
@@ -20,7 +21,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-300">
         <Toaster />
         <DisableContextMenu />
-
+        <ConfirmModal />
         <Navbar />
 
         <main className="flex-1 p-8 pt-20">
