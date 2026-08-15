@@ -17,13 +17,11 @@ export default function Page() {
 
       const { data, error } = await supabase
         .from("booths")
-        .select("id, booth_number, name, artist_names, category, description")
-        .order("sort_order", { ascending: true });
+        .select("id, booth_number, name, artist_names, category, description");
 
       if (error) {
         console.error("부스 목록 로드 실패:", error);
       } else if (data) {
-        // Supabase DB 컬럼(snake_case)을 Booth 타입(camelCase)으로 매핑
         const mappedBooths: Booth[] = data.map((booth) => ({
           id: booth.id,
           boothNumber: booth.booth_number,
@@ -33,6 +31,14 @@ export default function Page() {
           category: booth.category,
           description: booth.description,
         }));
+
+        const boothOrder = "MATE";
+        mappedBooths.sort((a, b) => {
+          const groupA = boothOrder.indexOf(a.boothNumber.charAt(0));
+          const groupB = boothOrder.indexOf(b.boothNumber.charAt(0));
+          if (groupA !== groupB) return groupA - groupB;
+          return a.boothNumber.localeCompare(b.boothNumber, undefined, { numeric: true });
+        });
 
         setBooths(mappedBooths);
       }
@@ -49,8 +55,8 @@ export default function Page() {
 
   return (
     <div className="flex flex-col gap-8 md:flex-row">
-      <div className="flex w-full md:w-1/2 items-center justify-center">
-        <div className="w-full max-w-150">
+      <div className="w-full md:w-1/2 md:sticky md:top-14 md:self-start md:h-[calc(100vh-3.5rem)] overflow-y-auto">
+        <div className="w-full max-w-150 mx-auto">
           <Image
             src="/images/booths/booth_map.jpeg"
             alt="부스 배치도"
@@ -61,6 +67,7 @@ export default function Page() {
           />
         </div>
       </div>
+
 
       {/* 표 */}
       <div className="flex flex-col md:w-1/2 relative">
