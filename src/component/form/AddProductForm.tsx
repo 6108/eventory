@@ -89,7 +89,7 @@ export default function AddProductForm({ eventId, boothId }: AddProductFormProps
       }
 
       toast.success("상품이 추가되었습니다.");
-      router.push(`/${eventId}/booths/${boothId}/manage`);
+      router.push(`/${eventId}/booths/${boothId}/manage/products`);
       router.refresh();
     } catch {
       toast.error("상품 추가 중 오류가 발생했습니다.");
@@ -161,7 +161,7 @@ export default function AddProductForm({ eventId, boothId }: AddProductFormProps
       </FormField>
 
       <FormActions
-        onCancel={() => router.push(`/${eventId}/booths/${boothId}/manage`)}
+        onCancel={() => router.push(`/${eventId}/booths/${boothId}/manage/products`)}
         loading={loading}
         submitLabel="상품 추가"
         loadingLabel="추가 중..."
