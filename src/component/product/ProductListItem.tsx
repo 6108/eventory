@@ -1,22 +1,20 @@
 import { Product, productCategories } from "@/src/types/product";
 import { EVENT_ID as eventId } from "@/src/constants/event";
-import { mockBooths } from "@/src/mocks/booths";
 import { mockArtists } from "@/src/mocks/user";
 import Image from "next/image";
 import Link from "next/link";
 import Badge from "../booth/Badge";
 import Like from "./Like";
+import { createClient } from "@/src/lib/supabase/server";
 
 interface ProductListItemProps {
   productInfo: Product;
 }
 
-export default function ProductListItem({
+export default async function ProductListItem({
   productInfo,
 }: ProductListItemProps) {
-  const booth = mockBooths.find(
-    (booth) => booth.id === productInfo.boothId
-  );
+
 
   const artists = mockArtists.filter((artist) =>
     productInfo.artistIds?.includes(artist.id)
@@ -29,6 +27,15 @@ export default function ProductListItem({
   const subCategory = category?.types.find(
     (item) => item.value === productInfo.subCategory
   );
+
+  const supabase = await createClient();
+
+  const { data: boothData } = await supabase
+    .from("booths")
+    .select("booth_name")
+    .eq("id", productInfo.boothId)
+    .single();
+
 
   return (
     <Link href={`/${eventId}/products/${productInfo.id}`}>
@@ -63,7 +70,7 @@ export default function ProductListItem({
           </span>
           <div className="flex min-w-0 truncate text-sm text-zinc-400">
             <span className="truncate">
-              {booth?.boothName}
+              {boothData?.booth_name}
             </span>
             <span className="shrink-0">
               {" - "}{artists.map((a) => a.artistName).join(', ')}

@@ -1,15 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BoothListItem from "@/src/component/booth/BoothListItem";
-import { mockBooths } from "@/src/mocks/booths";
 import Image from "next/image";
-
+import { createClient } from "@/src/lib/supabase/client";
+import { Booth } from "@/src/types/booth";
 
 export default function Page() {
   const [category, setCategory] = useState<"ALL" | "ADULT" | "GENERAL">("ALL");
+  const [booths, setBooths] = useState<Booth[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const filteredBooths = mockBooths.filter((booth) => {
+  useEffect(() => {
+    async function fetchBooths() {
+      const supabase = createClient();
+
+      const { data, error } = await supabase
+        .from("booths")
+        .select("id, booth_number, name, artist_names, category, description")
+        .order("sort_order", { ascending: true });
+
+      if (error) {
+        console.error("부스 목록 로드 실패:", error);
+      } else if (data) {
+        // Supabase DB 컬럼(snake_case)을 Booth 타입(camelCase)으로 매핑
+        const mappedBooths: Booth[] = data.map((booth) => ({
+          id: booth.id,
+          boothNumber: booth.booth_number,
+          boothName: booth.name,
+          artistName: booth.artist_names?.join(", ") || "",
+          artistIds: booth.artist_names ?? [],
+          category: booth.category,
+          description: booth.description,
+        }));
+
+        setBooths(mappedBooths);
+      }
+      setLoading(false);
+    }
+
+    fetchBooths();
+  }, []);
+
+  const filteredBooths = booths.filter((booth) => {
     if (category === "ALL") return true;
     return booth.category === category;
   });
@@ -44,8 +77,8 @@ export default function Page() {
             <option value="GENERAL">일반</option>
             <option value="ADULT">성인</option>
           </select>
-          {/* 표 헤더 */}
 
+          {/* 표 헤더 */}
           <div className="flex font-medium py-2">
             <span className="w-16 text-center">부스번호</span>
             <span className="flex-1 text-left px-2">부스명</span>
@@ -54,14 +87,15 @@ export default function Page() {
           </div>
         </div>
 
-
-        {/* 데이터 */}
-
-        {filteredBooths.map((booth) => (
-          <BoothListItem key={booth.id} boothInfo={booth} />
-        ))}
+        {/* 데이터 목록 */}
+        {loading ? (
+          <div className="p-8 text-center text-zinc-400">로딩 중...</div>
+        ) : (
+          filteredBooths.map((booth) => (
+            <BoothListItem key={booth.id} boothInfo={booth} />
+          ))
+        )}
       </div>
     </div>
-
-  )
+  );
 }

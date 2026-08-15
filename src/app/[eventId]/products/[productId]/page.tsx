@@ -1,9 +1,10 @@
 import Image from "next/image";
 import { mockProducts } from "@/src/mocks/products";
-import { mockBooths } from "@/src/mocks/booths";
 import { mockArtists } from "@/src/mocks/user";
 import { getCategoryLabel, getSubCategoryLabel } from "@/src/utils/product";
 import Link from "next/link";
+import { createClient } from "@/src/lib/supabase/server";
+import { Booth } from "@/src/types/booth";
 
 export default async function Page({
   params,
@@ -23,9 +24,29 @@ export default async function Page({
     return <div>상품을 찾을 수 없습니다.</div>;
   }
 
-  const booth = mockBooths.find(
-    (booth) => booth.id === product.boothId
-  );
+  const supabase = await createClient();
+
+  const { data: boothData } = await supabase
+    .from("booths")
+    .select(
+      "id, booth_number, booth_name, artist_name, artist_ids, category, description"
+    )
+    .eq("id", product.boothId)
+    .single();
+
+  if (!boothData) {
+    return <div>부스를 찾을 수 없습니다.</div>;
+  }
+
+  const booth: Booth = {
+    id: boothData.id,
+    boothNumber: boothData.booth_number,
+    boothName: boothData.booth_name,
+    artistName: boothData.artist_name,
+    artistIds: boothData.artist_ids ?? [],
+    category: boothData.category,
+    description: boothData.description,
+  };
 
   const artists = mockArtists.filter((artist) =>
     product.artistIds?.includes(artist.id)

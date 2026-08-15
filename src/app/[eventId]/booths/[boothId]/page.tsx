@@ -1,8 +1,9 @@
 import ProductExplorer from "@/src/component/product/ProductExplorer";
 import ProductList from "@/src/component/product/ProductList";
-import { mockBooths } from "@/src/mocks/booths";
+import { createClient } from "@/src/lib/supabase/server";
 import { mockProducts } from "@/src/mocks/products";
 import { mockArtists } from "@/src/mocks/user";
+import { Booth } from "@/src/types/booth";
 import { Suspense } from "react";
 
 export default async function Page({
@@ -12,11 +13,29 @@ export default async function Page({
 }) {
   const { boothId } = await params;
 
-  const booth = mockBooths.find((booth) => booth.id === boothId);
+  const supabase = await createClient();
 
-  if (!booth) {
+  const { data: boothData } = await supabase
+    .from("booths")
+    .select(
+      "id, booth_number, booth_name, artist_name, artist_ids, category, description"
+    )
+    .eq("id", boothId)
+    .single();
+
+  if (!boothData) {
     return <div>부스를 찾을 수 없습니다.</div>;
   }
+
+  const booth: Booth = {
+    id: boothData.id,
+    boothNumber: boothData.booth_number,
+    boothName: boothData.booth_name,
+    artistName: boothData.artist_name,
+    artistIds: boothData.artist_ids ?? [],
+    category: boothData.category,
+    description: boothData.description,
+  };
 
   const products = mockProducts.filter(
     (product) => product.boothId === booth.id
