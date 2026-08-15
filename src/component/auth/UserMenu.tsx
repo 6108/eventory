@@ -70,7 +70,7 @@ export function UserMenu() {
           </UserMenuItem>
 
           <UserMenuItem
-            href={`/${eventId}/mypage`}
+            href={`/mypage`}
             onClick={() => setOpen(false)}
           >
             마이페이지

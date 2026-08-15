@@ -30,6 +30,20 @@ export function BoothMenu({
   return (
     <>
       <UserMenuItem
+        href={`/${eventId}/booths/${boothId}`}
+        onClick={onNavigate}
+      >
+        내 부스 보기
+      </UserMenuItem>
+
+      <UserMenuItem
+        href={`/${eventId}/booths/${boothId}/manage/pos`}
+        onClick={onNavigate}
+      >
+        포스기
+      </UserMenuItem>
+
+      <UserMenuItem
         href={`/${eventId}/booths/${boothId}/manage`}
         onClick={onNavigate}
       >
