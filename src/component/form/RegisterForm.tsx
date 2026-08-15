@@ -41,7 +41,8 @@ export default function RegisterForm() {
       return;
     }
 
-    router.push(`/booths/${result.boothId}/manage`);
+    router.push(`/${result.eventId}/booths/${result.boothId}/manage`);
+    router.refresh();
   }
 
   if (authLoading || !user) return null;
