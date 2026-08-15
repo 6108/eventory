@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/src/lib/supabase/server";
 
-// 로그인한 부스 참여자가 자신의 부스에 상품을 추가하는 API
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ boothId: string }> }
 ) {
   const { boothId } = await params;
-
   const body = await request.json();
 
   const {
@@ -19,6 +17,7 @@ export async function POST(
     totalQuantity,
     purchaseLimit,
     description,
+    artistIds,
   } = body;
 
   if (!name?.trim()) {
@@ -49,6 +48,13 @@ export async function POST(
     );
   }
 
+  if (!Array.isArray(artistIds) || artistIds.length === 0) {
+    return NextResponse.json(
+      { error: "상품 작가를 선택해주세요." },
+      { status: 400 }
+    );
+  }
+
   const supabase = await createClient();
 
   const {
@@ -62,15 +68,15 @@ export async function POST(
     );
   }
 
-  // 현재 로그인한 사용자가 해당 부스의 참여자인지 확인
-  const { data: artist } = await supabase
+  // 현재 로그인한 사용자가 이 부스의 작가인지 확인
+  const { data: boothArtist } = await supabase
     .from("booth_artists")
-    .select("booth_id")
+    .select("artist_id")
     .eq("booth_id", boothId)
     .eq("artist_id", user.id)
     .maybeSingle();
 
-  if (!artist) {
+  if (!boothArtist) {
     return NextResponse.json(
       { error: "상품을 추가할 권한이 없습니다." },
       { status: 403 }
@@ -95,9 +101,10 @@ export async function POST(
           ? null
           : Number(purchaseLimit),
       description: description?.trim() ?? "",
+      artist_ids: artistIds,
     })
     .select(
-      "id, booth_id, main_image_url, name, price, category, sub_category, total_quantity, purchase_limit, description"
+      "id, booth_id, main_image_url, sample_images, name, price, category, sub_category, total_quantity, purchase_limit, description, options, artist_ids"
     )
     .single();
 

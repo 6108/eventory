@@ -1,6 +1,5 @@
 import Image from "next/image";
-import { mockArtists } from "@/src/mocks/user";
-import { getCategoryLabel, getSubCategoryLabel, } from "@/src/utils/product";
+import { getCategoryLabel, getSubCategoryLabel } from "@/src/utils/product";
 import Link from "next/link";
 import { createClient } from "@/src/lib/supabase/server";
 import { ProductCategory, ProductOption } from "@/src/types/product";
@@ -30,10 +29,10 @@ export default async function Page({
     return notFound();
   }
 
-  const { data: boothData } = await supabase
+  const { data: boothData, } = await supabase
     .from("booths")
     .select(
-      "id, booth_number, booth_name, artist_name, artist_ids, category, description"
+      "id, booth_number, name, category, description"
     )
     .eq("id", productData.booth_id)
     .single();
@@ -42,16 +41,24 @@ export default async function Page({
     return <div>부스를 찾을 수 없습니다.</div>;
   }
 
-  // 상품에 artist_ids가 있으면 사용하고,
-  // 없으면 부스 소속 작가를 사용
-  const artistIds =
-    productData.artist_ids && productData.artist_ids.length > 0
-      ? productData.artist_ids
-      : boothData.artist_ids ?? [];
+  // 상품에 등록된 작가 ID
+  const artistIds = productData.artist_ids ?? [];
 
-  const artists = mockArtists.filter((artist) =>
-    artistIds.includes(artist.id)
-  );
+  // 작가 조회
+  let artists: { id: string; name: string }[] = [];
+
+  if (artistIds.length > 0) {
+    const { data: artistData, error: artistError } = await supabase
+      .from("users")
+      .select("id, name")
+      .in("id", artistIds);
+
+    if (artistError) {
+      console.error("작가 조회 실패:", artistError);
+    } else {
+      artists = artistData ?? [];
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6 px-4 sm:px-6 md:px-10 lg:px-40 py-6">
@@ -80,7 +87,7 @@ export default async function Page({
             href={`/${eventId}/booths/${boothData.id}`}
             className="max-w-[8rem] sm:max-w-[10rem] truncate hover:underline"
           >
-            {boothData.booth_name}
+            {boothData.name}
           </Link>
 
           <span className="shrink-0">{">"}</span>
@@ -105,7 +112,7 @@ export default async function Page({
         <div className="flex flex-col gap-1">
           {artists.length > 0 && (
             <p className="text-sm text-zinc-500">
-              {artists.map((artist) => artist.artistName).join(", ")}
+              {artists.map((artist) => artist.name).join(", ")}
             </p>
           )}
 
@@ -128,7 +135,9 @@ export default async function Page({
       {/* 옵션 */}
       {productData.options && productData.options.length > 0 && (
         <div>
-          <h2 className="text-base sm:text-lg font-semibold mb-2">옵션</h2>
+          <h2 className="text-base sm:text-lg font-semibold mb-2">
+            옵션
+          </h2>
 
           <ul className="flex flex-col gap-1 text-sm sm:text-base">
             {productData.options.map((option: ProductOption) => (
@@ -163,20 +172,22 @@ export default async function Page({
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {productData.sample_images.map((image: string, index: number) => (
-                <div
-                  key={`${image}-${index}`}
-                  className="relative w-full aspect-square"
-                >
-                  <Image
-                    src={image}
-                    alt={productData.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className="rounded object-cover"
-                  />
-                </div>
-              ))}
+              {productData.sample_images.map(
+                (image: string, index: number) => (
+                  <div
+                    key={`${image}-${index}`}
+                    className="relative w-full aspect-square"
+                  >
+                    <Image
+                      src={image}
+                      alt={productData.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="rounded object-cover"
+                    />
+                  </div>
+                )
+              )}
             </div>
           </div>
         )}
