@@ -75,4 +75,15 @@ export type Product = {
 
   category: ProductCategory;
   subCategory: ProductSubCategory;
-} 
+}
+
+export type PosProduct = {
+  id: string;
+  name: string;
+  price: number;
+  main_image_url?: string;
+  category: string;
+  sub_category: string;
+  total_quantity?: number;
+  purchase_limit?: number;
+};
