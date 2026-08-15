@@ -1,6 +1,5 @@
 import ProductExplorer from "@/src/component/product/ProductExplorer";
 import { createClient } from "@/src/lib/supabase/server";
-import { mockArtists } from "@/src/mocks/user";
 import { Product } from "@/src/types/product";
 import { Suspense } from "react";
 
@@ -13,18 +12,48 @@ export default async function Page({
 
   const supabase = await createClient();
 
-  const { data: boothData } = await supabase
+  // 부스 정보
+  const { data: boothData, error: boothError } = await supabase
     .from("booths")
     .select(
-      "id, event_id, booth_number, booth_name, artist_name, artist_ids, category, description"
+      "id, event_id, booth_number, name, artist_names, category, description"
     )
     .eq("id", boothId)
     .single();
 
-  if (!boothData) {
+  if (boothError || !boothData) {
     return <div>부스를 찾을 수 없습니다.</div>;
   }
 
+  // 부스 참여 작가 조회
+  const { data: boothArtists, error: artistError } = await supabase
+    .from("booth_artists")
+    .select("artist_id")
+    .eq("booth_id", boothId);
+
+  if (artistError) {
+    console.error("작가 조회 실패:", artistError);
+  }
+
+  const artistIds = boothArtists?.map((item) => item.artist_id) ?? [];
+
+  // 작가 이름 조회
+  let artists: { id: string; name: string }[] = [];
+
+  if (artistIds.length > 0) {
+    const { data: artistData, error } = await supabase
+      .from("users")
+      .select("id, name")
+      .in("id", artistIds);
+
+    if (error) {
+      console.error("사용자 조회 실패:", error);
+    } else {
+      artists = artistData ?? [];
+    }
+  }
+
+  // 상품 조회
   const { data: productData, error: productError } = await supabase
     .from("products")
     .select(
@@ -54,19 +83,15 @@ export default async function Page({
     artistIds: product.artist_ids ?? [],
   }));
 
-  const artists = mockArtists.filter((artist) =>
-    (boothData.artist_ids ?? []).includes(artist.id)
-  );
-
   return (
     <div>
-      <h1>{boothData.booth_name}</h1>
+      <h1>{boothData.name}</h1>
 
       <p>부스번호: {boothData.booth_number}</p>
 
-      <p>
-        작가: {artists.map((artist) => artist.name).join(", ")}
-      </p>
+      {artists.length > 0 && (
+        <p>작가: {artists.map((artist) => artist.name).join(", ")}</p>
+      )}
 
       <p>구분: {boothData.category}</p>
 
