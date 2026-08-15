@@ -12,6 +12,8 @@ export default async function Page({
 
   const supabase = await createClient();
 
+  const { data: { user }, } = await supabase.auth.getUser();
+
   // 부스 정보
   const { data: boothData, error: boothError } = await supabase
     .from("booths")
@@ -26,14 +28,10 @@ export default async function Page({
   }
 
   // 부스 참여 작가 조회
-  const { data: boothArtists, error: artistError } = await supabase
+  const { data: boothArtists, } = await supabase
     .from("booth_artists")
     .select("artist_id")
     .eq("booth_id", boothId);
-
-  if (artistError) {
-    console.error("작가 조회 실패:", artistError);
-  }
 
   const artistIds = boothArtists?.map((item) => item.artist_id) ?? [];
 
@@ -100,7 +98,7 @@ export default async function Page({
       <h2 className="pt-24">판매 제품</h2>
 
       <Suspense fallback={<div>불러오는 중...</div>}>
-        <ProductExplorer products={products} />
+        <ProductExplorer products={products} currentUserId={user?.id} />
       </Suspense>
     </div>
   );

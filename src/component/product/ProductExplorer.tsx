@@ -9,9 +9,10 @@ import { Product, productCategories } from "@/src/types/product";
 
 interface ProductExplorerProps {
   products: Product[];
+  currentUserId?: string;
 }
 
-export default function ProductExplorer({ products }: ProductExplorerProps) {
+export default function ProductExplorer({ products, currentUserId }: ProductExplorerProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -107,7 +108,7 @@ export default function ProductExplorer({ products }: ProductExplorerProps) {
         </div>
       )}
       {/* 상품 */}
-      <ProductList products={filteredProducts} />
+      <ProductList products={filteredProducts} currentUserId={currentUserId} />
     </div>
   );
 }

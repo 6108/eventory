@@ -9,12 +9,16 @@ import Like from "./Like";
 interface ProductListItemProps {
   productInfo: Product;
   boothName?: string;
+  currentUserId?: string;
 }
 
 export default function ProductListItem({
   productInfo,
   boothName,
+  currentUserId,
 }: ProductListItemProps) {
+  const isOwner = !!currentUserId && productInfo.artistIds?.includes(currentUserId);
+
   const artists = mockArtists.filter((artist) =>
     productInfo.artistIds?.includes(artist.id)
   );
@@ -44,7 +48,7 @@ export default function ProductListItem({
               신상품
             </span>
 
-            <Like />
+            <Like productId={productInfo.id} isOwner={isOwner} />
           </div>
 
           <Badge />
