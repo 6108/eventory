@@ -17,13 +17,14 @@ export default function Page() {
 
       const { data, error } = await supabase
         .from("booths")
-        .select("id, booth_number, name, artist_names, category, description");
+        .select("id, event_id, booth_number, name, artist_names, category, description");
 
       if (error) {
         console.error("부스 목록 로드 실패:", error);
       } else if (data) {
         const mappedBooths: Booth[] = data.map((booth) => ({
           id: booth.id,
+          eventId: booth.event_id,
           boothNumber: booth.booth_number,
           boothName: booth.name,
           artistName: booth.artist_names?.join(", ") || "",

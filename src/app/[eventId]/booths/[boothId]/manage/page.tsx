@@ -21,10 +21,10 @@ export default async function Page({
   }
 
   return (
-    <div className="mx-auto w-full max-w-lg flex flex-col gap-6">
+    <div className="mx-auto w-full max-w-lg flex flex-col gap-2">
       <div>
-        <h1 className="text-xl font-semibold text-white">부스 관리</h1>
-        <p className="text-sm text-zinc-400">{booth.name}</p>
+        <h1 className="text-xl font-semibold text-white pb-8">부스 관리</h1>
+        <p className="text-lg text-zinc-400">{booth.name}</p>
       </div>
 
       <section className="rounded border border-zinc-800 p-4">
