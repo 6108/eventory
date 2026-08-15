@@ -24,7 +24,7 @@ export default function ProductManageListItem({
       href={href}
       className="flex items-center gap-3 rounded border border-zinc-800 p-3 hover:bg-zinc-900"
     >
-      <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded bg-zinc-900">
+      <div className="h-14 w-14 shrink-0 overflow-hidden rounded bg-zinc-900">
         {mainImageUrl && (
           <Image
             src={mainImageUrl}
@@ -42,7 +42,7 @@ export default function ProductManageListItem({
         <p className="text-sm text-zinc-400">{price.toLocaleString()}원</p>
       </div>
 
-      <span className="flex-shrink-0 text-xs text-zinc-500">
+      <span className="shrink-0 text-xs text-zinc-500">
         재고 {totalQuantity ?? "-"}
       </span>
     </Link>

@@ -85,7 +85,7 @@ export default async function Page({
         <div className="flex flex-wrap items-center gap-x-1 text-sm text-zinc-500">
           <Link
             href={`/${eventId}/booths/${boothData.id}`}
-            className="max-w-[8rem] sm:max-w-[10rem] truncate hover:underline"
+            className="max-w-32 sm:max-w-40 truncate hover:underline"
           >
             {boothData.name}
           </Link>
@@ -116,7 +116,7 @@ export default async function Page({
             </p>
           )}
 
-          <h1 className="text-xl sm:text-2xl font-semibold break-words">
+          <h1 className="text-xl sm:text-2xl font-semibold wrap-break-word">
             {productData.name}
           </h1>
 
@@ -126,7 +126,7 @@ export default async function Page({
         </div>
 
         {productData.description && (
-          <p className="text-sm sm:text-base whitespace-pre-wrap break-words">
+          <p className="text-sm sm:text-base whitespace-pre-wrap wrap-break-word">
             {productData.description}
           </p>
         )}
@@ -141,7 +141,7 @@ export default async function Page({
 
           <ul className="flex flex-col gap-1 text-sm sm:text-base">
             {productData.options.map((option: ProductOption) => (
-              <li key={option.id} className="break-words">
+              <li key={option.id} className="wrap-break-word">
                 {option.name} ({option.quantity}개)
               </li>
             ))}
