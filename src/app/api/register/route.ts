@@ -21,7 +21,7 @@ export async function POST(request: Request) {
   // id만 조회 — register_code 값 자체는 응답에 안 담김
   const { data: booth } = await supabase
     .from("booths")
-    .select("id")
+    .select("id, event_id")
     .eq("booth_number", boothNumber.trim())
     .eq("register_code", code.trim())
     .single();
@@ -45,5 +45,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "연결 중 문제가 발생했어요." }, { status: 500 });
   }
 
-  return NextResponse.json({ boothId: booth.id });
+  return NextResponse.json({ boothId: booth.id, eventId: booth.event_id, });
 }

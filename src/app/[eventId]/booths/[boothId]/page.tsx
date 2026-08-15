@@ -1,5 +1,4 @@
 import ProductExplorer from "@/src/component/product/ProductExplorer";
-import ProductList from "@/src/component/product/ProductList";
 import { createClient } from "@/src/lib/supabase/server";
 import { mockProducts } from "@/src/mocks/products";
 import { mockArtists } from "@/src/mocks/user";
@@ -18,7 +17,7 @@ export default async function Page({
   const { data: boothData } = await supabase
     .from("booths")
     .select(
-      "id, booth_number, booth_name, artist_name, artist_ids, category, description"
+      "id, event_id, booth_number, booth_name, artist_name, artist_ids, category, description"
     )
     .eq("id", boothId)
     .single();
@@ -29,6 +28,7 @@ export default async function Page({
 
   const booth: Booth = {
     id: boothData.id,
+    eventId: boothData.event_id,
     boothNumber: boothData.booth_number,
     boothName: boothData.booth_name,
     artistName: boothData.artist_name,
