@@ -2,14 +2,14 @@
 export type User = {
   id: string;
   email: string;
-  name?: string;
-  profileImage?: string;
+  name: string;
+  profileImage: string;
 };
 
 // 작가는 User + 부스 활동 관련 추가 정보를 가진 유저
 export type Artist = User & {
   artistName: string; // 활동명 (name과 다를 수 있어 별도 필드)
-  instagram?: string;
-  twitter?: string;
-  homepage?: string;
+  instagram: string;
+  twitter: string;
+  homepage: string;
 };

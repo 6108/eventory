@@ -1,5 +1,6 @@
+// src/app/api/booth/[boothId]/products/route.ts
 import { NextResponse } from "next/server";
-import { createClient } from "@/src/lib/supabase/server";
+import { requireBoothArtist } from "@/src/lib/auth/requireBoothArtist";
 
 export async function POST(
   request: Request,
@@ -55,33 +56,25 @@ export async function POST(
     );
   }
 
-  const supabase = await createClient();
+  const authResult = await requireBoothArtist(boothId);
+  if (authResult instanceof NextResponse) return authResult;
+  const { supabase } = authResult;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // 작가 이름 스냅샷 생성 — 클라이언트가 보낸 이름을 믿지 않고 서버에서 직접 조회
+  const { data: artistData, error: artistError } = await supabase
+    .from("users")
+    .select("id, name")
+    .in("id", artistIds);
 
-  if (!user) {
+  if (artistError || !artistData || artistData.length !== artistIds.length) {
     return NextResponse.json(
-      { error: "로그인이 필요합니다." },
-      { status: 401 }
+      { error: "유효하지 않은 작가가 포함되어 있습니다." },
+      { status: 400 }
     );
   }
 
-  // 현재 로그인한 사용자가 이 부스의 작가인지 확인
-  const { data: boothArtist } = await supabase
-    .from("booth_artists")
-    .select("artist_id")
-    .eq("booth_id", boothId)
-    .eq("artist_id", user.id)
-    .maybeSingle();
-
-  if (!boothArtist) {
-    return NextResponse.json(
-      { error: "상품을 추가할 권한이 없습니다." },
-      { status: 403 }
-    );
-  }
+  const nameMap = new Map(artistData.map((a) => [a.id, a.name]));
+  const artistNames = artistIds.map((id: string) => nameMap.get(id)!);
 
   const { data: product, error } = await supabase
     .from("products")
@@ -102,9 +95,10 @@ export async function POST(
           : Number(purchaseLimit),
       description: description?.trim() ?? "",
       artist_ids: artistIds,
+      artist_names: artistNames,
     })
     .select(
-      "id, booth_id, main_image_url, sample_images, name, price, category, sub_category, total_quantity, purchase_limit, description, options, artist_ids"
+      "id, booth_id, main_image_url, sample_images, name, price, category, sub_category, total_quantity, purchase_limit, description, options, artist_ids, artist_names"
     )
     .single();
 
@@ -117,8 +111,5 @@ export async function POST(
     );
   }
 
-  return NextResponse.json(
-    { product },
-    { status: 201 }
-  );
+  return NextResponse.json({ product }, { status: 201 });
 }

@@ -1,7 +1,8 @@
-import { Product } from '@/src/types/product'
+import { ProductSummary } from '@/src/types/product'
 import ProductListItem from './ProductListItem';
+
 interface ProductListProps {
-  products: Product[];
+  products: ProductSummary[];
   currentUserId?: string;
 }
 

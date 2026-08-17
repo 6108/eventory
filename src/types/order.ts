@@ -3,8 +3,8 @@ export type OrderItem = {
   name: string;
   price: number;
   quantity: number;
-  totalQuantity?: number;
-  purchaseLimit?: number;
+  totalQuantity: number | null;
+  purchaseLimit: number | null;
 };
 
 export type Order = {
@@ -15,5 +15,5 @@ export type Order = {
   totalQuantity: number;
   items: OrderItem[];
   createdAt: string;
-  synced?: boolean; // 로컬 동기화 상태 표시용, DB엔 없는 프론트 전용 필드
+  synced: boolean; // 로컬 동기화 상태 표시용, DB엔 없는 프론트 전용 필드
 };

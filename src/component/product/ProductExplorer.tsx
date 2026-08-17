@@ -5,10 +5,10 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import ProductList from "@/src/component/product/ProductList";
 import CategoryChip from "@/src/component/product/CategoryChip";
 import SubCategoryChip from "@/src/component/product/SubCategoryChip";
-import { Product, productCategories } from "@/src/types/product";
+import { productCategories, ProductSummary } from "@/src/types/product";
 
 interface ProductExplorerProps {
-  products: Product[];
+  products: ProductSummary[];
   currentUserId?: string;
 }
 
@@ -24,7 +24,6 @@ export default function ProductExplorer({ products, currentUserId }: ProductExpl
     searchParams.get("subCategory") ?? "ALL"
   );
 
-  // 상태 바뀔 때마다 URL 쿼리도 같이 갱신
   const updateQuery = (nextCategory: string, nextSubCategory: string) => {
     const params = new URLSearchParams();
     if (nextCategory !== "ALL") params.set("category", nextCategory);

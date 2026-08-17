@@ -60,30 +60,46 @@ export type ProductOption = {
   quantity: number;
 };
 
+// 상품 정보 타입
 export type Product = {
   id: string;
   boothId: string;
-  artistIds?: string[]; //공동 창작물(회지 등) 가능
+  artistIds: string[]; //공동 창작물(회지 등) 가능
+  artistNames: string[];
   mainImage: string;
   sampleImages: string[];
   name: string;
   price: number;
-  totalQuantity?: number;
-  purchaseLimit?: number;
+  totalQuantity: number | null; // null이면 수량 제한 없음
+  purchaseLimit: number | null; // null이면 구매 제한 없음
   description: string;
-  options?: ProductOption[];
+  options: ProductOption[];
 
   category: ProductCategory;
   subCategory: ProductSubCategory;
 }
 
+// POS에서 사용할 상품 정보 타입
 export type PosProduct = {
   id: string;
   name: string;
   price: number;
-  main_image_url?: string;
+  main_image_url: string;
   category: string;
   sub_category: string;
-  total_quantity?: number;
-  purchase_limit?: number;
+  total_quantity: number | null;
+  purchase_limit: number | null;
 };
+
+// 상품 요약 정보 타입
+export type ProductSummary = {
+  id: string;
+  boothId: string;
+  artistIds: string[];
+  artistNames: string[];
+  mainImage: string;
+  name: string;
+  price: number;
+  category: ProductCategory;
+  subCategory: ProductSubCategory;
+}

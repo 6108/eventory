@@ -1,13 +1,12 @@
-import { Product, productCategories } from "@/src/types/product";
+import { ProductSummary, productCategories } from "@/src/types/product";
 import { EVENT_ID as eventId } from "@/src/constants/event";
-import { mockArtists } from "@/src/mocks/user";
 import Image from "next/image";
 import Link from "next/link";
 import Badge from "../booth/Badge";
 import Like from "./Like";
 
 interface ProductListItemProps {
-  productInfo: Product;
+  productInfo: ProductSummary;
   boothName?: string;
   currentUserId?: string;
 }
@@ -18,10 +17,6 @@ export default function ProductListItem({
   currentUserId,
 }: ProductListItemProps) {
   const isOwner = !!currentUserId && productInfo.artistIds?.includes(currentUserId);
-
-  const artists = mockArtists.filter((artist) =>
-    productInfo.artistIds?.includes(artist.id)
-  );
 
   const category = productCategories.find(
     (item) => item.value === productInfo.category
@@ -68,7 +63,7 @@ export default function ProductListItem({
 
             <span className="shrink-0">
               {" - "}
-              {artists.map((a) => a.artistName).join(", ")}
+              {productInfo.artistNames.join(", ")}
             </span>
           </div>
 

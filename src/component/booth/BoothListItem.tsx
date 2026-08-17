@@ -1,7 +1,6 @@
 import { Booth } from '@/src/types/booth';
 import { EVENT_ID as eventId } from "@/src/constants/event";
 import Link from 'next/link';
-import { mockArtists } from '@/src/mocks/user';
 
 interface BoothListItemProps {
   boothInfo: Booth;
@@ -9,10 +8,6 @@ interface BoothListItemProps {
 
 export default function BoothListItem({ boothInfo }: BoothListItemProps) {
   const isAdult = boothInfo.category === "ADULT";
-
-  const artists = mockArtists.filter(
-    (artist) => boothInfo.artistIds.includes(artist.id)
-  );
 
   return (
     <Link
@@ -29,7 +24,7 @@ export default function BoothListItem({ boothInfo }: BoothListItemProps) {
         </span>
 
         <span className="w-1/4 px-2 line-clamp-3">
-          {boothInfo.artistName}
+          {boothInfo.artistNames.join(", ")}
         </span>
 
         <span

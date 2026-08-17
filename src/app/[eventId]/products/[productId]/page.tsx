@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { getCategoryLabel, getSubCategoryLabel } from "@/src/utils/product";
 import Link from "next/link";
-import { createClient } from "@/src/lib/supabase/server";
-import { ProductCategory, ProductOption } from "@/src/types/product";
+import { getBooth } from "@/src/lib/data/booth";
+import { getProduct } from "@/src/lib/data/product";
 import { notFound } from "next/navigation";
 
 export default async function Page({
@@ -15,59 +15,26 @@ export default async function Page({
 }) {
   const { eventId, productId } = await params;
 
-  const supabase = await createClient();
+  const product = await getProduct(productId);
 
-  const { data: productData, error: productError } = await supabase
-    .from("products")
-    .select(
-      "id, booth_id, main_image_url, sample_images, name, price, category, sub_category, total_quantity, purchase_limit, description, options, artist_ids"
-    )
-    .eq("id", productId)
-    .single();
-
-  if (productError || !productData) {
+  if (!product) {
     return notFound();
   }
 
-  const { data: boothData, } = await supabase
-    .from("booths")
-    .select(
-      "id, booth_number, name, category, description"
-    )
-    .eq("id", productData.booth_id)
-    .single();
+  const booth = await getBooth(product.boothId);
 
-  if (!boothData) {
+  if (!booth) {
     return <div>부스를 찾을 수 없습니다.</div>;
-  }
-
-  // 상품에 등록된 작가 ID
-  const artistIds = productData.artist_ids ?? [];
-
-  // 작가 조회
-  let artists: { id: string; name: string }[] = [];
-
-  if (artistIds.length > 0) {
-    const { data: artistData, error: artistError } = await supabase
-      .from("users")
-      .select("id, name")
-      .in("id", artistIds);
-
-    if (artistError) {
-      console.error("작가 조회 실패:", artistError);
-    } else {
-      artists = artistData ?? [];
-    }
   }
 
   return (
     <div className="flex flex-col gap-6 px-4 sm:px-6 md:px-10 lg:px-40 py-6">
       {/* 이미지 */}
       <div className="relative aspect-square w-full sm:w-1/2 md:w-1/3 lg:w-1/4 max-w-md mx-auto sm:mx-0">
-        {productData.main_image_url ? (
+        {product.mainImage ? (
           <Image
-            src={productData.main_image_url}
-            alt={productData.name}
+            src={product.mainImage}
+            alt={product.name}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 448px"
             className="rounded object-cover"
@@ -84,63 +51,63 @@ export default async function Page({
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-x-1 text-sm text-zinc-500">
           <Link
-            href={`/${eventId}/booths/${boothData.id}`}
+            href={`/${eventId}/booths/${booth.id}`}
             className="max-w-32 sm:max-w-40 truncate hover:underline"
           >
-            {boothData.name}
+            {booth.boothName}
           </Link>
 
           <span className="shrink-0">{">"}</span>
 
           <Link
-            href={`/${eventId}/booths/${boothData.id}?category=${productData.category}`}
+            href={`/${eventId}/booths/${booth.id}?category=${product.category}`}
             className="truncate hover:underline"
           >
-            {getCategoryLabel(productData.category as ProductCategory)}
+            {getCategoryLabel(product.category)}
           </Link>
 
           <span className="shrink-0">{">"}</span>
 
           <Link
-            href={`/${eventId}/booths/${boothData.id}?category=${productData.category}&subCategory=${productData.sub_category}`}
+            href={`/${eventId}/booths/${booth.id}?category=${product.category}&subCategory=${product.subCategory}`}
             className="truncate hover:underline"
           >
-            {getSubCategoryLabel(productData.sub_category)}
+            {getSubCategoryLabel(product.subCategory)}
           </Link>
         </div>
 
         <div className="flex flex-col gap-1">
-          {artists.length > 0 && (
+          {product.artistNames.length > 0 && (
             <p className="text-sm text-zinc-500">
-              {artists.map((artist) => artist.name).join(", ")}
+              {product.artistNames.join(", ")}
             </p>
           )}
 
           <h1 className="text-xl sm:text-2xl font-semibold wrap-break-word">
-            {productData.name}
+            {product.name}
           </h1>
 
           <p className="text-base sm:text-lg font-medium">
-            {productData.price.toLocaleString()}원
+            {product.price.toLocaleString()}원
           </p>
         </div>
 
-        {productData.description && (
+        {product.description && (
           <p className="text-sm sm:text-base whitespace-pre-wrap wrap-break-word">
-            {productData.description}
+            {product.description}
           </p>
         )}
       </div>
 
       {/* 옵션 */}
-      {productData.options && productData.options.length > 0 && (
+      {product.options.length > 0 && (
         <div>
           <h2 className="text-base sm:text-lg font-semibold mb-2">
             옵션
           </h2>
 
           <ul className="flex flex-col gap-1 text-sm sm:text-base">
-            {productData.options.map((option: ProductOption) => (
+            {product.options.map((option) => (
               <li key={option.id} className="wrap-break-word">
                 {option.name} ({option.quantity}개)
               </li>
@@ -150,47 +117,44 @@ export default async function Page({
       )}
 
       {/* 재고 */}
-      {productData.total_quantity != null && (
+      {product.totalQuantity != null && (
         <p className="text-sm sm:text-base">
-          총 수량: {productData.total_quantity}개
+          총 수량: {product.totalQuantity}개
         </p>
       )}
 
       {/* 구매 제한 */}
-      {productData.purchase_limit != null && (
+      {product.purchaseLimit != null && (
         <p className="text-sm sm:text-base">
-          1인 구매 제한: {productData.purchase_limit}개
+          1인 구매 제한: {product.purchaseLimit}개
         </p>
       )}
 
       {/* 샘플 이미지 */}
-      {productData.sample_images &&
-        productData.sample_images.length > 0 && (
-          <div className="flex flex-col gap-4">
-            <h2 className="text-base sm:text-lg font-semibold">
-              상세 이미지
-            </h2>
+      {product.sampleImages.length > 0 && (
+        <div className="flex flex-col gap-4">
+          <h2 className="text-base sm:text-lg font-semibold">
+            상세 이미지
+          </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {productData.sample_images.map(
-                (image: string, index: number) => (
-                  <div
-                    key={`${image}-${index}`}
-                    className="relative w-full aspect-square"
-                  >
-                    <Image
-                      src={image}
-                      alt={productData.name}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      className="rounded object-cover"
-                    />
-                  </div>
-                )
-              )}
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {product.sampleImages.map((image, index) => (
+              <div
+                key={`${image}-${index}`}
+                className="relative w-full aspect-square"
+              >
+                <Image
+                  src={image}
+                  alt={product.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="rounded object-cover"
+                />
+              </div>
+            ))}
           </div>
-        )}
+        </div>
+      )}
     </div>
   );
 }
