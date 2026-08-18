@@ -1,9 +1,9 @@
 import Image from "next/image";
-import { getCategoryLabel, getSubCategoryLabel } from "@/src/utils/product";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getCategoryLabel, getSubCategoryLabel } from "@/src/utils/product";
 import { getBooth } from "@/src/lib/data/booth";
 import { getProduct } from "@/src/lib/data/product";
-import { notFound } from "next/navigation";
 
 export default async function Page({
   params,
@@ -109,7 +109,7 @@ export default async function Page({
           <ul className="flex flex-col gap-1 text-sm sm:text-base">
             {product.options.map((option) => (
               <li key={option.id} className="wrap-break-word">
-                {option.name} ({option.quantity}개)
+                {option.name} ({option.initialQuantity}개)
               </li>
             ))}
           </ul>
@@ -117,9 +117,9 @@ export default async function Page({
       )}
 
       {/* 재고 */}
-      {product.totalQuantity != null && (
+      {product.initialQuantity != null && (
         <p className="text-sm sm:text-base">
-          총 수량: {product.totalQuantity}개
+          총 수량: {product.initialQuantity}개
         </p>
       )}
 

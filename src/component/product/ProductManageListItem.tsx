@@ -7,7 +7,6 @@ interface ProductManageListItemProps {
   name: string;
   price: number;
   mainImageUrl: string | null;
-  totalQuantity: number | null;
   priority?: boolean;
 }
 
@@ -16,7 +15,6 @@ export default function ProductManageListItem({
   name,
   price,
   mainImageUrl,
-  totalQuantity,
   priority = false,
 }: ProductManageListItemProps) {
   return (
@@ -43,7 +41,7 @@ export default function ProductManageListItem({
       </div>
 
       <span className="shrink-0 text-xs text-zinc-500">
-        재고 {totalQuantity ?? "-"}
+        재고 {"-"}
       </span>
     </Link>
   );

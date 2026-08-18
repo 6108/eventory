@@ -87,7 +87,7 @@ export default async function Page() {
           <div className="flex justify-between gap-4">
             <span className="text-zinc-400">가입일</span>
             <span className="text-white">
-              {new Date(profile.created_at).toLocaleDateString("ko-KR")}
+              {new Date(profile.created_at ?? "-").toLocaleDateString("ko-KR")}
             </span>
           </div>
         </div>

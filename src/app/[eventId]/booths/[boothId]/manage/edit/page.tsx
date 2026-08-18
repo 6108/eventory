@@ -1,6 +1,7 @@
 // src/app/[eventId]/booths/[boothId]/manage/products/[productId]/edit/page.tsx
 import { createClient } from "@/src/lib/supabase/server";
 import EditProductForm from "@/src/component/form/EditProductForm";
+import { getProduct } from "@/src/lib/data/product";
 
 export default async function Page({
   params,
@@ -13,16 +14,7 @@ export default async function Page({
 }) {
   const { eventId, boothId, productId } = await params;
 
-  const supabase = await createClient();
-
-  const { data: product } = await supabase
-    .from("products")
-    .select(
-      "name, price, category, sub_category, total_quantity, purchase_limit, description, main_image_url"
-    )
-    .eq("id", productId)
-    .eq("booth_id", boothId)
-    .single();
+  const product = await getProduct(productId, boothId);
 
   if (!product) {
     return <div>상품을 찾을 수 없습니다.</div>;

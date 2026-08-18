@@ -15,10 +15,11 @@ export async function POST(
     price,
     category,
     subCategory,
-    totalQuantity,
+    initialQuantity,
     purchaseLimit,
     description,
     artistIds,
+    options,
   } = body;
 
   if (!name?.trim()) {
@@ -56,8 +57,17 @@ export async function POST(
     );
   }
 
+  if (!Array.isArray(options)) {
+    return NextResponse.json(
+      { error: "상품 옵션이 올바르지 않습니다." },
+      { status: 400 }
+    );
+  }
+
   const authResult = await requireBoothArtist(boothId);
+
   if (authResult instanceof NextResponse) return authResult;
+
   const { supabase } = authResult;
 
   // 작가 이름 스냅샷 생성 — 클라이언트가 보낸 이름을 믿지 않고 서버에서 직접 조회
@@ -76,6 +86,14 @@ export async function POST(
   const nameMap = new Map(artistData.map((a) => [a.id, a.name]));
   const artistNames = artistIds.map((id: string) => nameMap.get(id)!);
 
+  const hasOptions = options.length > 0;
+
+  const productInitialQuantity = hasOptions
+    ? null
+    : initialQuantity === null || initialQuantity === ""
+      ? null
+      : Number(initialQuantity);
+
   const { data: product, error } = await supabase
     .from("products")
     .insert({
@@ -85,20 +103,21 @@ export async function POST(
       price: Number(price),
       category,
       sub_category: subCategory,
-      total_quantity:
-        totalQuantity === null || totalQuantity === ""
-          ? null
-          : Number(totalQuantity),
+
+      initial_quantity: productInitialQuantity,
+      remaining_quantity: productInitialQuantity,
+
       purchase_limit:
         purchaseLimit === null || purchaseLimit === ""
           ? null
           : Number(purchaseLimit),
+
       description: description?.trim() ?? "",
       artist_ids: artistIds,
       artist_names: artistNames,
     })
     .select(
-      "id, booth_id, main_image_url, sample_images, name, price, category, sub_category, total_quantity, purchase_limit, description, options, artist_ids, artist_names"
+      "id, booth_id, main_image_url, sample_images, name, price, category, sub_category, initial_quantity, purchase_limit, description, remaining_quantity, artist_ids, artist_names"
     )
     .single();
 
@@ -109,6 +128,39 @@ export async function POST(
       { error: "상품 추가에 실패했습니다." },
       { status: 500 }
     );
+  }
+
+  // 옵션이 있는 경우 상품 수량은 null이고 옵션별 수량을 저장
+  if (hasOptions) {
+    const optionRows = options.map(
+      (option: {
+        name: string;
+        initialQuantity: number;
+      }) => ({
+        product_id: product.id,
+        name: option.name.trim(),
+        initial_quantity: Number(option.initialQuantity),
+        remaining_quantity: Number(option.initialQuantity),
+      })
+    );
+
+    const { error: optionError } = await supabase
+      .from("product_options")
+      .insert(optionRows);
+
+    if (optionError) {
+      console.error(optionError);
+
+      await supabase
+        .from("products")
+        .delete()
+        .eq("id", product.id);
+
+      return NextResponse.json(
+        { error: "상품 옵션 추가에 실패했습니다." },
+        { status: 500 }
+      );
+    }
   }
 
   return NextResponse.json({ product }, { status: 201 });

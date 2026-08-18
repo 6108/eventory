@@ -57,3 +57,66 @@ export async function getBooths(): Promise<Booth[]> {
     description: booth.description ?? "",
   }));
 }
+
+export type MyEvent = {
+  eventId: string;
+  eventName: string;
+  booths: {
+    boothId: string;
+    boothNumber: string;
+    boothName: string;
+    artistName: string;
+  }[];
+};
+
+
+// 내가 참여 중인 행사/부스 목록 조회
+export async function getMyBooths(
+  userId: string
+): Promise<MyEvent[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("booth_artists")
+    .select(
+      `booth_id, artist_name,
+      booths ( id, event_id, booth_number, name, events ( id, name ) )`
+    )
+    .eq("artist_id", userId);
+
+  if (error) {
+    console.error("내 부스 조회 실패:", error);
+    return [];
+  }
+
+  const eventMap = new Map<string, MyEvent>();
+
+  for (const boothArtist of data) {
+    const booth = boothArtist.booths;
+    if (!booth) continue;
+
+    const event = booth.events;
+    if (!event) continue;
+
+    let eventGroup = eventMap.get(event.id);
+
+    if (!eventGroup) {
+      eventGroup = {
+        eventId: event.id,
+        eventName: event.name,
+        booths: [],
+      };
+
+      eventMap.set(event.id, eventGroup);
+    }
+
+    eventGroup.booths.push({
+      boothId: booth.id,
+      boothNumber: booth.booth_number,
+      boothName: booth.name,
+      artistName: boothArtist.artist_name ?? "",
+    });
+  }
+
+  return Array.from(eventMap.values());
+}

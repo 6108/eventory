@@ -12,12 +12,23 @@ export default async function Page({
 
   const { data: booth } = await supabase
     .from("booths")
-    .select("id, name, register_code")
+    .select("id, name")
     .eq("id", boothId)
     .single();
 
   if (!booth) {
     return <div>부스를 찾을 수 없습니다.</div>;
+  }
+
+  // register_code는 컬럼이 아니라 booth_codes 테이블에 분리되어 있고,
+  // RLS로 직접 조회가 막혀있어서 권한 체크가 포함된 RPC로만 가져올 수 있음
+  const { data: boothCode, error: boothCodeError } = await supabase.rpc(
+    "get_booth_code",
+    { p_booth_id: boothId }
+  );
+
+  if (boothCodeError) {
+    console.error("부스 코드 조회 실패:", boothCodeError);
   }
 
   return (
@@ -33,7 +44,7 @@ export default async function Page({
           이 코드를 같은 부스 인원에게 공유하세요.
         </p>
         <code className="block rounded bg-zinc-900 px-3 py-2 text-primary text-lg tracking-widest">
-          {booth.register_code}
+          {boothCode ?? "코드를 불러올 수 없습니다."}
         </code>
       </section>
 

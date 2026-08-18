@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { createClient } from "@/src/lib/supabase/server";
 import ProductManageListItem from "@/src/component/product/ProductManageListItem";
+import { getProductSummaries } from "@/src/lib/data/product";
 
 export default async function Page({
   params,
@@ -13,13 +14,11 @@ export default async function Page({
 }) {
   const { eventId, boothId } = await params;
 
-  const supabase = await createClient();
+  const products = await getProductSummaries(boothId);
 
-  const { data: products } = await supabase
-    .from("products")
-    .select("id, name, price, main_image_url, total_quantity, category")
-    .eq("booth_id", boothId)
-    .order("created_at", { ascending: false });
+  if (!products) {
+    return <div>상품이 없습니다.</div>;
+  }
 
   return (
     <div className="mx-auto w-full max-w-lg">
@@ -43,8 +42,7 @@ export default async function Page({
                 href={`/${eventId}/booths/${boothId}/manage/products/${product.id}/edit`}
                 name={product.name}
                 price={product.price}
-                mainImageUrl={product.main_image_url}
-                totalQuantity={product.total_quantity}
+                mainImageUrl={product.mainImage}
                 priority={index < 4}
               />
             </li>

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/src/lib/supabase/client";
 import { useAuth } from "@/src/hooks/useAuth";
 import { useConfirmModalStore } from "@/src/store/confirmModalStore";
+import { getMyProductLike, getProductLikeCount } from "@/src/lib/data/productLike";
 
 interface LikeProps {
   productId: string;
@@ -28,21 +29,11 @@ export default function Like({ productId, isOwner = false }: LikeProps) {
       setUserId(user?.id ?? null);
 
       if (user) {
-        const { data: myLike } = await supabase
-          .from("product_likes")
-          .select("id")
-          .eq("product_id", productId)
-          .eq("user_id", user.id)
-          .maybeSingle();
-        setLiked(!!myLike);
+        setLiked(await getMyProductLike(productId, user.id));
       }
 
       if (isOwner) {
-        const { count: likeCount } = await supabase
-          .from("product_likes")
-          .select("id", { count: "exact", head: true })
-          .eq("product_id", productId);
-        setCount(likeCount ?? 0);
+        setCount(await getProductLikeCount(productId));
       }
     }
 
@@ -53,19 +44,33 @@ export default function Like({ productId, isOwner = false }: LikeProps) {
     const supabase = createClient();
 
     if (liked) {
-      await supabase
+      setLiked(false);
+      setCount((c) => (c !== null ? c - 1 : c));
+
+      const { error } = await supabase
         .from("product_likes")
         .delete()
         .eq("product_id", productId)
         .eq("user_id", userId!);
-      setLiked(false);
-      setCount((c) => (c !== null ? c - 1 : c));
+
+      if (error) {
+        console.error("좋아요 취소 실패:", error);
+        setLiked(true);
+        setCount((c) => (c !== null ? c + 1 : c));
+      }
     } else {
-      await supabase
-        .from("product_likes")
-        .insert({ product_id: productId, user_id: userId! });
       setLiked(true);
       setCount((c) => (c !== null ? c + 1 : c));
+
+      const { error } = await supabase
+        .from("product_likes")
+        .insert({ product_id: productId, user_id: userId! });
+
+      if (error) {
+        console.error("좋아요 실패:", error);
+        setLiked(false);
+        setCount((c) => (c !== null ? c - 1 : c));
+      }
     }
   };
 

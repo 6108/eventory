@@ -40,7 +40,7 @@ export default function PosProductExplorer({
             products.some(
               (product) =>
                 product.category === category &&
-                product.sub_category === type.value
+                product.subCategory === type.value
             )
           ) ?? []),
       ];
@@ -49,7 +49,7 @@ export default function PosProductExplorer({
     (product) =>
       (category === "ALL" || product.category === category) &&
       (subCategory === "ALL" ||
-        product.sub_category === subCategory)
+        product.subCategory === subCategory)
   );
 
   return (

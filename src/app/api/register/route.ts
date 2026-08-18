@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/src/lib/supabase/server";
 
-//부스 등록 코드로 아티스트 부스 연결
+// 부스 등록 코드로 아티스트 부스 연결
 export async function POST(request: Request) {
   const { boothNumber, code } = await request.json();
 
@@ -18,32 +18,31 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
   }
 
-  // id만 조회 — register_code 값 자체는 응답에 안 담김
-  const { data: booth } = await supabase
-    .from("booths")
-    .select("id, event_id")
-    .eq("booth_number", boothNumber.trim())
-    .eq("register_code", code.trim())
-    .single();
+  // 코드 검증 + booth_artists 연결을 claim_booth 하나로 처리
+  // (booth_codes는 RLS로 전부 막혀있어서 SECURITY DEFINER RPC로만 접근 가능)
+  const { data: boothId, error } = await supabase.rpc("claim_booth", {
+    p_booth_number: boothNumber.trim(),
+    p_code: code.trim(),
+  });
 
-  if (!booth) {
+  if (error) {
+    console.error(error);
+    return NextResponse.json({ error: "연결 중 문제가 발생했어요." }, { status: 500 });
+  }
+
+  if (!boothId) {
     return NextResponse.json(
       { error: "부스번호 또는 코드가 올바르지 않습니다." },
       { status: 404 }
     );
   }
 
-  const { error: insertError } = await supabase
-    .from("booth_artists")
-    .upsert(
-      { booth_id: booth.id, artist_id: user.id },
-      { onConflict: "booth_id,artist_id" }
-    );
+  // claim_booth는 booth_id만 반환하므로 event_id는 별도 조회
+  const { data: booth } = await supabase
+    .from("booths")
+    .select("event_id")
+    .eq("id", boothId)
+    .single();
 
-  if (insertError) {
-    console.error(insertError);
-    return NextResponse.json({ error: "연결 중 문제가 발생했어요." }, { status: 500 });
-  }
-
-  return NextResponse.json({ boothId: booth.id, eventId: booth.event_id, });
+  return NextResponse.json({ boothId, eventId: booth?.event_id ?? null });
 }

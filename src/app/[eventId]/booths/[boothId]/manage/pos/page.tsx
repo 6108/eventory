@@ -1,8 +1,9 @@
 // src/app/[eventId]/booths/[boothId]/manage/pos/page.tsx
-import { createClient } from "@/src/lib/supabase/server";
+
 import PosProductExplorer from "@/src/component/pos/PosProductExplorer";
 import CartPanel from "@/src/component/pos/OrderPanel";
 import MobileCart from "@/src/component/pos/MobileOrder";
+import { getPosProducts } from "@/src/lib/data/product";
 
 export default async function Page({
   params,
@@ -10,20 +11,13 @@ export default async function Page({
   params: Promise<{ eventId: string; boothId: string }>;
 }) {
   const { boothId } = await params;
-  const supabase = await createClient();
 
-  const { data: products } = await supabase
-    .from("products")
-    .select(
-      "id, name, price, main_image_url, category, sub_category, total_quantity, purchase_limit"
-    )
-    .eq("booth_id", boothId)
-    .order("created_at", { ascending: false });
+  const products = await getPosProducts(boothId);
 
   return (
     <div className="h-[calc(100vh-4rem)]">
       <div className="h-full overflow-y-auto pb-20 lg:pb-0">
-        <PosProductExplorer products={products ?? []} />
+        <PosProductExplorer products={products} />
       </div>
 
       {/* PC */}

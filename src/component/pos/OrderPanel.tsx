@@ -32,6 +32,7 @@ export default function OrderPanel({ boothId }: OrderPanelProps) {
           clientTransactionId: crypto.randomUUID(),
           items: items.map((i) => ({
             productId: i.productId,
+            optionId: i.optionId,
             quantity: i.quantity,
           })),
         }),
@@ -40,14 +41,14 @@ export default function OrderPanel({ boothId }: OrderPanelProps) {
       const result = await res.json();
 
       if (!res.ok) {
-        toast.error(result.error ?? "결제 처리에 실패했습니다.");
+        toast.error(result.error ?? "주문 등록에 실패했습니다.");
         return;
       }
 
-      toast.success("결제가 완료되었습니다.");
+      toast.success("판매가 등록되었습니다.");
       clear();
     } catch {
-      toast.error("결제 중 오류가 발생했습니다.");
+      toast.error("주문 등록 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
@@ -65,7 +66,7 @@ export default function OrderPanel({ boothId }: OrderPanelProps) {
         <ul className="flex-1 overflow-y-auto flex flex-col gap-2">
           {items.map((item) => (
             <li
-              key={item.productId}
+              key={`${item.productId}-${item.optionId ?? "default"}`}
               className="flex items-center justify-between gap-2 rounded border border-zinc-800 p-2"
             >
               <div className="min-w-0 flex-1">
@@ -77,7 +78,7 @@ export default function OrderPanel({ boothId }: OrderPanelProps) {
 
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => decrement(item.productId)}
+                  onClick={() => decrement(item.productId, item.optionId)}
                   className="h-6 w-6 rounded bg-zinc-800 text-white"
                 >
                   −
@@ -86,7 +87,7 @@ export default function OrderPanel({ boothId }: OrderPanelProps) {
                   {item.quantity}
                 </span>
                 <button
-                  onClick={() => increment(item.productId)}
+                  onClick={() => increment(item.productId, item.optionId)}
                   className="h-6 w-6 rounded bg-zinc-800 text-white"
                 >
                   +
@@ -94,7 +95,7 @@ export default function OrderPanel({ boothId }: OrderPanelProps) {
               </div>
 
               <button
-                onClick={() => removeItem(item.productId)}
+                onClick={() => removeItem(item.productId, item.optionId)}
                 className="text-xs text-red-400"
               >
                 삭제
@@ -117,7 +118,7 @@ export default function OrderPanel({ boothId }: OrderPanelProps) {
           disabled={items.length === 0 || loading}
           className="w-full rounded bg-primary px-4 py-3 text-sm font-medium text-white disabled:opacity-50"
         >
-          {loading ? "처리 중..." : "결제 완료"}
+          {loading ? "등록 중..." : "판매 완료"}
         </button>
       </div>
     </div>
