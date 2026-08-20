@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/src/lib/supabase/client";
 import { useAuth } from "@/src/hooks/useAuth";
 import { useConfirmModalStore } from "@/src/store/confirmModalStore";
-import { getMyProductLike, getProductLikeCount } from "@/src/lib/data/productLike";
+import { getMyProductLike, getProductLikeCount } from "@/src/lib/action/product";
 
 interface LikeProps {
   productId: string;
@@ -91,14 +91,9 @@ export default function Like({ productId, isOwner = false }: LikeProps) {
 
   return (
     <div
-      className="absolute top-1 right-1 z-10 flex items-center gap-1"
+      className="absolute top-1 right-1 z-10"
       onMouseEnter={(e) => e.stopPropagation()}
     >
-      {isOwner && count !== null && (
-        <span className="rounded-full bg-zinc-300/70 px-2 py-1 text-xs font-semibold text-primary">
-          {count}
-        </span>
-      )}
       <button
         type="button"
         onClick={(e) => {
@@ -106,9 +101,18 @@ export default function Like({ productId, isOwner = false }: LikeProps) {
           e.stopPropagation();
           handleClick();
         }}
-        className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-300/70 text-primary hover:bg-zinc-200 transition-colors"
+        className="flex min-w-8 flex-col items-center justify-center rounded-full bg-zinc-300/70 px-2 py-1 text-primary backdrop-blur-sm transition-colors hover:bg-zinc-200"
       >
-        <Heart size={20} className={liked ? "fill-primary" : ""} />
+        <Heart
+          size={18}
+          className={liked ? "fill-primary" : ""}
+        />
+
+        {count !== null && (
+          <span className="text-[11px] font-semibold leading-none">
+            {count}
+          </span>
+        )}
       </button>
     </div>
   );

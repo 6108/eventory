@@ -1,5 +1,5 @@
 import { createClient } from "@/src/lib/supabase/server";
-import { Booth } from "@/src/types/booth";
+import { Booth, FollowedBooth } from "@/src/types/booth";
 
 // 부스 단일 조회
 export async function getBooth(
@@ -119,4 +119,48 @@ export async function getMyBooths(
   }
 
   return Array.from(eventMap.values());
+}
+
+// 팔로우한 부스 조회
+export async function getFollowedBooths(userId: string): Promise<FollowedBooth[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("booth_follows")
+    .select(
+      `
+      id, created_at,
+      booths (
+        id, event_id, booth_number, name, artist_names, category, description
+      )
+      `
+    )
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("팔로우한 부스 조회 실패:", error);
+    return [];
+  }
+
+  return (data ?? [])
+    .map((follow) => {
+      const booth = Array.isArray(follow.booths) ? follow.booths[0] : follow.booths;
+      if (!booth) return null;
+
+      return {
+        followId: follow.id,
+        followedAt: follow.created_at,
+        booth: {
+          id: booth.id,
+          eventId: booth.event_id,
+          boothNumber: booth.booth_number,
+          boothName: booth.name,
+          artistNames: booth.artist_names ?? [],
+          category: booth.category as "ADULT" | "GENERAL",
+          description: booth.description ?? "",
+        },
+      };
+    })
+    .filter((item): item is FollowedBooth => item !== null);
 }

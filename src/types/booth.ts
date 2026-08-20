@@ -9,3 +9,10 @@ export type Booth = {
   category: "ADULT" | "GENERAL";
   description: string;
 }
+
+// 팔로우한 부스 타입
+export type FollowedBooth = {
+  followId: string;
+  followedAt: string;
+  booth: Booth;
+};

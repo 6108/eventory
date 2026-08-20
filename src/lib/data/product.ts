@@ -9,7 +9,8 @@ export async function getProductSummaries(boothId?: string): Promise<ProductSumm
   let query = supabase
     .from("products")
     .select(
-      "id, booth_id, artist_ids, artist_names, main_image_url, name, price, category, sub_category, initial_quantity"
+      `id, booth_id, artist_ids, artist_names, main_image_url, name, price, 
+      category, sub_category, initial_quantity, remaining_quantity`
     )
     .order("created_at", { ascending: false });
 
@@ -35,6 +36,7 @@ export async function getProductSummaries(boothId?: string): Promise<ProductSumm
     price: product.price,
     category: product.category as ProductCategory,
     subCategory: product.sub_category as ProductSubCategory,
+    remainingQuantity: product.remaining_quantity
   }));
 }
 

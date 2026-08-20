@@ -105,4 +105,12 @@ export type ProductSummary = {
   price: number;
   category: ProductCategory;
   subCategory: ProductSubCategory;
+  remainingQuantity: number | null;
+};
+
+// 좋아요한 상품
+export type LikedProduct = {
+  likeId: string;
+  likedAt: string;
+  product: ProductSummary;
 };

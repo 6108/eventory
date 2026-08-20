@@ -1,6 +1,5 @@
 // src/app/[eventId]/booths/[boothId]/manage/products/page.tsx
 import Link from "next/link";
-import { createClient } from "@/src/lib/supabase/server";
 import ProductManageListItem from "@/src/component/product/ProductManageListItem";
 import { getProductSummaries } from "@/src/lib/data/product";
 
