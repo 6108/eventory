@@ -47,6 +47,15 @@ export const productCategories = [
       { value: "badge", label: "뱃지" },
     ],
   },
+  {
+    value: "freebie",
+    label: "무료나눔",
+    types: [
+      { value: "event", label: "이벤트 증정" },
+      { value: "gift", label: "구매 증정" },
+      { value: "free", label: "무료 배포" },
+    ],
+  },
 ] as const;
 
 // 배열에서 타입을 자동으로 뽑아냄

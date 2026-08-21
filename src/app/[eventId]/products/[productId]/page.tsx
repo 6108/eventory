@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getCategoryLabel, getSubCategoryLabel } from "@/src/utils/product";
 import { getBooth } from "@/src/lib/data/booth";
 import { getProduct } from "@/src/lib/data/product";
+import AddToCartButton from "@/src/component/cart/AddToCartButton";
 
 export default async function Page({
   params,
@@ -91,6 +92,8 @@ export default async function Page({
             {product.price.toLocaleString()}원
           </p>
         </div>
+
+        <AddToCartButton product={product} boothName={booth.boothName} />
 
         {product.description && (
           <p className="text-sm sm:text-base whitespace-pre-wrap wrap-break-word">

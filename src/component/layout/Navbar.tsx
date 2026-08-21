@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { EVENT_ID as eventId } from "@/src/constants/event";
 import { Login } from "../auth/Login";
+import CartNavLink from "../cart/CartNavLink";
 
 export function Navbar() {
   return (
@@ -27,7 +28,7 @@ export function Navbar() {
           >
             회지 및 굿즈
           </Link>
-
+          <CartNavLink />
           <Login />
         </div>
       </div>
