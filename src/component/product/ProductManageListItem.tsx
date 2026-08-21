@@ -1,48 +1,69 @@
 // src/component/product/ProductManageListItem.tsx
 import Link from "next/link";
 import Image from "next/image";
+import { Infinity as InfinityIcon } from "lucide-react";
+import { ProductSummary } from "@/src/types/product";
 
 interface ProductManageListItemProps {
   href: string;
-  name: string;
-  price: number;
-  mainImageUrl: string | null;
-  priority?: boolean;
+  product: ProductSummary;
+  priority: boolean;
 }
 
 export default function ProductManageListItem({
   href,
-  name,
-  price,
-  mainImageUrl,
-  priority = false,
+  product,
+  priority = false
 }: ProductManageListItemProps) {
+  const isSoldOut = product.remainingQuantity === 0;
+
   return (
     <Link
       href={href}
-      className="flex items-center gap-3 rounded border border-zinc-800 p-3 hover:bg-zinc-900"
+      className="flex flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 transition-colors hover:border-zinc-700 hover:bg-zinc-900"
     >
-      <div className="h-14 w-14 shrink-0 overflow-hidden rounded bg-zinc-900">
-        {mainImageUrl && (
+      <div className="relative aspect-square w-full shrink-0 overflow-hidden bg-zinc-900">
+        {product.mainImage ? (
           <Image
-            src={mainImageUrl}
-            alt={name}
-            width={56}
-            height={56}
+            src={product.mainImage}
+            alt={product.name}
+            fill
+            sizes="(max-width: 640px) 50vw, 25vw"
+            className="object-cover"
             priority={priority}
-            className="h-full w-full object-cover"
           />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-xs text-zinc-600">
+            이미지 없음
+          </div>
+        )}
+
+        {isSoldOut && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+            <span className="rounded bg-zinc-900 px-2 py-1 text-xs font-medium text-zinc-300">
+              품절
+            </span>
+          </div>
         )}
       </div>
 
-      <div className="flex-1 min-w-0">
-        <p className="truncate text-sm font-medium text-white">{name}</p>
-        <p className="text-sm text-zinc-400">{price.toLocaleString()}원</p>
-      </div>
+      <div className="flex flex-1 flex-col gap-1 p-3">
+        <p className="truncate text-sm font-medium text-white">{product.name}</p>
+        <p className="text-sm text-zinc-400">
+          {product.price.toLocaleString("ko-KR")}원
+        </p>
 
-      <span className="shrink-0 text-xs text-zinc-500">
-        재고 {"-"}
-      </span>
+        <div className="mt-auto flex items-center gap-1 pt-1 text-xs text-zinc-500">
+          <span>재고</span>
+          {product.remainingQuantity === null ? (
+            <InfinityIcon className="h-3.5 w-3.5" aria-label="무제한" />
+          ) : (
+            <span className={isSoldOut ? "text-red-400" : "text-zinc-400"}>
+              {product.remainingQuantity}
+            </span>
+          )}
+        </div>
+      </div>
     </Link>
   );
 }

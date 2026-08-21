@@ -1,18 +1,20 @@
-// src/component/product/ProductExplorer.tsx
+// src/component/product/ProductManageExplorer.tsx
 "use client";
 
-import ProductList from "@/src/component/product/ProductList";
 import CategoryChip from "@/src/component/product/CategoryChip";
 import SubCategoryChip from "@/src/component/product/SubCategoryChip";
 import { useProductCategoryFilter } from "@/src/hooks/useProductCategoryFilter";
 import { ProductSummary } from "@/src/types/product";
+import ProductManageList from "./ProductManageList";
 
-interface ProductExplorerProps {
+interface ProductManageExplorerProps {
+  eventId: string;
+  boothId: string;
   products: ProductSummary[];
-  currentUserId?: string;
+
 }
 
-export default function ProductExplorer({ products, currentUserId }: ProductExplorerProps) {
+export default function ProductManageExplorer({ eventId, boothId, products }: ProductManageExplorerProps) {
   const {
     category,
     subCategory,
@@ -50,7 +52,7 @@ export default function ProductExplorer({ products, currentUserId }: ProductExpl
         </div>
       )}
       {/* 상품 */}
-      <ProductList products={filteredProducts} currentUserId={currentUserId} />
+      <ProductManageList eventId={eventId} boothId={boothId} products={filteredProducts} />
     </div>
   );
 }

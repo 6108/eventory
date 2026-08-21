@@ -1,6 +1,6 @@
 // src/app/[eventId]/booths/[boothId]/manage/products/page.tsx
 import Link from "next/link";
-import ProductManageListItem from "@/src/component/product/ProductManageListItem";
+import ProductManageExplorer from "@/src/component/product/ProductManageExplorer";
 import { getProductSummaries } from "@/src/lib/data/product";
 
 export default async function Page({
@@ -15,12 +15,8 @@ export default async function Page({
 
   const products = await getProductSummaries(boothId);
 
-  if (!products) {
-    return <div>상품이 없습니다.</div>;
-  }
-
   return (
-    <div className="mx-auto w-full max-w-lg">
+    <div className="mx-auto w-full max-w-3xl">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-xl font-semibold text-white">상품 관리</h1>
         <Link
@@ -31,23 +27,11 @@ export default async function Page({
         </Link>
       </div>
 
-      {!products || products.length === 0 ? (
-        <p className="text-sm text-zinc-400">등록된 상품이 없습니다.</p>
-      ) : (
-        <ul className="flex flex-col gap-3">
-          {products.map((product, index) => (
-            <li key={product.id}>
-              <ProductManageListItem
-                href={`/${eventId}/booths/${boothId}/manage/products/${product.id}/edit`}
-                name={product.name}
-                price={product.price}
-                mainImageUrl={product.mainImage}
-                priority={index < 4}
-              />
-            </li>
-          ))}
-        </ul>
-      )}
+      <ProductManageExplorer
+        products={products ?? []}
+        eventId={eventId}
+        boothId={boothId}
+      />
     </div>
   );
 }
