@@ -49,7 +49,7 @@ export async function getProduct(productId: string, boothId?: string): Promise<P
     .select(
       `id, booth_id, main_image_url, sample_images, name, price, category, sub_category,
       initial_quantity, remaining_quantity, purchase_limit, description, artist_ids, artist_names,
-      product_options ( id, name, initial_quantity, remaining_quantity )`
+      product_options ( id, name, price, initial_quantity, remaining_quantity )`
     )
     .eq("id", productId);
 
@@ -80,6 +80,7 @@ export async function getProduct(productId: string, boothId?: string): Promise<P
     options: (productData.product_options ?? []).map((option): ProductOption => ({
       id: option.id,
       name: option.name,
+      price: option.price,
       initialQuantity: option.initial_quantity,
       remainingQuantity: option.remaining_quantity,
     })),
@@ -96,7 +97,8 @@ export async function getPosProducts(boothId: string): Promise<PosProduct[]> {
     .from("products")
     .select(
       `id, name, price, main_image_url, category, sub_category,
-      initial_quantity, remaining_quantity, purchase_limit`
+      initial_quantity, remaining_quantity, purchase_limit,
+      product_options ( id, name, price, initial_quantity, remaining_quantity )`
     )
     .eq("booth_id", boothId)
     .order("created_at", { ascending: false });
@@ -116,5 +118,14 @@ export async function getPosProducts(boothId: string): Promise<PosProduct[]> {
     initialQuantity: product.initial_quantity,
     remainingQuantity: product.remaining_quantity,
     purchaseLimit: product.purchase_limit,
+    options: (product.product_options ?? []).map(
+      (option): ProductOption => ({
+        id: option.id,
+        name: option.name,
+        price: option.price,
+        initialQuantity: option.initial_quantity,
+        remainingQuantity: option.remaining_quantity,
+      })
+    ),
   }));
 }

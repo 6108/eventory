@@ -1,86 +1,149 @@
-// src/component/pos/ProductCard.tsx
 "use client";
 
-import Image from "next/image";
 import { useOrderStore } from "@/src/store/orderStore";
-import { PosProduct } from "@/src/types/product";
+import { PosProduct, ProductOption } from "@/src/types/product";
 
-
-interface ProductCardProps {
+export default function ProductCard({
+  product,
+}: {
   product: PosProduct;
-}
-
-export default function ProductCard({ product }: ProductCardProps) {
+}) {
   const addItem = useOrderStore((s) => s.addItem);
 
-  const orderQuantity = useOrderStore(
-    (s) =>
-      s.items.find(
-        (item) => item.productId === product.id && item.optionId === null
-      )?.quantity ?? 0
-  );
+  const hasOptions = product.options.length > 0;
 
-  const remainingQuantity =
-    product.remainingQuantity == null
-      ? undefined
-      : Math.max(product.remainingQuantity - orderQuantity, 0);
+  // 옵션이 있으면 옵션 재고를 합산
+  const totalRemaining = hasOptions
+    ? product.options.reduce(
+      (sum, option) => sum + (option.remainingQuantity ?? 0),
+      0
+    )
+    : product.remainingQuantity;
 
-  const remainingPurchaseLimit =
-    product.purchaseLimit == null
-      ? undefined
-      : Math.max(product.purchaseLimit - orderQuantity, 0);
+  const totalQuantity = hasOptions
+    ? product.options.reduce(
+      (sum, option) => sum + (option.initialQuantity ?? 0),
+      0
+    )
+    : product.initialQuantity;
 
-  const isSoldOut =
-    remainingQuantity === 0 || remainingPurchaseLimit === 0;
+  const isSoldOut = totalRemaining !== null && totalRemaining <= 0;
+
+  function handleAdd(option?: ProductOption) {
+    const remainingQuantity = option
+      ? option.remainingQuantity
+      : product.remainingQuantity;
+
+    if (remainingQuantity !== null && remainingQuantity <= 0) return;
+
+    addItem({
+      productId: product.id,
+      optionId: option?.id ?? null,
+      name: option ? `${product.name} (${option.name})` : product.name,
+      price: option?.price ?? product.price,
+      remainingQuantity,
+      purchaseLimit: product.purchaseLimit,
+    });
+  }
 
   return (
-    <button
-      type="button"
-      disabled={isSoldOut}
-      onClick={() =>
-        addItem({
-          productId: product.id,
-          optionId: null,
-          name: product.name,
-          price: product.price,
-          remainingQuantity: product.remainingQuantity,
-          purchaseLimit: product.purchaseLimit,
-        })
-      }
-      className="flex flex-col gap-1 rounded border border-zinc-800 p-2 text-left hover:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+    <div
+      className={`overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900 ${isSoldOut ? "opacity-40" : ""
+        }`}
     >
-      <div className="aspect-square w-full overflow-hidden rounded bg-zinc-900">
-        {product.mainImage && (
-          <Image
+      {/* 상품 이미지 */}
+      <div className="aspect-square w-full bg-zinc-800">
+        {product.mainImage ? (
+          <img
             src={product.mainImage}
             alt={product.name}
-            width={150}
-            height={150}
             className="h-full w-full object-cover"
           />
+        ) : (
+          <div className="flex h-full items-center justify-center text-xs text-zinc-500">
+            이미지 없음
+          </div>
         )}
       </div>
 
-      <p className="truncate text-xs text-white">
-        {product.name}
-      </p>
+      {/* 상품 정보 */}
+      <div className="p-3">
+        <div className="mb-2">
+          <p className="text-sm font-medium text-white">{product.name}</p>
 
-      <p className="text-xs text-zinc-400">
-        {product.price.toLocaleString()}원
-      </p>
+          {/* 총 수량 / 남은 수량 */}
+          <p className="mt-1 text-xs text-zinc-400">
+            총 {totalQuantity === null ? "무제한" : `${totalQuantity}개`}
+            {" · "}
+            남은{" "}
+            {totalRemaining === null
+              ? "무제한"
+              : `${Math.max(totalRemaining, 0)}개`}
+          </p>
+        </div>
 
-      <p className="text-xs text-zinc-500">
-        남은 수량{" "}
-        {remainingQuantity === undefined
-          ? "무제한"
-          : remainingQuantity}
-      </p>
+        {/* 옵션 없는 상품 */}
+        {!hasOptions && (
+          <button
+            onClick={() => handleAdd()}
+            disabled={isSoldOut}
+            className="flex w-full items-center justify-between rounded border border-zinc-700 px-3 py-2 text-left hover:bg-zinc-800 disabled:cursor-not-allowed"
+          >
+            <span className="text-sm text-zinc-300">담기</span>
+            <span className="text-sm font-medium text-white">
+              {product.price.toLocaleString()}원
+            </span>
+          </button>
+        )}
 
-      {remainingPurchaseLimit !== undefined && (
-        <p className="text-xs text-zinc-500">
-          구매 제한 {remainingPurchaseLimit}/{product.purchaseLimit}
-        </p>
-      )}
-    </button>
+        {/* 옵션 있는 상품 */}
+        {hasOptions && (
+          <div className="space-y-1.5">
+            {product.options.map((option) => {
+              const soldOut =
+                option.remainingQuantity !== null &&
+                option.remainingQuantity <= 0;
+
+              return (
+                <button
+                  key={option.id}
+                  onClick={() => handleAdd(option)}
+                  disabled={soldOut}
+                  className="flex w-full items-center justify-between rounded border border-zinc-700 px-3 py-2 text-left hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm text-zinc-200">
+                      {option.name}
+                    </p>
+
+                    <p className="mt-0.5 text-xs text-zinc-500">
+                      총{" "}
+                      {option.initialQuantity === null
+                        ? "무제한"
+                        : `${option.initialQuantity}개`}
+                      {" · "}
+                      남은{" "}
+                      {option.remainingQuantity === null
+                        ? "무제한"
+                        : `${Math.max(option.remainingQuantity, 0)}개`}
+                    </p>
+                  </div>
+
+                  <div className="ml-3 shrink-0 text-right">
+                    <p className="text-sm font-medium text-white">
+                      {(option.price ?? product.price).toLocaleString()}원
+                    </p>
+
+                    {soldOut && (
+                      <p className="text-xs text-red-500">품절</p>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

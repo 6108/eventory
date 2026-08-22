@@ -2,6 +2,7 @@
 import { createClient } from "@/src/lib/supabase/server";
 import EditProductForm from "@/src/component/form/EditProductForm";
 import { getProduct } from "@/src/lib/data/product";
+import { getBoothArtists } from "@/src/lib/data/artist";
 
 export default async function Page({
   params,
@@ -20,6 +21,9 @@ export default async function Page({
     return <div>상품이 없습니다.</div>;
   }
 
+  const artists = await getBoothArtists(boothId);
+
+
   return (
     <div className="mx-auto w-full max-w-lg">
       <h1 className="mb-8 text-xl font-semibold text-white">상품 수정</h1>
@@ -28,6 +32,7 @@ export default async function Page({
         boothId={boothId}
         productId={productId}
         product={product}
+        artists={artists}
       />
     </div>
   );

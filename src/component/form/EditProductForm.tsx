@@ -1,4 +1,3 @@
-// EditProductForm.tsx
 "use client";
 
 import { useState } from "react";
@@ -7,17 +6,21 @@ import toast from "react-hot-toast";
 import { FormField } from "./FormField";
 import { ProductImageField } from "./ProductImageField";
 import { CategorySelect } from "./CategorySelect";
+import { ArtistSelectField } from "./ArtistSelectField";
 import { ProductOptionsField } from "./ProductOptionsField";
 import { FormActions } from "./FormActions";
 import { useProductForm } from "@/src/hooks/useProductForm";
+import { useArtistSelection } from "@/src/hooks/useArtistSelection";
 import { useProductMutations } from "@/src/hooks/useProductMutations";
 import type { Product } from "@/src/types/product";
+import { User } from "@/src/types/user";
 
 interface EditProductFormProps {
   eventId: string;
   boothId: string;
   productId: string;
   product: Product;
+  artists: User[];
 }
 
 export default function EditProductForm({
@@ -25,6 +28,7 @@ export default function EditProductForm({
   boothId,
   productId,
   product,
+  artists,
 }: EditProductFormProps) {
   const router = useRouter();
 
@@ -35,6 +39,11 @@ export default function EditProductForm({
     updateOption,
     removeOption,
   } = useProductForm(product);
+
+  const {
+    selectedArtistIds,
+    toggleArtist,
+  } = useArtistSelection(product.artistIds);
 
   const {
     loading,
@@ -58,7 +67,12 @@ export default function EditProductForm({
       return;
     }
 
-    submit(form, image);
+    if (selectedArtistIds.length === 0) {
+      toast.error("상품 작가를 한 명 이상 선택해주세요.");
+      return;
+    }
+
+    submit(form, image, selectedArtistIds);
   }
 
   return (
@@ -66,7 +80,9 @@ export default function EditProductForm({
       <FormField label="상품명">
         <input
           value={form.name}
-          onChange={(e) => updateField("name", e.target.value)}
+          onChange={(e) =>
+            updateField("name", e.target.value)
+          }
           required
           className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none focus:border-primary"
         />
@@ -83,7 +99,9 @@ export default function EditProductForm({
           type="number"
           min="0"
           value={form.price}
-          onChange={(e) => updateField("price", e.target.value)}
+          onChange={(e) =>
+            updateField("price", e.target.value)
+          }
           required
           className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none focus:border-primary"
         />
@@ -98,6 +116,12 @@ export default function EditProductForm({
         onSubCategoryChange={(value) =>
           updateField("subCategory", value)
         }
+      />
+
+      <ArtistSelectField
+        artists={artists}
+        selectedArtistIds={selectedArtistIds}
+        onToggle={toggleArtist}
       />
 
       <ProductOptionsField

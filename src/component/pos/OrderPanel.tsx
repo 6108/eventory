@@ -70,9 +70,9 @@ export default function OrderPanel({ boothId }: OrderPanelProps) {
               className="flex items-center justify-between gap-2 rounded border border-zinc-800 p-2"
             >
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm text-white">{item.name}</p>
+                <p className="truncate text-sm text-white">{item.productName}</p>
                 <p className="text-xs text-zinc-400">
-                  {item.price.toLocaleString()}원
+                  {item.unitPrice.toLocaleString()}원
                 </p>
               </div>
 

@@ -6,11 +6,11 @@
 //    부스별로 묶어서 보여주고 부스별로 주문서를 보낼 수 있음
 export type CartItem = {
   productId: string;
-  optionId: string | null;
-  optionName: string | null; // 옵션 있으면 표시용 이름 (선택 화면에서 담을 때 같이 저장)
   boothId: string;
+  optionId: string | null;
+  productName: string;
   boothName: string;
-  name: string;
+  optionName: string | null; // 옵션 있으면 표시용 이름 (선택 화면에서 담을 때 같이 저장)
   price: number;
   image: string;
   quantity: number;

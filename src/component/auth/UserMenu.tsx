@@ -70,6 +70,13 @@ export function UserMenu() {
           </UserMenuItem>
 
           <UserMenuItem
+            href={`/${eventId}/my-orders`}
+            onClick={() => setOpen(false)}
+          >
+            내 주문내역
+          </UserMenuItem>
+
+          <UserMenuItem
             href={`/mypage`}
             onClick={() => setOpen(false)}
           >

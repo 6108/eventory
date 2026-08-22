@@ -19,7 +19,7 @@ export default function CartItemRow({ item }: CartItemRowProps) {
       {item.image ? (
         <Image
           src={item.image}
-          alt={item.name}
+          alt={item.productName}
           width={56}
           height={56}
           className="h-14 w-14 shrink-0 rounded object-cover"
@@ -29,7 +29,7 @@ export default function CartItemRow({ item }: CartItemRowProps) {
       )}
 
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm text-white">{item.name}</p>
+        <p className="truncate text-sm text-white">{item.productName}</p>
         {item.optionName && (
           <p className="truncate text-xs text-zinc-400">{item.optionName}</p>
         )}

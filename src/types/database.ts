@@ -198,27 +198,39 @@ export type Database = {
       }
       order_items: {
         Row: {
+          cancelled_quantity: number
           id: string
           option_id: string | null
+          option_name: string | null
           order_id: string | null
-          product_id: string | null
+          product_id: string
+          product_name: string
           quantity: number
+          subtotal: number
           unit_price: number
         }
         Insert: {
+          cancelled_quantity?: number
           id?: string
           option_id?: string | null
+          option_name?: string | null
           order_id?: string | null
-          product_id?: string | null
+          product_id: string
+          product_name: string
           quantity: number
+          subtotal: number
           unit_price: number
         }
         Update: {
+          cancelled_quantity?: number
           id?: string
           option_id?: string | null
+          option_name?: string | null
           order_id?: string | null
-          product_id?: string | null
+          product_id?: string
+          product_name?: string
           quantity?: number
+          subtotal?: number
           unit_price?: number
         }
         Relationships: [
@@ -245,12 +257,91 @@ export type Database = {
           },
         ]
       }
+      order_request_items: {
+        Row: {
+          id: string
+          option_id: string | null
+          option_name: string | null
+          order_request_id: string
+          product_id: string
+          product_name: string
+          quantity: number
+        }
+        Insert: {
+          id?: string
+          option_id?: string | null
+          option_name?: string | null
+          order_request_id: string
+          product_id: string
+          product_name: string
+          quantity: number
+        }
+        Update: {
+          id?: string
+          option_id?: string | null
+          option_name?: string | null
+          order_request_id?: string
+          product_id?: string
+          product_name?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_request_items_order_request_id_fkey"
+            columns: ["order_request_id"]
+            isOneToOne: false
+            referencedRelation: "order_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_requests: {
+        Row: {
+          booth_id: string
+          created_at: string
+          customer_id: string
+          customer_nickname: string
+          id: string
+          order_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          booth_id: string
+          created_at?: string
+          customer_id: string
+          customer_nickname: string
+          id?: string
+          order_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          booth_id?: string
+          created_at?: string
+          customer_id?: string
+          customer_nickname?: string
+          id?: string
+          order_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_requests_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           booth_id: string
           cancelled_at: string | null
           client_transaction_id: string
-          created_at: string | null
+          created_at: string
           id: string
           status: Database["public"]["Enums"]["order_status"]
           total_amount: number
@@ -260,7 +351,7 @@ export type Database = {
           booth_id: string
           cancelled_at?: string | null
           client_transaction_id: string
-          created_at?: string | null
+          created_at?: string
           id?: string
           status?: Database["public"]["Enums"]["order_status"]
           total_amount: number
@@ -270,7 +361,7 @@ export type Database = {
           booth_id?: string
           cancelled_at?: string | null
           client_transaction_id?: string
-          created_at?: string | null
+          created_at?: string
           id?: string
           status?: Database["public"]["Enums"]["order_status"]
           total_amount?: number
@@ -279,6 +370,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "orders_booth_id_fkey"
+            columns: ["booth_id"]
+            isOneToOne: false
+            referencedRelation: "booths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prepaid: {
+        Row: {
+          booth_id: string
+          checked: boolean
+          created_at: string
+          id: string
+          row_data: Json
+        }
+        Insert: {
+          booth_id: string
+          checked?: boolean
+          created_at?: string
+          id?: string
+          row_data: Json
+        }
+        Update: {
+          booth_id?: string
+          checked?: boolean
+          created_at?: string
+          id?: string
+          row_data?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prepaid_booth_id_fkey"
             columns: ["booth_id"]
             isOneToOne: false
             referencedRelation: "booths"
@@ -328,6 +451,7 @@ export type Database = {
           id: string
           initial_quantity: number | null
           name: string
+          price: number | null
           product_id: string | null
           remaining_quantity: number | null
         }
@@ -336,6 +460,7 @@ export type Database = {
           id?: string
           initial_quantity?: number | null
           name: string
+          price?: number | null
           product_id?: string | null
           remaining_quantity?: number | null
         }
@@ -344,6 +469,7 @@ export type Database = {
           id?: string
           initial_quantity?: number | null
           name?: string
+          price?: number | null
           product_id?: string | null
           remaining_quantity?: number | null
         }
@@ -449,6 +575,10 @@ export type Database = {
     }
     Functions: {
       cancel_order: { Args: { p_order_id: string }; Returns: undefined }
+      cancel_order_item: {
+        Args: { p_cancel_quantity: number; p_order_item_id: string }
+        Returns: Json
+      }
       claim_booth: {
         Args: { p_booth_number: string; p_code: string }
         Returns: string
@@ -459,6 +589,10 @@ export type Database = {
           p_client_transaction_id: string
           p_items: Json
         }
+        Returns: string
+      }
+      create_order_request: {
+        Args: { p_booth_id: string; p_customer_nickname: string; p_items: Json }
         Returns: string
       }
       get_booth_code: { Args: { p_booth_id: string }; Returns: string }

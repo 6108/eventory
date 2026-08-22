@@ -6,7 +6,7 @@ import { CartGroup, CartItem } from "../types/cart";
 interface CartState {
   items: CartItem[];
 
-  addItem: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
+  addItem: (cartItem: CartItem) => void;
   increment: (productId: string, optionId: string | null) => void;
   decrement: (productId: string, optionId: string | null) => void;
   removeItem: (productId: string, optionId: string | null) => void;
@@ -25,15 +25,15 @@ export const useCartStore = create<CartState>()(
     (set, get) => ({
       items: [],
 
-      addItem: (item, quantity = 1) =>
+      addItem: (cartItem) =>
         set((state) => {
           const existing = state.items.find(
             (i) =>
-              i.productId === item.productId && i.optionId === item.optionId
+              i.productId === cartItem.productId && i.optionId === cartItem.optionId
           );
 
           if (existing) {
-            const nextQuantity = existing.quantity + quantity;
+            const nextQuantity = existing.quantity + cartItem.quantity;
 
             if (
               existing.purchaseLimit != null &&
@@ -51,92 +51,93 @@ export const useCartStore = create<CartState>()(
 
             return {
               items: state.items.map((i) =>
-                i.productId === item.productId && i.optionId === item.optionId
+                i.productId === cartItem.productId && i.optionId === cartItem.optionId
                   ? { ...i, quantity: nextQuantity }
                   : i
               ),
             };
           }
 
-          if (item.remainingQuantity != null && item.remainingQuantity <= 0) {
+          if (cartItem.remainingQuantity != null && cartItem.remainingQuantity <= 0) {
             return state;
           }
 
           return {
-            items: [...state.items, { ...item, quantity }],
+            items: [...state.items, cartItem],
           };
         }),
 
       increment: (productId, optionId) =>
         set((state) => ({
-          items: state.items.map((item) => {
-            if (item.productId !== productId || item.optionId !== optionId) {
-              return item;
+          items: state.items.map((cartItem) => {
+            if (cartItem.productId !== productId || cartItem.optionId !== optionId) {
+              return cartItem;
             }
 
-            const nextQuantity = item.quantity + 1;
+            const nextQuantity = cartItem.quantity + 1;
 
-            if (item.purchaseLimit != null && nextQuantity > item.purchaseLimit) {
-              return item;
+            if (cartItem.purchaseLimit != null && nextQuantity > cartItem.purchaseLimit) {
+              return cartItem;
             }
 
             if (
-              item.remainingQuantity != null &&
-              nextQuantity > item.remainingQuantity
+              cartItem.remainingQuantity != null &&
+              nextQuantity > cartItem.remainingQuantity
             ) {
-              return item;
+              return cartItem;
             }
 
-            return { ...item, quantity: nextQuantity };
+            return { ...cartItem, quantity: nextQuantity };
           }),
         })),
 
       decrement: (productId, optionId) =>
         set((state) => ({
           items: state.items
-            .map((i) =>
-              i.productId === productId && i.optionId === optionId
-                ? { ...i, quantity: i.quantity - 1 }
-                : i
+            .map((cartItem) =>
+              cartItem.productId === productId && cartItem.optionId === optionId
+                ? { ...cartItem, quantity: cartItem.quantity - 1 }
+                : cartItem
             )
-            .filter((i) => i.quantity > 0),
+            .filter((cartItem) => cartItem.quantity > 0),
         })),
 
       removeItem: (productId, optionId) =>
         set((state) => ({
           items: state.items.filter(
-            (i) => !(i.productId === productId && i.optionId === optionId)
+            (cartItem) =>
+              !(cartItem.productId === productId && cartItem.optionId === optionId)
           ),
         })),
 
       clearBooth: (boothId) =>
         set((state) => ({
-          items: state.items.filter((i) => i.boothId !== boothId),
+          items: state.items.filter((cartItem) => cartItem.boothId !== boothId),
         })),
 
       clearAll: () => set({ items: [] }),
 
       totalQuantity: () =>
-        get().items.reduce((sum, i) => sum + i.quantity, 0),
+        get().items.reduce((sum, cartItem) => sum + cartItem.quantity, 0),
 
       groupedByBooth: () => {
         const items = get().items;
         const map = new Map<string, CartGroup>();
 
-        for (const item of items) {
-          const group = map.get(item.boothId);
+        for (const cartItem of items) {
+          const group = map.get(cartItem.boothId);
 
           if (group) {
-            group.items.push(item);
-            group.totalAmount += item.price * item.quantity;
-            group.totalQuantity += item.quantity;
+            group.items.push(cartItem);
+            group.totalAmount += cartItem.price * cartItem.quantity;
+            group.totalQuantity += cartItem.quantity;
           } else {
-            map.set(item.boothId, {
-              boothId: item.boothId,
-              boothName: item.boothName,
-              items: [item],
-              totalAmount: item.price * item.quantity,
-              totalQuantity: item.quantity,
+            map.set(cartItem.boothId, {
+              boothId: cartItem.boothId,
+              boothName: cartItem.boothName,
+              items: [cartItem],
+              totalAmount: cartItem.price * cartItem.quantity,
+              totalQuantity: cartItem.quantity,
             });
           }
         }

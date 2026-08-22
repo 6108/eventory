@@ -1,7 +1,6 @@
-// src/app/[eventId]/booths/[boothId]/manage/products/[productId]/edit/page.tsx
+import { redirect } from "next/navigation";
 import { createClient } from "@/src/lib/supabase/server";
-import EditProductForm from "@/src/component/form/EditProductForm";
-import { getProduct } from "@/src/lib/data/product";
+import EditBoothForm from "@/src/component/form/EditBoothForm";
 
 export default async function Page({
   params,
@@ -9,25 +8,42 @@ export default async function Page({
   params: Promise<{
     eventId: string;
     boothId: string;
-    productId: string;
   }>;
 }) {
-  const { eventId, boothId, productId } = await params;
+  const { eventId, boothId } = await params;
 
-  const product = await getProduct(productId, boothId);
+  const supabase = await createClient();
 
-  if (!product) {
-    return <div>상품을 찾을 수 없습니다.</div>;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect(`/${eventId}`);
+  }
+
+  const { data: booth } = await supabase
+    .from("booths")
+    .select("id, name, description, category")
+    .eq("id", boothId)
+    .single();
+
+  if (!booth) {
+    return <div>부스를 찾을 수 없습니다.</div>;
   }
 
   return (
     <div className="mx-auto w-full max-w-lg">
-      <h1 className="mb-8 text-xl font-semibold text-white">상품 수정</h1>
-      <EditProductForm
-        eventId={eventId}
+      <h1 className="mb-8 text-xl font-semibold text-white">
+        부스 정보 수정
+      </h1>
+
+      <EditBoothForm
         boothId={boothId}
-        productId={productId}
-        product={product}
+        eventId={eventId}
+        boothName={booth.name}
+        description={booth.description}
+        category={booth.category}
       />
     </div>
   );

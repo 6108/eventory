@@ -33,26 +33,25 @@ export default function AddToCartButton({
     ? selectedOption?.remainingQuantity ?? null
     : product.remainingQuantity;
 
-  const isSoldOut = remainingQuantity !== null && remainingQuantity <= 0;
+  const isSoldOut =
+    remainingQuantity !== null && remainingQuantity <= 0;
 
   function handleAdd() {
     if (isSoldOut) return;
 
-    addItem(
-      {
-        productId: product.id,
-        optionId: selectedOptionId,
-        optionName: selectedOption?.name ?? null,
-        boothId: product.boothId,
-        boothName,
-        name: product.name,
-        price: product.price,
-        image: product.mainImage,
-        remainingQuantity,
-        purchaseLimit: product.purchaseLimit,
-      },
-      quantity
-    );
+    addItem({
+      productId: product.id,
+      optionId: selectedOptionId,
+      productName: product.name,
+      boothId: product.boothId,
+      boothName,
+      optionName: selectedOption?.name ?? null,
+      price: product.price,
+      image: product.mainImage,
+      quantity,
+      remainingQuantity,
+      purchaseLimit: product.purchaseLimit,
+    });
 
     toast.success("장바구니에 담았습니다.");
     setQuantity(1);
@@ -74,7 +73,11 @@ export default function AddToCartButton({
                 option.remainingQuantity <= 0;
 
               return (
-                <option key={option.id} value={option.id} disabled={optionSoldOut}>
+                <option
+                  key={option.id}
+                  value={option.id}
+                  disabled={optionSoldOut}
+                >
                   {option.name}
                   {optionSoldOut ? " (품절)" : ""}
                 </option>

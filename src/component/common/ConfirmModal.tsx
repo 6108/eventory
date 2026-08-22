@@ -1,23 +1,15 @@
-// src/component/common/ConfirmModal.tsx
 "use client";
 
 import { useConfirmModalStore } from "@/src/store/confirmModalStore";
+import { Modal } from "./Modal";
 
 export default function ConfirmModal() {
   const { isOpen, title, message, confirmText, cancelText, handleConfirm, handleCancel } =
     useConfirmModalStore();
 
-  if (!isOpen) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-      onClick={handleCancel}
-    >
-      <div
-        className="w-full max-w-xs rounded-lg bg-zinc-900 p-6 text-center"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Modal isOpen={isOpen} onClose={handleCancel} maxWidth="xs">
+      <div className="text-center">
         <p className="text-base text-zinc-200 mb-1">{title}</p>
         {message && <p className="text-sm text-zinc-500 mb-6">{message}</p>}
 
@@ -38,6 +30,6 @@ export default function ConfirmModal() {
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

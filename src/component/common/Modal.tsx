@@ -1,19 +1,30 @@
-import { ReactNode } from "react"
+"use client";
+
+import { ReactNode } from "react";
 
 interface ModalProps {
-  isOpen: boolean
-  onClose: () => void
-  children: ReactNode
+  isOpen: boolean;
+  onClose: () => void;
+  children: ReactNode;
+  maxWidth?: "xs" | "sm" | "md";
 }
 
-export function Modal({ isOpen, onClose, children }: ModalProps) {
-  if (!isOpen) return null
+const maxWidthClass = { xs: "max-w-xs", sm: "max-w-sm", md: "max-w-md" };
+
+export function Modal({ isOpen, onClose, children, maxWidth = "sm" }: ModalProps) {
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white rounded-lg p-6 w-full max-w-md z-10">
+    <div
+      className="fixed inset-0 flex items-center justify-center bg-black/70 p-4 z-999"
+      onClick={onClose}
+    >
+      <div
+        className={`max-h-[90vh] w-full ${maxWidthClass[maxWidth]} overflow-y-auto rounded-lg bg-zinc-900 p-5`}
+        onClick={(e) => e.stopPropagation()}
+      >
         {children}
       </div>
     </div>
-  )
+  );
 }

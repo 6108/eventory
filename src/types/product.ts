@@ -66,6 +66,7 @@ export type ProductSubCategory = CategoryItem["types"][number]["value"];
 export type ProductOption = {
   id: string;
   name: string;
+  price: number | null;
   initialQuantity: number | null;
   remainingQuantity: number | null;
 };
@@ -101,6 +102,7 @@ export type PosProduct = {
   initialQuantity: number | null;
   remainingQuantity: number | null;
   purchaseLimit: number | null;
+  options: ProductOption[];
 };
 
 // 상품 요약 정보 타입

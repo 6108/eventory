@@ -10,7 +10,12 @@ interface Params {
   currentImageUrl: string;
 }
 
-export function useProductMutations({ eventId, boothId, productId, currentImageUrl }: Params) {
+export function useProductMutations({
+  eventId,
+  boothId,
+  productId,
+  currentImageUrl,
+}: Params) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -20,47 +25,67 @@ export function useProductMutations({ eventId, boothId, productId, currentImageU
     formData.append("file", image);
     formData.append("boothId", boothId);
 
-    const res = await fetch("/api/upload/product", { method: "POST", body: formData });
+    const res = await fetch("/api/upload/product", {
+      method: "POST",
+      body: formData,
+    });
+
     const result = await res.json();
 
     if (!res.ok) {
       toast.error(result.error ?? "이미지 업로드에 실패했습니다.");
       return null;
     }
+
     return result.url;
   }
 
-  async function submit(form: ProductFormState, image: File | null) {
+  async function submit(
+    form: ProductFormState,
+    image: File | null,
+    artistIds: string[]
+  ) {
     setLoading(true);
+
     try {
       let mainImageUrl = currentImageUrl;
 
       if (image) {
         const uploadedUrl = await uploadImage(image);
+
         if (!uploadedUrl) return;
+
         mainImageUrl = uploadedUrl;
       }
 
-      const res = await fetch(`/api/booth/${boothId}/products/${productId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          mainImageUrl,
-          price: Number(form.price),
-          initialQuantity:
-            form.options.length > 0
-              ? null
-              : form.initialQuantity
-                ? Number(form.initialQuantity)
-                : null,
-          purchaseLimit: form.purchaseLimit ? Number(form.purchaseLimit) : null,
-          options: form.options.map((option) => ({
-            name: option.name,
-            initialQuantity: Number(option.initialQuantity),
-          })),
-        }),
-      });
+      const res = await fetch(
+        `/api/booth/${boothId}/products/${productId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...form,
+            mainImageUrl,
+            artistIds,
+            price: Number(form.price),
+            initialQuantity:
+              form.options.length > 0
+                ? null
+                : form.initialQuantity
+                  ? Number(form.initialQuantity)
+                  : null,
+            purchaseLimit: form.purchaseLimit
+              ? Number(form.purchaseLimit)
+              : null,
+            options: form.options.map((option) => ({
+              name: option.name,
+              initialQuantity: Number(option.initialQuantity),
+            })),
+          }),
+        }
+      );
 
       const result = await res.json();
 
@@ -70,7 +95,10 @@ export function useProductMutations({ eventId, boothId, productId, currentImageU
       }
 
       toast.success("상품이 수정되었습니다.");
-      router.push(`/${eventId}/booths/${boothId}/manage/products`);
+
+      router.push(
+        `/${eventId}/booths/${boothId}/manage/products`
+      );
       router.refresh();
     } catch {
       toast.error("상품 수정 중 오류가 발생했습니다.");
@@ -80,11 +108,19 @@ export function useProductMutations({ eventId, boothId, productId, currentImageU
   }
 
   async function remove() {
-    if (!confirm("이 상품을 삭제하시겠습니까? 되돌릴 수 없습니다.")) return;
+    if (!confirm("이 상품을 삭제하시겠습니까? 되돌릴 수 없습니다.")) {
+      return;
+    }
 
     setDeleting(true);
+
     try {
-      const res = await fetch(`/api/booth/${boothId}/products/${productId}`, { method: "DELETE" });
+      const res = await fetch(
+        `/api/booth/${boothId}/products/${productId}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!res.ok) {
         const result = await res.json();
@@ -93,7 +129,10 @@ export function useProductMutations({ eventId, boothId, productId, currentImageU
       }
 
       toast.success("상품이 삭제되었습니다.");
-      router.push(`/${eventId}/booths/${boothId}/manage/products`);
+
+      router.push(
+        `/${eventId}/booths/${boothId}/manage/products`
+      );
       router.refresh();
     } catch {
       toast.error("삭제 중 오류가 발생했습니다.");
@@ -102,5 +141,10 @@ export function useProductMutations({ eventId, boothId, productId, currentImageU
     }
   }
 
-  return { loading, deleting, submit, remove };
+  return {
+    loading,
+    deleting,
+    submit,
+    remove,
+  };
 }

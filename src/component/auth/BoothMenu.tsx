@@ -56,6 +56,13 @@ export function BoothMenu({
       >
         상품 관리
       </UserMenuItem>
+
+      <UserMenuItem
+        href={`/${eventId}/booths/${boothId}/manage/prepaid`}
+        onClick={onNavigate}
+      >
+        선입금 등록
+      </UserMenuItem>
     </>
   );
 }

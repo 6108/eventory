@@ -1,6 +1,7 @@
 // src/app/api/booth/[boothId]/orders/route.ts
 import { NextResponse } from "next/server";
 import { requireBoothArtist } from "@/src/lib/auth/requireBoothArtist";
+import { getBoothOrders } from "@/src/lib/data/order";
 
 type OrderPayload = {
   productId: string;
@@ -56,7 +57,6 @@ export async function POST(
   return NextResponse.json({ success: true, orderId });
 }
 
-
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ boothId: string }> }
@@ -65,36 +65,8 @@ export async function GET(
 
   const authResult = await requireBoothArtist(boothId);
   if (authResult instanceof NextResponse) return authResult;
-  const { supabase } = authResult;
 
-  const { data: orders, error } = await supabase
-    .from("orders")
-    .select(
-      `
-      id,
-      created_at,
-      total_amount,
-      status,
-      order_items (
-        id,
-        product_name,
-        option_name,
-        quantity,
-        unit_price,
-        subtotal
-      )
-    `
-    )
-    .eq("booth_id", boothId)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error(error);
-    return NextResponse.json(
-      { error: "주문 내역을 불러오지 못했습니다." },
-      { status: 500 }
-    );
-  }
+  const orders = await getBoothOrders(boothId);
 
   return NextResponse.json({ orders });
 }
