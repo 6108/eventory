@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/src/lib/supabase/server";
+import { requireBoothArtist } from "@/src/lib/auth/requireBoothArtist";
 
 export async function POST(
   request: Request,
@@ -15,26 +15,9 @@ export async function POST(
     );
   }
 
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-  }
-
-  const { data: artist } = await supabase
-    .from("booth_artists")
-    .select("booth_id")
-    .eq("booth_id", boothId)
-    .eq("artist_id", user.id)
-    .maybeSingle();
-
-  if (!artist) {
-    return NextResponse.json({ error: "취소 권한이 없습니다." }, { status: 403 });
-  }
+  const authResult = await requireBoothArtist(boothId);
+  if (authResult instanceof NextResponse) return authResult;
+  const { supabase } = authResult;
 
   const { data, error } = await supabase.rpc("cancel_order_item", {
     p_order_item_id: orderItemId,

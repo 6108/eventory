@@ -2,6 +2,7 @@
 "use client";
 
 import { productCategories } from "@/src/types/product";
+import { Select } from "@/src/component/common/Select";
 
 type Props = {
   category: string;
@@ -24,14 +25,13 @@ export function CategorySelect({
     <>
       <div className="flex flex-col gap-2">
         <label className="text-sm text-zinc-400">카테고리</label>
-        <select
+        <Select
           value={category}
           onChange={(e) => {
             onCategoryChange(e.target.value);
             onSubCategoryChange("");
           }}
           required
-          className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none focus:border-primary"
         >
           <option value="">카테고리 선택</option>
           {productCategories.map((item) => (
@@ -39,17 +39,16 @@ export function CategorySelect({
               {item.label}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
 
       <div className="flex flex-col gap-2">
         <label className="text-sm text-zinc-400">세부 카테고리</label>
-        <select
+        <Select
           value={subCategory}
           onChange={(e) => onSubCategoryChange(e.target.value)}
           disabled={!selectedCategory}
           required
-          className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none disabled:opacity-40 focus:border-primary"
         >
           <option value="">세부 카테고리 선택</option>
           {selectedCategory?.types.map((type) => (
@@ -57,7 +56,7 @@ export function CategorySelect({
               {type.label}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
     </>
   );

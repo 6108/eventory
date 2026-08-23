@@ -1,6 +1,6 @@
 // src/component/form/ProductOptionsField.tsx
-
 import { FormField } from "./FormField";
+import { Input } from "@/src/component/common/Input";
 import type { ProductOptionFormState } from "@/src/types/form";
 
 interface Props {
@@ -16,19 +16,19 @@ export function ProductOptionsField({ options, onAdd, onUpdate, onRemove }: Prop
       <div className="flex flex-col gap-2">
         {options.map((option, index) => (
           <div key={index} className="flex gap-2">
-            <input
+            <Input
               value={option.name}
               onChange={(e) => onUpdate(index, "name", e.target.value)}
               placeholder="옵션명"
-              className="flex-1 rounded border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none focus:border-primary"
+              className="flex-1"
             />
-            <input
+            <Input
               type="number"
               min="0"
               value={option.initialQuantity}
               onChange={(e) => onUpdate(index, "initialQuantity", e.target.value)}
               placeholder="수량"
-              className="w-32 rounded border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none focus:border-primary"
+              className="w-32"
             />
             <button type="button" onClick={() => onRemove(index)} className="px-2 text-sm text-red-400">
               삭제

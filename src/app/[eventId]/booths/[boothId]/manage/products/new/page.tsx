@@ -1,4 +1,4 @@
-import AddProductForm from "@/src/component/form/AddProductForm";
+import ProductForm from "@/src/component/form/ProductForm";
 import { getBoothArtists } from "@/src/lib/data/artist";
 
 export default async function Page({
@@ -20,7 +20,7 @@ export default async function Page({
           상품 추가
         </h1>
 
-        <AddProductForm
+        <ProductForm
           eventId={eventId}
           boothId={boothId}
           artists={artists}

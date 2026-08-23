@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/src/lib/supabase/server";
+import { requireBoothArtist } from "@/src/lib/auth/requireBoothArtist";
 
 // 부스 아티스트가 엑셀 파싱된 선입금 리스트를 저장 (기존 것 지우고 새로 덮어쓰기)
 export async function POST(
@@ -16,32 +16,9 @@ export async function POST(
     );
   }
 
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json(
-      { error: "로그인이 필요합니다." },
-      { status: 401 }
-    );
-  }
-
-  const { data: artist } = await supabase
-    .from("booth_artists")
-    .select("booth_id")
-    .eq("booth_id", boothId)
-    .eq("artist_id", user.id)
-    .maybeSingle();
-
-  if (!artist) {
-    return NextResponse.json(
-      { error: "수정 권한이 없습니다." },
-      { status: 403 }
-    );
-  }
+  const authResult = await requireBoothArtist(boothId);
+  if (authResult instanceof NextResponse) return authResult;
+  const { supabase } = authResult;
 
   const { error: deleteError } = await supabase
     .from("prepaid")
@@ -86,32 +63,9 @@ export async function GET(
 ) {
   const { boothId } = await params;
 
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json(
-      { error: "로그인이 필요합니다." },
-      { status: 401 }
-    );
-  }
-
-  const { data: artist } = await supabase
-    .from("booth_artists")
-    .select("booth_id")
-    .eq("booth_id", boothId)
-    .eq("artist_id", user.id)
-    .maybeSingle();
-
-  if (!artist) {
-    return NextResponse.json(
-      { error: "조회 권한이 없습니다." },
-      { status: 403 }
-    );
-  }
+  const authResult = await requireBoothArtist(boothId);
+  if (authResult instanceof NextResponse) return authResult;
+  const { supabase } = authResult;
 
   const { data: rows, error } = await supabase
     .from("prepaid")

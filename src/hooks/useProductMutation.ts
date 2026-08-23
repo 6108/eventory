@@ -6,11 +6,11 @@ import type { ProductFormState } from "@/src/types/form";
 interface Params {
   eventId: string;
   boothId: string;
-  productId: string;
-  currentImageUrl: string;
+  productId?: string;
+  currentImageUrl?: string;
 }
 
-export function useProductMutations({
+export function useProductMutation({
   eventId,
   boothId,
   productId,
@@ -19,6 +19,7 @@ export function useProductMutations({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const isEdit = Boolean(productId);
 
   async function uploadImage(image: File): Promise<string | null> {
     const formData = new FormData();
@@ -48,66 +49,61 @@ export function useProductMutations({
     setLoading(true);
 
     try {
-      let mainImageUrl = currentImageUrl;
+      let mainImageUrl = currentImageUrl ?? "";
 
       if (image) {
         const uploadedUrl = await uploadImage(image);
-
         if (!uploadedUrl) return;
-
         mainImageUrl = uploadedUrl;
       }
 
-      const res = await fetch(
-        `/api/booth/${boothId}/products/${productId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...form,
-            mainImageUrl,
-            artistIds,
-            price: Number(form.price),
-            initialQuantity:
-              form.options.length > 0
-                ? null
-                : form.initialQuantity
-                  ? Number(form.initialQuantity)
-                  : null,
-            purchaseLimit: form.purchaseLimit
-              ? Number(form.purchaseLimit)
-              : null,
-            options: form.options.map((option) => ({
-              name: option.name,
-              initialQuantity: Number(option.initialQuantity),
-            })),
-          }),
-        }
-      );
+      const url = isEdit
+        ? `/api/booth/${boothId}/products/${productId}`
+        : `/api/booth/${boothId}/products`;
+
+      const res = await fetch(url, {
+        method: isEdit ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          mainImageUrl,
+          artistIds,
+          price: Number(form.price),
+          initialQuantity:
+            form.options.length > 0
+              ? null
+              : form.initialQuantity
+                ? Number(form.initialQuantity)
+                : null,
+          purchaseLimit: form.purchaseLimit ? Number(form.purchaseLimit) : null,
+          options: form.options.map((option) => ({
+            name: option.name,
+            initialQuantity: Number(option.initialQuantity),
+          })),
+        }),
+      });
 
       const result = await res.json();
 
       if (!res.ok) {
-        toast.error(result.error ?? "상품 수정에 실패했습니다.");
+        toast.error(result.error ?? (isEdit ? "상품 수정에 실패했습니다." : "상품 추가에 실패했습니다."));
         return;
       }
 
-      toast.success("상품이 수정되었습니다.");
-
-      router.push(
-        `/${eventId}/booths/${boothId}/manage/products`
-      );
+      toast.success(isEdit ? "상품이 수정되었습니다." : "상품이 추가되었습니다.");
+      router.push(`/${eventId}/booths/${boothId}/manage/products`);
       router.refresh();
-    } catch {
-      toast.error("상품 수정 중 오류가 발생했습니다.");
+    } catch (error) {
+      console.error(error);
+      toast.error(isEdit ? "상품 수정 중 오류가 발생했습니다." : "상품 추가 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
   }
 
   async function remove() {
+    if (!productId) return;
+
     if (!confirm("이 상품을 삭제하시겠습니까? 되돌릴 수 없습니다.")) {
       return;
     }
@@ -115,12 +111,9 @@ export function useProductMutations({
     setDeleting(true);
 
     try {
-      const res = await fetch(
-        `/api/booth/${boothId}/products/${productId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const res = await fetch(`/api/booth/${boothId}/products/${productId}`, {
+        method: "DELETE",
+      });
 
       if (!res.ok) {
         const result = await res.json();
@@ -129,10 +122,7 @@ export function useProductMutations({
       }
 
       toast.success("상품이 삭제되었습니다.");
-
-      router.push(
-        `/${eventId}/booths/${boothId}/manage/products`
-      );
+      router.push(`/${eventId}/booths/${boothId}/manage/products`);
       router.refresh();
     } catch {
       toast.error("삭제 중 오류가 발생했습니다.");
@@ -141,10 +131,5 @@ export function useProductMutations({
     }
   }
 
-  return {
-    loading,
-    deleting,
-    submit,
-    remove,
-  };
+  return { loading, deleting, submit, remove };
 }

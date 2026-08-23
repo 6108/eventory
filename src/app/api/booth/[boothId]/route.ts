@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/src/lib/supabase/server";
+import { requireBoothArtist } from "@/src/lib/auth/requireBoothArtist";
 
 // 로그인한 부스 참여자가 부스명, 설명, 유형을 수정하는 API
 export async function PUT(
@@ -23,32 +23,9 @@ export async function PUT(
     );
   }
 
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json(
-      { error: "로그인이 필요합니다." },
-      { status: 401 }
-    );
-  }
-
-  const { data: artist } = await supabase
-    .from("booth_artists")
-    .select("booth_id")
-    .eq("booth_id", boothId)
-    .eq("artist_id", user.id)
-    .maybeSingle();
-
-  if (!artist) {
-    return NextResponse.json(
-      { error: "수정 권한이 없습니다." },
-      { status: 403 }
-    );
-  }
+  const authResult = await requireBoothArtist(boothId);
+  if (authResult instanceof NextResponse) return authResult;
+  const { supabase } = authResult;
 
   const { data: booth, error } = await supabase
     .from("booths")

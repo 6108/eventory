@@ -1,6 +1,5 @@
 // src/app/[eventId]/booths/[boothId]/manage/products/[productId]/edit/page.tsx
-import { createClient } from "@/src/lib/supabase/server";
-import EditProductForm from "@/src/component/form/EditProductForm";
+import ProductForm from "@/src/component/form/ProductForm";
 import { getProduct } from "@/src/lib/data/product";
 import { getBoothArtists } from "@/src/lib/data/artist";
 
@@ -23,11 +22,10 @@ export default async function Page({
 
   const artists = await getBoothArtists(boothId);
 
-
   return (
     <div className="mx-auto w-full max-w-lg">
       <h1 className="mb-8 text-xl font-semibold text-white">상품 수정</h1>
-      <EditProductForm
+      <ProductForm
         eventId={eventId}
         boothId={boothId}
         productId={productId}

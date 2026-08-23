@@ -6,6 +6,8 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { FormField } from "./FormField";
 import { FormActions } from "./FormActions";
+import { Input } from "@/src/component/common/Input";
+import { Textarea } from "@/src/component/common/Textarea";
 import type { BoothFormState } from "@/src/types/form";
 
 type Category = "GENERAL" | "ADULT";
@@ -72,20 +74,18 @@ export default function EditBoothForm({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       <FormField label="부스명">
-        <input
+        <Input
           value={form.name}
           onChange={(e) => updateField("name", e.target.value)}
           required
-          className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none focus:border-primary"
         />
       </FormField>
 
       <FormField label="부스 설명">
-        <textarea
+        <Textarea
           value={form.description}
           onChange={(e) => updateField("description", e.target.value)}
           rows={5}
-          className="resize-none rounded border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none focus:border-primary"
         />
       </FormField>
 
