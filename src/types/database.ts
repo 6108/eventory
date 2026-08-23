@@ -147,7 +147,6 @@ export type Database = {
           event_id: string
           id: string
           name: string
-          sort_order: number | null
         }
         Insert: {
           artist_names?: string[] | null
@@ -158,7 +157,6 @@ export type Database = {
           event_id: string
           id?: string
           name: string
-          sort_order?: number | null
         }
         Update: {
           artist_names?: string[] | null
@@ -169,7 +167,6 @@ export type Database = {
           event_id?: string
           id?: string
           name?: string
-          sort_order?: number | null
         }
         Relationships: [
           {
@@ -557,6 +554,7 @@ export type Database = {
           created_at: string | null
           email: string | null
           id: string
+          last_notice_seen_at: string | null
           name: string | null
           profile_image: string | null
         }
@@ -564,6 +562,7 @@ export type Database = {
           created_at?: string | null
           email?: string | null
           id: string
+          last_notice_seen_at?: string | null
           name?: string | null
           profile_image?: string | null
         }
@@ -571,6 +570,7 @@ export type Database = {
           created_at?: string | null
           email?: string | null
           id?: string
+          last_notice_seen_at?: string | null
           name?: string | null
           profile_image?: string | null
         }

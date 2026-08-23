@@ -2,15 +2,15 @@ import ProductExplorer from "@/src/component/product/ProductExplorer";
 import FollowButton from "@/src/component/booth/FollowButton";
 
 import { createClient } from "@/src/lib/supabase/server";
-import { getBooth } from "@/src/lib/data/booth";
+import { getBooth, isFollowingBooth } from "@/src/lib/data/booth";
 import { getProductSummaries } from "@/src/lib/data/product";
 
 export default async function Page({
   params,
 }: {
-  params: Promise<{ boothId: string }>;
+  params: Promise<{ eventId: string, boothId: string }>;
 }) {
-  const { boothId } = await params;
+  const { eventId, boothId } = await params;
 
   const supabase = await createClient();
 
@@ -30,7 +30,10 @@ export default async function Page({
     );
   }
 
-  const products = await getProductSummaries(boothId);
+  const [products, initialFollowed] = await Promise.all([
+    getProductSummaries(boothId),
+    user ? isFollowingBooth(user.id, boothId) : Promise.resolve(false),
+  ]);
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
@@ -52,8 +55,10 @@ export default async function Page({
           </div>
 
           <FollowButton
+            eventId={eventId}
             boothId={booth.id}
             currentUserId={user?.id}
+            initialFollowed={initialFollowed}
           />
         </div>
 
@@ -63,8 +68,6 @@ export default async function Page({
           <span className="text-zinc-700">•</span>
 
           <span>작가 {booth.artistNames.length}명</span>
-
-
         </div>
       </header>
 

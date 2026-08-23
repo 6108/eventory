@@ -1,16 +1,16 @@
-// src/component/booth/FollowButton.tsx
-
 "use client";
 
 import { useState, useTransition } from "react";
 
 type Props = {
+  eventId: string;
   boothId: string;
   currentUserId?: string;
   initialFollowed?: boolean;
 };
 
 export default function FollowButton({
+  eventId,
   boothId,
   currentUserId,
   initialFollowed = false,
@@ -24,17 +24,19 @@ export default function FollowButton({
       return;
     }
 
+    const next = !isFollowed;
+    setIsFollowed(next); // 낙관적 업데이트
+
     startTransition(async () => {
       try {
-        if (isFollowed) {
-          // await unfollowBooth(boothId);
-          setIsFollowed(false);
-        } else {
-          // await followBooth(boothId);
-          setIsFollowed(true);
-        }
+        const res = await fetch(`/api/${eventId}booth/${boothId}/follow`, {
+          method: next ? "POST" : "DELETE",
+        });
+
+        if (!res.ok) throw new Error("요청 실패");
       } catch (error) {
         console.error(error);
+        setIsFollowed(!next); // 실패 시 롤백
       }
     });
   }
@@ -51,11 +53,7 @@ export default function FollowButton({
         }
       `}
     >
-      {isPending
-        ? "처리중..."
-        : isFollowed
-          ? "♥ 팔로잉"
-          : "♡ 팔로우"}
+      {isPending ? "처리중..." : isFollowed ? "♥ 팔로잉" : "♡ 팔로우"}
     </button>
   );
 }

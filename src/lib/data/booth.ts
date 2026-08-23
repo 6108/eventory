@@ -164,3 +164,20 @@ export async function getFollowedBooths(userId: string): Promise<FollowedBooth[]
     })
     .filter((item): item is FollowedBooth => item !== null);
 }
+
+// 특정 부스를 팔로우 중인지 확인 (부스 상세 페이지 초기 상태용)
+export async function isFollowingBooth(
+  userId: string,
+  boothId: string
+): Promise<boolean> {
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from("booth_follows")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("booth_id", boothId)
+    .maybeSingle();
+
+  return !!data;
+}
