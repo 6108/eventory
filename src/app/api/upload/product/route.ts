@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/src/lib/supabase/server";
 
-// 로그인한 사용자가 상품 대표 이미지를 Supabase Storage에 업로드하는 API
+// 로그인한 사용자가 상품 이미지(대표/상세)를 Supabase Storage에 업로드하는 API
 export async function POST(request: Request) {
   const supabase = await createClient();
 
@@ -20,6 +20,7 @@ export async function POST(request: Request) {
 
   const file = formData.get("file");
   const boothId = formData.get("boothId");
+  const type = formData.get("type");
 
   if (!(file instanceof File)) {
     return NextResponse.json(
@@ -34,6 +35,9 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
+
+  // type이 없으면 기존 대표 이미지 업로드와 동일하게 동작 (하위 호환)
+  const folder = type === "detail" ? "detail" : "main";
 
   // 현재 로그인한 사용자가 해당 부스의 참여자인지 확인
   const { data: artist } = await supabase
@@ -53,7 +57,7 @@ export async function POST(request: Request) {
   const extension = file.name.split(".").pop() ?? "jpg";
 
   const fileName = `${crypto.randomUUID()}.${extension}`;
-  const filePath = `${boothId}/${fileName}`;
+  const filePath = `${boothId}/${folder}/${fileName}`;
 
   const { error: uploadError } = await supabase.storage
     .from("products")

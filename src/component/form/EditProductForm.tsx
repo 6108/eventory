@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import dynamic from "next/dynamic";
 import { FormField } from "./FormField";
 import { ProductImageField } from "./ProductImageField";
 import { CategorySelect } from "./CategorySelect";
@@ -23,6 +24,16 @@ interface EditProductFormProps {
   artists: User[];
 }
 
+const ProductDescriptionEditor = dynamic(
+  () => import("./ProductDescriptionEditor"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-72 animate-pulse rounded border border-zinc-800 bg-zinc-900" />
+    ),
+  }
+);
+
 export default function EditProductForm({
   eventId,
   boothId,
@@ -32,25 +43,14 @@ export default function EditProductForm({
 }: EditProductFormProps) {
   const router = useRouter();
 
-  const {
-    form,
-    updateField,
-    addOption,
-    updateOption,
-    removeOption,
-  } = useProductForm(product);
+  const { form, updateField, addOption, updateOption, removeOption } =
+    useProductForm(product);
 
-  const {
-    selectedArtistIds,
-    toggleArtist,
-  } = useArtistSelection(product.artistIds);
+  const { selectedArtistIds, toggleArtist } = useArtistSelection(
+    product.artistIds
+  );
 
-  const {
-    loading,
-    deleting,
-    submit,
-    remove,
-  } = useProductMutations({
+  const { loading, deleting, submit, remove } = useProductMutations({
     eventId,
     boothId,
     productId,
@@ -80,9 +80,7 @@ export default function EditProductForm({
       <FormField label="상품명">
         <input
           value={form.name}
-          onChange={(e) =>
-            updateField("name", e.target.value)
-          }
+          onChange={(e) => updateField("name", e.target.value)}
           required
           className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none focus:border-primary"
         />
@@ -99,9 +97,7 @@ export default function EditProductForm({
           type="number"
           min="0"
           value={form.price}
-          onChange={(e) =>
-            updateField("price", e.target.value)
-          }
+          onChange={(e) => updateField("price", e.target.value)}
           required
           className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none focus:border-primary"
         />
@@ -110,12 +106,8 @@ export default function EditProductForm({
       <CategorySelect
         category={form.category}
         subCategory={form.subCategory}
-        onCategoryChange={(value) =>
-          updateField("category", value)
-        }
-        onSubCategoryChange={(value) =>
-          updateField("subCategory", value)
-        }
+        onCategoryChange={(value) => updateField("category", value)}
+        onSubCategoryChange={(value) => updateField("subCategory", value)}
       />
 
       <ArtistSelectField
@@ -137,9 +129,7 @@ export default function EditProductForm({
             type="number"
             min="0"
             value={form.initialQuantity}
-            onChange={(e) =>
-              updateField("initialQuantity", e.target.value)
-            }
+            onChange={(e) => updateField("initialQuantity", e.target.value)}
             placeholder="비워두면 제한 없음"
             className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none focus:border-primary"
           />
@@ -151,30 +141,23 @@ export default function EditProductForm({
           type="number"
           min="1"
           value={form.purchaseLimit}
-          onChange={(e) =>
-            updateField("purchaseLimit", e.target.value)
-          }
+          onChange={(e) => updateField("purchaseLimit", e.target.value)}
           placeholder="비워두면 제한 없음"
           className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none focus:border-primary"
         />
       </FormField>
 
       <FormField label="상품 설명">
-        <textarea
+        <ProductDescriptionEditor
           value={form.description}
-          onChange={(e) =>
-            updateField("description", e.target.value)
-          }
-          rows={5}
-          className="resize-none rounded border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none focus:border-primary"
+          onChange={(value) => updateField("description", value)}
+          boothId={boothId}
         />
       </FormField>
 
       <FormActions
         onCancel={() =>
-          router.push(
-            `/${eventId}/booths/${boothId}/manage/products`
-          )
+          router.push(`/${eventId}/booths/${boothId}/manage/products`)
         }
         loading={loading}
         submitLabel="상품 수정"

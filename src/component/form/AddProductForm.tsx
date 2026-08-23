@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import dynamic from "next/dynamic";
 import { FormField } from "./FormField";
 import { ProductImageField } from "./ProductImageField";
 import { CategorySelect } from "./CategorySelect";
@@ -20,6 +21,16 @@ interface AddProductFormProps {
   boothId: string;
   artists: User[];
 }
+
+const ProductDescriptionEditor = dynamic(
+  () => import("./ProductDescriptionEditor"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-48 animate-pulse rounded border border-zinc-800 bg-zinc-900" />
+    ),
+  }
+);
 
 export default function AddProductForm({
   eventId,
@@ -143,13 +154,12 @@ export default function AddProductForm({
       </FormField>
 
       <FormField label="상품 설명">
-        <textarea
+        <ProductDescriptionEditor
           value={form.description}
-          onChange={(e) =>
-            updateField("description", e.target.value)
+          onChange={(value) =>
+            updateField("description", value)
           }
-          rows={5}
-          className="resize-none rounded border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none focus:border-primary"
+          boothId={boothId}
         />
       </FormField>
 

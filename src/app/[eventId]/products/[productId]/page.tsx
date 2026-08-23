@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import DOMPurify from "isomorphic-dompurify";
 import { getCategoryLabel, getSubCategoryLabel } from "@/src/utils/product";
 import { getBooth } from "@/src/lib/data/booth";
 import { getProduct } from "@/src/lib/data/product";
@@ -27,6 +28,10 @@ export default async function Page({
   if (!booth) {
     return <div>부스를 찾을 수 없습니다.</div>;
   }
+
+  const sanitizedDescription = product.description
+    ? DOMPurify.sanitize(product.description)
+    : "";
 
   return (
     <div className="flex flex-col gap-6 px-4 sm:px-6 md:px-10 lg:px-40 py-6">
@@ -96,9 +101,10 @@ export default async function Page({
         <AddToCartButton product={product} boothName={booth.boothName} />
 
         {product.description && (
-          <p className="text-sm sm:text-base whitespace-pre-wrap wrap-break-word">
-            {product.description}
-          </p>
+          <div
+            className="ql-editor !p-0 text-sm sm:text-base wrap-break-word [&_img]:max-w-full [&_img]:rounded"
+            dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
+          />
         )}
       </div>
 
