@@ -10,7 +10,9 @@ export async function getProductSummaries(boothId?: string): Promise<ProductSumm
     .from("products")
     .select(
       `id, booth_id, artist_ids, artist_names, main_image_url, name, price, 
-      category, sub_category, initial_quantity, remaining_quantity`
+      category, sub_category, initial_quantity, remaining_quantity, purchase_limit,
+      booths ( name ),
+      product_options ( id, name, price, initial_quantity, remaining_quantity )`
     )
     .order("created_at", { ascending: false });
 
@@ -25,10 +27,10 @@ export async function getProductSummaries(boothId?: string): Promise<ProductSumm
     return [];
   }
 
-
   return (productData ?? []).map((product) => ({
     id: product.id,
     boothId: product.booth_id,
+    boothName: product.booths?.name ?? "",
     artistIds: product.artist_ids ?? [],
     artistNames: product.artist_names ?? [],
     mainImage: product.main_image_url ?? "",
@@ -36,7 +38,17 @@ export async function getProductSummaries(boothId?: string): Promise<ProductSumm
     price: product.price,
     category: product.category as ProductCategory,
     subCategory: product.sub_category as ProductSubCategory,
-    remainingQuantity: product.remaining_quantity
+    remainingQuantity: product.remaining_quantity,
+    purchaseLimit: product.purchase_limit,
+    options: (product.product_options ?? []).map(
+      (option): ProductOption => ({
+        id: option.id,
+        name: option.name,
+        price: option.price,
+        initialQuantity: option.initial_quantity,
+        remainingQuantity: option.remaining_quantity,
+      })
+    ),
   }));
 }
 

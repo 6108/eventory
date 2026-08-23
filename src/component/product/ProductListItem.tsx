@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Badge from "../booth/Badge";
 import Like from "./Like";
+import QuickAddButton from "../cart/QuickAddButton";
 
 interface ProductListItemProps {
   productInfo: ProductSummary;
@@ -27,8 +28,11 @@ export default function ProductListItem({
   );
 
   return (
-    <Link href={`/${eventId}/products/${productInfo.id}`}>
-      <div className="flex flex-col gap-4 cursor-pointer rounded-md p-2 hover:bg-primary/40 transition-colors">
+    <div className="relative flex flex-col gap-4 rounded-md p-2 hover:bg-primary/40 transition-colors">
+      <Link
+        href={`/${eventId}/products/${productInfo.id}`}
+        className="flex flex-col gap-4 cursor-pointer"
+      >
         <div className="relative aspect-square w-full">
           <Image
             src={productInfo.mainImage}
@@ -39,10 +43,6 @@ export default function ProductListItem({
           />
 
           <div className="flex justify-between">
-            <span className="absolute top-1 left-1 flex items-center justify-center px-2 py-1 bg-primary text-zinc-300 rounded-sm text-xs font-semibold">
-              신상품
-            </span>
-
             <Like productId={productInfo.id} isOwner={isOwner} />
           </div>
 
@@ -75,7 +75,13 @@ export default function ProductListItem({
             {productInfo.price.toLocaleString()}원
           </p>
         </div>
+      </Link>
+
+      {/* Link 바깥에 위치 -> 모달 배경 클릭 등으로 인한 버블링이
+          Link의 클릭 핸들러(페이지 이동)까지 닿지 않음 */}
+      <div className="absolute bottom-[168px] right-3">
+        <QuickAddButton product={productInfo} />
       </div>
-    </Link>
+    </div>
   );
 }

@@ -109,6 +109,7 @@ export type PosProduct = {
 export type ProductSummary = {
   id: string;
   boothId: string;
+  boothName: string;
   artistIds: string[];
   artistNames: string[];
   mainImage: string;
@@ -117,6 +118,8 @@ export type ProductSummary = {
   category: ProductCategory;
   subCategory: ProductSubCategory;
   remainingQuantity: number | null;
+  purchaseLimit: number | null;
+  options: ProductOption[];
 };
 
 // 좋아요한 상품

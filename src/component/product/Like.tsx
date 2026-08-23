@@ -101,7 +101,7 @@ export default function Like({ productId, isOwner = false }: LikeProps) {
           e.stopPropagation();
           handleClick();
         }}
-        className="flex min-w-8 flex-col items-center justify-center rounded-full bg-zinc-300/70 px-2 py-1 text-primary backdrop-blur-sm transition-colors hover:bg-zinc-200"
+        className="flex h-8 w-8 flex-col items-center justify-center rounded-full bg-zinc-300/70 text-primary backdrop-blur-sm transition-colors hover:bg-zinc-200"
       >
         <Heart
           size={18}
@@ -109,7 +109,7 @@ export default function Like({ productId, isOwner = false }: LikeProps) {
         />
 
         {count !== null && (
-          <span className="text-[11px] font-semibold leading-none">
+          <span className="text-[9px] font-semibold leading-none">
             {count}
           </span>
         )}

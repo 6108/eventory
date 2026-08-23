@@ -5,6 +5,7 @@ import { CartGroup, CartItem } from "../types/cart";
 
 interface CartState {
   items: CartItem[];
+  sentBoothIds: Record<string, string>; // boothId -> 마지막 전송 시각(ISO)
 
   addItem: (cartItem: CartItem) => void;
   increment: (productId: string, optionId: string | null) => void;
@@ -12,6 +13,7 @@ interface CartState {
   removeItem: (productId: string, optionId: string | null) => void;
   clearBooth: (boothId: string) => void;
   clearAll: () => void;
+  markBoothSent: (boothId: string) => void;
 
   // 파생 데이터
   totalQuantity: () => number;
@@ -24,6 +26,7 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      sentBoothIds: {},
 
       addItem: (cartItem) =>
         set((state) => {
@@ -31,6 +34,11 @@ export const useCartStore = create<CartState>()(
             (i) =>
               i.productId === cartItem.productId && i.optionId === cartItem.optionId
           );
+
+          // 부스에 다시 담기 시작하면, 이전에 보낸 요청은 더이상 최신 상태가 아니므로
+          // "전송됨" 표시를 해제해서 사용자가 다시 보내야 함을 인지하게 함
+          const nextSentBoothIds = { ...state.sentBoothIds };
+          delete nextSentBoothIds[cartItem.boothId];
 
           if (existing) {
             const nextQuantity = existing.quantity + cartItem.quantity;
@@ -55,6 +63,7 @@ export const useCartStore = create<CartState>()(
                   ? { ...i, quantity: nextQuantity }
                   : i
               ),
+              sentBoothIds: nextSentBoothIds,
             };
           }
 
@@ -64,12 +73,15 @@ export const useCartStore = create<CartState>()(
 
           return {
             items: [...state.items, cartItem],
+            sentBoothIds: nextSentBoothIds,
           };
         }),
 
       increment: (productId, optionId) =>
-        set((state) => ({
-          items: state.items.map((cartItem) => {
+        set((state) => {
+          let boothId: string | null = null;
+
+          const nextItems = state.items.map((cartItem) => {
             if (cartItem.productId !== productId || cartItem.optionId !== optionId) {
               return cartItem;
             }
@@ -87,35 +99,82 @@ export const useCartStore = create<CartState>()(
               return cartItem;
             }
 
+            boothId = cartItem.boothId;
             return { ...cartItem, quantity: nextQuantity };
-          }),
-        })),
+          });
+
+          if (!boothId) {
+            return { items: nextItems };
+          }
+
+          const nextSentBoothIds = { ...state.sentBoothIds };
+          delete nextSentBoothIds[boothId];
+
+          return { items: nextItems, sentBoothIds: nextSentBoothIds };
+        }),
 
       decrement: (productId, optionId) =>
-        set((state) => ({
-          items: state.items
+        set((state) => {
+          const target = state.items.find(
+            (cartItem) => cartItem.productId === productId && cartItem.optionId === optionId
+          );
+
+          const nextItems = state.items
             .map((cartItem) =>
               cartItem.productId === productId && cartItem.optionId === optionId
                 ? { ...cartItem, quantity: cartItem.quantity - 1 }
                 : cartItem
             )
-            .filter((cartItem) => cartItem.quantity > 0),
-        })),
+            .filter((cartItem) => cartItem.quantity > 0);
+
+          if (!target) {
+            return { items: nextItems };
+          }
+
+          const nextSentBoothIds = { ...state.sentBoothIds };
+          delete nextSentBoothIds[target.boothId];
+
+          return { items: nextItems, sentBoothIds: nextSentBoothIds };
+        }),
 
       removeItem: (productId, optionId) =>
-        set((state) => ({
-          items: state.items.filter(
+        set((state) => {
+          const target = state.items.find(
+            (cartItem) => cartItem.productId === productId && cartItem.optionId === optionId
+          );
+
+          const nextItems = state.items.filter(
             (cartItem) =>
               !(cartItem.productId === productId && cartItem.optionId === optionId)
-          ),
-        })),
+          );
+
+          if (!target) {
+            return { items: nextItems };
+          }
+
+          const nextSentBoothIds = { ...state.sentBoothIds };
+          delete nextSentBoothIds[target.boothId];
+
+          return { items: nextItems, sentBoothIds: nextSentBoothIds };
+        }),
 
       clearBooth: (boothId) =>
-        set((state) => ({
-          items: state.items.filter((cartItem) => cartItem.boothId !== boothId),
-        })),
+        set((state) => {
+          const nextSentBoothIds = { ...state.sentBoothIds };
+          delete nextSentBoothIds[boothId];
 
-      clearAll: () => set({ items: [] }),
+          return {
+            items: state.items.filter((cartItem) => cartItem.boothId !== boothId),
+            sentBoothIds: nextSentBoothIds,
+          };
+        }),
+
+      clearAll: () => set({ items: [], sentBoothIds: {} }),
+
+      markBoothSent: (boothId) =>
+        set((state) => ({
+          sentBoothIds: { ...state.sentBoothIds, [boothId]: new Date().toISOString() },
+        })),
 
       totalQuantity: () =>
         get().items.reduce((sum, cartItem) => sum + cartItem.quantity, 0),

@@ -17,6 +17,8 @@ interface CartBoothGroupProps {
 
 export default function CartBoothGroup({ group }: CartBoothGroupProps) {
   const clearBooth = useCartStore((s) => s.clearBooth);
+  const markBoothSent = useCartStore((s) => s.markBoothSent);
+  const sentAt = useCartStore((s) => s.sentBoothIds[group.boothId]);
   const { user, login } = useAuth();
   const openConfirmModal = useConfirmModalStore((s) => s.openConfirmModal);
   const [sending, setSending] = useState(false);
@@ -58,6 +60,9 @@ export default function CartBoothGroup({ group }: CartBoothGroupProps) {
       }
 
       toast.success("주문 요청을 보냈습니다. 부스 앞에서 닉네임을 말씀해주세요!");
+      // 결제/재고가 확정되는 게 아니므로 장바구니는 비우지 않고
+      // "이 부스는 이미 요청을 보냈다"는 상태만 표시함
+      markBoothSent(group.boothId);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "주문 보내기에 실패했습니다.");
     } finally {
@@ -107,8 +112,14 @@ export default function CartBoothGroup({ group }: CartBoothGroupProps) {
         disabled={sending}
         className="w-full rounded bg-primary px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
       >
-        {sending ? "보내는 중..." : "주문 보내기"}
+        {sending ? "보내는 중..." : sentAt ? "다시 보내기" : "주문 보내기"}
       </button>
+
+      {sentAt && (
+        <p className="text-center text-xs text-primary">
+          요청을 보냈습니다. 내용을 바꾸면 버튼을 눌러 다시 보낼 수 있어요.
+        </p>
+      )}
 
       {/*
         주문 요청은 "대기열"이 아니라 부스러의 실수 방지를 돕는 편의 도구임을 명시.
