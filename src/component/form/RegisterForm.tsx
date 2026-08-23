@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/src/hooks/useAuth";
+import { useBoothStore } from "@/src/store/boothStore";
 
 export default function RegisterForm() {
   const [boothNumber, setBoothNumber] = useState("");
@@ -41,6 +42,7 @@ export default function RegisterForm() {
       return;
     }
 
+    useBoothStore.getState().setBoothId(result.boothId);
     router.push(`/${result.eventId}/booths/${result.boothId}/manage`);
     router.refresh();
   }

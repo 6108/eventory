@@ -6,29 +6,21 @@ import { EVENT_ID as eventId } from "@/src/constants/event";
 import { useAuth } from "@/src/hooks/useAuth";
 import { BoothMenu } from "./BoothMenu";
 import { UserMenuItem } from "./UserMenuItem";
+import { useBoothStore } from "@/src/store/boothStore";
 
 export function UserMenu() {
   const { user, logout } = useAuth();
+  const { boothId, checked, fetchBoothId } = useBoothStore();
 
   const [open, setOpen] = useState(false);
-  const [boothId, setBoothId] = useState<string | null>(null);
-  const [boothChecked, setBoothChecked] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   useEffect(() => {
-    if (!user || boothChecked) return;
-
-    fetch("/api/booth/my")
-      .then((res) => res.json())
-      .then((data) => {
-        setBoothId(data?.boothId ?? null);
-      })
-      .finally(() => {
-        setBoothChecked(true);
-      });
-  }, [user, boothChecked]);
+    if (!user || checked) return;
+    fetchBoothId();
+  }, [user, checked, fetchBoothId]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -87,7 +79,7 @@ export function UserMenu() {
 
           <BoothMenu
             boothId={boothId}
-            loading={!boothChecked}
+            loading={!checked}
             onNavigate={() => setOpen(false)}
           />
 

@@ -28,7 +28,9 @@ export function Navbar() {
           >
             회지 및 굿즈
           </Link>
+          {/* 장바구니 */}
           <CartNavLink />
+          {/* 로그인. 로그인 후엔 유저 메뉴 드롭다운으로 바뀜 */}
           <Login />
         </div>
       </div>
