@@ -12,7 +12,7 @@ export default async function Page({
 
   const { data: booth } = await supabase
     .from("booths")
-    .select("id, name")
+    .select("id, name, booth_number")
     .eq("id", boothId)
     .single();
 
@@ -35,7 +35,13 @@ export default async function Page({
     <div className="mx-auto w-full max-w-lg flex flex-col gap-2">
       <div>
         <h1 className="text-xl font-semibold text-white pb-8">부스 관리</h1>
-        <p className="text-lg text-zinc-400">{booth.name}</p>
+        <div className="flex items-center gap-2">
+          <span className="h-5 w-1 rounded-full bg-primary" />
+          <p className="text-lg font-semibold tracking-tight text-zinc-100">
+            {booth.name}
+          </p>
+        </div>
+        <p className=" text-zinc-500">부스 번호: {booth.booth_number}</p>
       </div>
 
       <section className="rounded border border-zinc-800 p-4">
@@ -63,10 +69,10 @@ export default async function Page({
       </Link>
 
       <Link
-        href={`/${eventId}/booths/${boothId}/manage/notices`}
-        className="rounded bg-zinc-900 border border-zinc-800 px-4 py-2 text-sm text-white text-center"
+        href={`/${eventId}/booths/${boothId}/manage/prepaid`}
+        className="rounded bg-primary px-4 py-2 text-sm text-white text-center"
       >
-        공지 관리
+        선입금 관리
       </Link>
     </div>
   );

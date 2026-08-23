@@ -26,8 +26,8 @@ export default function CartBoothGroup({ group }: CartBoothGroupProps) {
   async function handleSendRequest() {
     if (!user) {
       openConfirmModal({
-        title: "로그인이 필요해요",
-        message: "주문 보내기는 로그인 후 이용할 수 있어요.",
+        title: "로그인 하시겠습니까?",
+        message: "주문 보내기는 로그인 후 이용 가능합니다.",
         confirmText: "로그인",
         cancelText: "취소",
         onConfirm: () => login(),
@@ -57,7 +57,7 @@ export default function CartBoothGroup({ group }: CartBoothGroupProps) {
         throw new Error(data.error ?? "주문 보내기에 실패했습니다.");
       }
 
-      toast.success("주문을 보냈어요. 부스 앞에서 닉네임을 말씀해주세요!");
+      toast.success("주문 요청을 보냈습니다. 부스 앞에서 닉네임을 말씀해주세요!");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "주문 보내기에 실패했습니다.");
     } finally {
@@ -116,10 +116,14 @@ export default function CartBoothGroup({ group }: CartBoothGroupProps) {
         말로 확인해야 확실하다는 점을 오해 없이 전달하는 게 목적.
       */}
       <p className="text-center text-xs text-zinc-500">
-        주문을 보내도 자동으로 접수되는 건 아니에요.<br />
-        부스 앞에서 닉네임을 말씀해주시면 부스러가 확인 후 담아드려요.
+        이 요청은 구매할 상품을 부스러에게 미리 알려두는 기능입니다.
         <br />
-        다시 보내면 이전 내용은 최신 내용으로 갱신됩니다.
+        실제 구매는 부스에서 직접 진행해 주세요.
+        <br />
+        부스 앞에서 닉네임을 말씀해 주시면, 부스러가 요청 내용을 확인하고 상품을 담아드립니다.
+        <br />
+        요청을 보내자마자 결제되거나 재고가 확정되는 것은 아니며,
+        같은 부스에 다시 요청하면 이전 요청은 새 내용으로 변경됩니다.
       </p>
     </div>
   );

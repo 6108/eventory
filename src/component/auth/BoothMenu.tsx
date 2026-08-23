@@ -23,11 +23,11 @@ export function BoothMenu({ boothId, loading, onNavigate }: Props) {
   return (
     <>
       <UserMenuItem href={`/${eventId}/booths/${boothId}`} onClick={onNavigate}>
-        내 부스 보기
+        부스 페이지 보기
       </UserMenuItem>
 
       <UserMenuItem href={`/${eventId}/booths/${boothId}/manage/pos`} onClick={onNavigate}>
-        포스기
+        판매 (POS)
       </UserMenuItem>
 
       <UserMenuItem href={`/${eventId}/booths/${boothId}/manage`} onClick={onNavigate}>

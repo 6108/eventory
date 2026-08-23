@@ -7,6 +7,7 @@ import { useAuth } from "@/src/hooks/useAuth";
 import { BoothMenu } from "./BoothMenu";
 import { UserMenuItem } from "./UserMenuItem";
 import { useBoothStore } from "@/src/store/boothStore";
+import { UserMenuSection } from "./UserMenuSection";
 
 export function UserMenu() {
   const { user, logout } = useAuth();
@@ -53,37 +54,38 @@ export function UserMenu() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-40 rounded-md border border-zinc-800 bg-zinc-900 py-1 shadow-lg">
-          <UserMenuItem
-            href={`/${eventId}/likes`}
-            onClick={() => setOpen(false)}
-          >
-            좋아요 목록
-          </UserMenuItem>
+        <div className="absolute right-0 top-full z-50 mt-2 w-44 rounded-md border border-zinc-800 bg-zinc-900 py-1 shadow-lg">
+          <UserMenuSection label="쇼핑">
+            <UserMenuItem
+              href={`/${eventId}/likes`}
+              onClick={() => setOpen(false)}
+            >
+              보관함
+            </UserMenuItem>
 
-          <UserMenuItem
-            href={`/${eventId}/my-orders`}
-            onClick={() => setOpen(false)}
-          >
-            내 주문내역
-          </UserMenuItem>
-
-          <UserMenuItem
-            href={`/mypage`}
-            onClick={() => setOpen(false)}
-          >
-            마이페이지
-          </UserMenuItem>
+            <UserMenuItem
+              href={`/${eventId}/my-orders`}
+              onClick={() => setOpen(false)}
+            >
+              내 주문내역
+            </UserMenuItem>
+          </UserMenuSection>
 
           <div className="my-1 h-px bg-zinc-800" />
 
-          <BoothMenu
-            boothId={boothId}
-            loading={!checked}
-            onNavigate={() => setOpen(false)}
-          />
+          <UserMenuSection label="내 부스">
+            <BoothMenu
+              boothId={boothId}
+              loading={!checked}
+              onNavigate={() => setOpen(false)}
+            />
+          </UserMenuSection>
 
           <div className="my-1 h-px bg-zinc-800" />
+
+          <UserMenuItem href="/mypage" onClick={() => setOpen(false)}>
+            프로필 설정
+          </UserMenuItem>
 
           <button
             onClick={async () => {

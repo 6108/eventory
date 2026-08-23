@@ -77,7 +77,7 @@ export default function Page({
           <h1 className="text-lg font-semibold text-white">선입금 등록</h1>
           <p className="mt-1 text-sm text-zinc-500">
             엑셀(.xlsx, .csv) 파일을 업로드하면 리스트로 변환됩니다. POS의 &quot;선입금
-            수령&quot; 탭에서 바로 조회할 수 있어요.
+            수령&quot; 탭에서 바로 조회할 수 있습니다.
           </p>
         </div>
         <label className="cursor-pointer rounded-md bg-white px-4 py-2 text-sm font-medium text-black hover:bg-zinc-200">

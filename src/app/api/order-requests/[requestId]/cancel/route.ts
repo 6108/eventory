@@ -37,7 +37,7 @@ export async function POST(
       {
         error:
           existing.status === "checked"
-            ? "이미 부스러가 확인한 주문이라 취소할 수 없어요. 부스 앞에서 직접 말씀해주세요."
+            ? "취소할 수 없는 상태입니다."
             : "취소할 수 없는 상태입니다.",
       },
       { status: 409 }

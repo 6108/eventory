@@ -8,9 +8,9 @@ import { getProductSummaries } from "@/src/lib/data/product";
 export default async function Page({
   params,
 }: {
-  params: Promise<{ eventId: string, boothId: string }>;
+  params: Promise<{ boothId: string }>;
 }) {
-  const { eventId, boothId } = await params;
+  const { boothId } = await params;
 
   const supabase = await createClient();
 
@@ -55,7 +55,6 @@ export default async function Page({
           </div>
 
           <FollowButton
-            eventId={eventId}
             boothId={booth.id}
             currentUserId={user?.id}
             initialFollowed={initialFollowed}
