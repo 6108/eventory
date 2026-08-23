@@ -1,5 +1,6 @@
 "use client";
 
+import toast from "react-hot-toast";
 import { useOrderStore } from "@/src/store/orderStore";
 import { PosProduct, ProductOption } from "@/src/types/product";
 
@@ -9,6 +10,7 @@ export default function ProductCard({
   product: PosProduct;
 }) {
   const addItem = useOrderStore((s) => s.addItem);
+  const orderItems = useOrderStore((s) => s.items);
 
   const hasOptions = product.options.length > 0;
 
@@ -34,15 +36,49 @@ export default function ProductCard({
       ? option.remainingQuantity
       : product.remainingQuantity;
 
-    if (remainingQuantity !== null && remainingQuantity <= 0) return;
+    if (remainingQuantity !== null && remainingQuantity <= 0) {
+      toast.error("품절된 상품입니다.");
+      return;
+    }
+
+    const optionId = option?.id ?? null;
+    const unitPrice = option?.price ?? product.price;
+
+    // 이미 담긴 수량 확인 (재고/구매제한은 "이미 담은 것 + 이번에 담을 것" 기준으로 판단해야 함)
+    const existing = orderItems.find(
+      (i) => i.productId === product.id && i.optionId === optionId
+    );
+    const currentQuantity = existing?.quantity ?? 0;
+    const nextQuantity = currentQuantity + 1;
+
+    if (
+      remainingQuantity !== null &&
+      nextQuantity > remainingQuantity
+    ) {
+      toast.error("재고 수량을 초과했습니다.");
+      return;
+    }
+
+    if (
+      product.purchaseLimit !== null &&
+      nextQuantity > product.purchaseLimit
+    ) {
+      toast.error(
+        `1인당 ${product.purchaseLimit}개까지 구매할 수 있습니다.`
+      );
+      return;
+    }
 
     addItem({
+      id: crypto.randomUUID(),
       productId: product.id,
-      optionId: option?.id ?? null,
-      name: option ? `${product.name} (${option.name})` : product.name,
-      price: option?.price ?? product.price,
-      remainingQuantity,
-      purchaseLimit: product.purchaseLimit,
+      optionId,
+      productName: product.name,
+      optionName: option?.name ?? null,
+      unitPrice,
+      quantity: 1,
+      cancelledQuantity: 0,
+      subtotal: unitPrice,
     });
   }
 
