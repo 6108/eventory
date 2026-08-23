@@ -19,14 +19,14 @@ export function Navbar() {
             href={`/${eventId}/booths`}
             className="text-primary hover:text-white whitespace-nowrap"
           >
-            부스 리스트
+            부스
           </Link>
 
           <Link
             href={`/${eventId}/products`}
             className="text-primary hover:text-white whitespace-nowrap"
           >
-            회지 및 굿즈
+            창작물
           </Link>
           {/* 장바구니 */}
           <CartNavLink />
