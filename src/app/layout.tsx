@@ -5,6 +5,7 @@ import { Footer } from "../component/layout/Footer";
 import DisableContextMenu from "../component/common/DisableContextMenu";
 import { Toaster } from "react-hot-toast";
 import ConfirmModal from "../component/common/ConfirmModal";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "프로젝트 이름",
@@ -19,16 +20,16 @@ export default function RootLayout({
   return (
     <html lang="ko" className="h-full max-w-7xl mx-auto">
       <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-300">
-        <Toaster />
-        <DisableContextMenu />
-        <ConfirmModal />
-        <Navbar />
+        <Providers>
+          <Toaster />
+          <DisableContextMenu />
+          <ConfirmModal />
+          <Navbar />
 
-        <main className="flex-1 p-8 pt-20">
-          {children}
-        </main>
+          <main className="flex-1 p-8 pt-20">{children}</main>
 
-        {/* <Footer /> */}
+          {/* <Footer /> */}
+        </Providers>
       </body>
     </html>
   );
