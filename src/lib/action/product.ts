@@ -1,18 +1,16 @@
 // src/lib/data/productLike.ts
 import { createClient } from "@/src/lib/supabase/client";
 
-// 내가 이 상품에 좋아요 눌렀는지 조회
-export async function getMyProductLike(productId: string, userId: string): Promise<boolean> {
+// 내가 좋아요 누른 상품 id 전체 조회 (페이지당 1회만 호출)
+export async function getMyLikedProductIds(userId: string): Promise<string[]> {
   const supabase = createClient();
 
   const { data } = await supabase
     .from("product_likes")
-    .select("id")
-    .eq("product_id", productId)
-    .eq("user_id", userId)
-    .maybeSingle();
+    .select("product_id")
+    .eq("user_id", userId);
 
-  return !!data;
+  return (data ?? []).map((row) => row.product_id);
 }
 
 // 상품에 달린 전체 좋아요 개수 조회 (작가 본인용)

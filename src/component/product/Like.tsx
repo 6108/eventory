@@ -1,78 +1,29 @@
 "use client";
 
 import { Heart } from "lucide-react";
-import { useEffect, useState } from "react";
-import { createClient } from "@/src/lib/supabase/client";
 import { useAuth } from "@/src/hooks/useAuth";
 import { useConfirmModalStore } from "@/src/store/confirmModalStore";
-import { getMyProductLike, getProductLikeCount } from "@/src/lib/action/product";
+import {
+  useMyLikedProductIds,
+  useProductLikeCount,
+  useToggleLike,
+} from "@/src/hooks/useProductLikes";
 
 interface LikeProps {
   productId: string;
-  isOwner?: boolean; // 로그인 유저가 이 상품을 올린 작가 본인인지
+  isOwner?: boolean;
 }
 
 export default function Like({ productId, isOwner = false }: LikeProps) {
-  const [liked, setLiked] = useState(false);
-  const [count, setCount] = useState<number | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const { login } = useAuth();
+  const { user, login } = useAuth();
+  const userId = user?.id ?? null;
   const openConfirmModal = useConfirmModalStore((s) => s.openConfirmModal);
 
-  useEffect(() => {
-    const supabase = createClient();
+  const { data: likedIds } = useMyLikedProductIds(userId);
+  const { data: count } = useProductLikeCount(productId, isOwner);
+  const toggleLike = useToggleLike(userId);
 
-    async function load() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUserId(user?.id ?? null);
-
-      if (user) {
-        setLiked(await getMyProductLike(productId, user.id));
-      }
-
-      if (isOwner) {
-        setCount(await getProductLikeCount(productId));
-      }
-    }
-
-    load();
-  }, [productId, isOwner]);
-
-  const toggleLike = async () => {
-    const supabase = createClient();
-
-    if (liked) {
-      setLiked(false);
-      setCount((c) => (c !== null ? c - 1 : c));
-
-      const { error } = await supabase
-        .from("product_likes")
-        .delete()
-        .eq("product_id", productId)
-        .eq("user_id", userId!);
-
-      if (error) {
-        console.error("좋아요 취소 실패:", error);
-        setLiked(true);
-        setCount((c) => (c !== null ? c + 1 : c));
-      }
-    } else {
-      setLiked(true);
-      setCount((c) => (c !== null ? c + 1 : c));
-
-      const { error } = await supabase
-        .from("product_likes")
-        .insert({ product_id: productId, user_id: userId! });
-
-      if (error) {
-        console.error("좋아요 실패:", error);
-        setLiked(false);
-        setCount((c) => (c !== null ? c - 1 : c));
-      }
-    }
-  };
+  const liked = likedIds?.includes(productId) ?? false;
 
   const handleClick = () => {
     if (!userId) {
@@ -86,7 +37,7 @@ export default function Like({ productId, isOwner = false }: LikeProps) {
       return;
     }
 
-    toggleLike();
+    toggleLike.mutate({ productId, liked });
   };
 
   return (
@@ -103,12 +54,9 @@ export default function Like({ productId, isOwner = false }: LikeProps) {
         }}
         className="flex h-8 w-8 flex-col items-center justify-center rounded-full bg-zinc-300/70 text-primary backdrop-blur-sm transition-colors hover:bg-zinc-200"
       >
-        <Heart
-          size={18}
-          className={liked ? "fill-primary" : ""}
-        />
+        <Heart size={18} className={liked ? "fill-primary" : ""} />
 
-        {count !== null && (
+        {count !== undefined && (
           <span className="text-[9px] font-semibold leading-none">
             {count}
           </span>
