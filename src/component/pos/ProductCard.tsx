@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import toast from "react-hot-toast";
 import { useOrderStore } from "@/src/store/orderStore";
 import { PosProduct, ProductOption } from "@/src/types/product";
@@ -10,7 +11,6 @@ export default function ProductCard({
   product: PosProduct;
 }) {
   const addItem = useOrderStore((s) => s.addItem);
-  const orderItems = useOrderStore((s) => s.items);
 
   const hasOptions = product.options.length > 0;
 
@@ -45,6 +45,9 @@ export default function ProductCard({
     const unitPrice = option?.price ?? product.price;
 
     // 이미 담긴 수량 확인 (재고/구매제한은 "이미 담은 것 + 이번에 담을 것" 기준으로 판단해야 함)
+    // 렌더링에 쓰는 값이 아니라 클릭 시점에만 필요한 값이라 훅으로 구독하지 않고
+    // getState()로 그 순간의 최신 상태만 읽는다 (구독하면 다른 상품 담을 때도 이 카드가 리렌더됨)
+    const orderItems = useOrderStore.getState().items;
     const existing = orderItems.find(
       (i) => i.productId === product.id && i.optionId === optionId
     );
@@ -88,12 +91,14 @@ export default function ProductCard({
         }`}
     >
       {/* 상품 이미지 */}
-      <div className="aspect-square w-full bg-zinc-800">
+      <div className="relative aspect-square w-full bg-zinc-800">
         {product.mainImage ? (
-          <img
+          <Image
             src={product.mainImage}
             alt={product.name}
-            className="h-full w-full object-cover"
+            fill
+            sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 12vw"
+            className="object-cover"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-xs text-zinc-500">

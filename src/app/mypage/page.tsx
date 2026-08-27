@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createClient } from "@/src/lib/supabase/server";
 import ProfileForm from "@/src/component/form/ProfileForm";
@@ -47,9 +48,11 @@ export default async function Page() {
 
         <div className="mb-6 flex items-center gap-4">
           {profile.profile_image ? (
-            <img
+            <Image
               src={profile.profile_image}
               alt={profile.name ?? "프로필"}
+              width={64}
+              height={64}
               className="h-16 w-16 rounded-full object-cover"
             />
           ) : (

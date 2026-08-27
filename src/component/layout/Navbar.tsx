@@ -26,7 +26,7 @@ export function Navbar() {
             href={`/${eventId}/products`}
             className="text-primary hover:text-white whitespace-nowrap"
           >
-            창작물
+            회지 & 굿즈
           </Link>
           {/* 장바구니 */}
           <CartNavLink />

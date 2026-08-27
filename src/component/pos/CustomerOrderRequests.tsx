@@ -5,6 +5,7 @@ import { useOrderStore } from "@/src/store/orderStore";
 import type { PosProduct } from "@/src/types/product";
 import type { OrderRequest } from "@/src/types/request";
 import { useOrderRequests } from "@/src/hooks/useOrderRequests";
+import { useIsActiveTab } from "./PosTabContext";
 
 interface Props {
   boothId: string;
@@ -12,7 +13,8 @@ interface Props {
 }
 
 export default function OrderRequests({ boothId, products }: Props) {
-  const { requests, isLoading, setStatus } = useOrderRequests(boothId);
+  const isActive = useIsActiveTab("requests");
+  const { requests, isLoading, setStatus } = useOrderRequests(boothId, isActive);
   const addItem = useOrderStore((s) => s.addItem);
   const decrementBy = useOrderStore((s) => s.decrementBy);
   const markRequestChecked = useOrderStore((s) => s.markRequestChecked);

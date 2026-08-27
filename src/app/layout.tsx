@@ -8,8 +8,8 @@ import ConfirmModal from "../component/common/ConfirmModal";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "프로젝트 이름",
-  description: "프로젝트 설명",
+  title: "redemption",
+  description: "솔음사헌 배포전",
 };
 
 export default function RootLayout({
