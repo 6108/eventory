@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.15"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
@@ -140,33 +140,33 @@ export type Database = {
       booths: {
         Row: {
           artist_names: string[] | null
+          booth_name: string
           booth_number: string
           category: Database["public"]["Enums"]["booth_category"]
           created_at: string | null
           description: string | null
           event_id: string
           id: string
-          name: string
         }
         Insert: {
           artist_names?: string[] | null
+          booth_name: string
           booth_number: string
           category?: Database["public"]["Enums"]["booth_category"]
           created_at?: string | null
           description?: string | null
           event_id: string
           id?: string
-          name: string
         }
         Update: {
           artist_names?: string[] | null
+          booth_name?: string
           booth_number?: string
           category?: Database["public"]["Enums"]["booth_category"]
           created_at?: string | null
           description?: string | null
           event_id?: string
           id?: string
-          name?: string
         }
         Relationships: [
           {
@@ -497,7 +497,7 @@ export type Database = {
           description: string | null
           id: string
           initial_quantity: number | null
-          main_image_url: string | null
+          main_image: string | null
           name: string
           price: number
           purchase_limit: number | null
@@ -514,7 +514,7 @@ export type Database = {
           description?: string | null
           id?: string
           initial_quantity?: number | null
-          main_image_url?: string | null
+          main_image?: string | null
           name: string
           price: number
           purchase_limit?: number | null
@@ -531,7 +531,7 @@ export type Database = {
           description?: string | null
           id?: string
           initial_quantity?: number | null
-          main_image_url?: string | null
+          main_image?: string | null
           name?: string
           price?: number
           purchase_limit?: number | null

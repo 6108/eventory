@@ -117,7 +117,7 @@ export default function CartBoothGroup({ group }: CartBoothGroupProps) {
 
       {sentAt && (
         <p className="text-center text-xs text-primary">
-          요청을 보냈습니다. 내용을 바꾸면 버튼을 눌러 다시 보낼 수 있어요.
+          요청을 보냈습니다. 내용을 바꾸면 버튼을 눌러 다시 보낼 수 있습니다.
         </p>
       )}
 

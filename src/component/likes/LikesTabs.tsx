@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FollowedBooth } from "@/src/types/booth";
 import { LikedProduct } from "@/src/types/product";
+import ImageLightbox from "@/src/component/product/ImageLightbox";
 
 export function LikesTabs({
   likedProducts,
@@ -17,6 +18,11 @@ export function LikesTabs({
   const [activeTab, setActiveTab] = useState<"products" | "booths">(
     "products"
   );
+  const [openProductId, setOpenProductId] = useState<string | null>(null);
+
+  const openProduct = likedProducts.find(
+    ({ product }) => product.id === openProductId
+  )?.product;
 
   return (
     <div className="mx-auto w-full max-w-lg flex flex-col gap-4">
@@ -26,8 +32,8 @@ export function LikesTabs({
         <button
           onClick={() => setActiveTab("products")}
           className={`flex-1 py-2 text-center text-sm ${activeTab === "products"
-              ? "bg-primary text-white"
-              : "bg-zinc-900 text-zinc-400"
+            ? "bg-primary text-white"
+            : "bg-zinc-900 text-zinc-400"
             }`}
         >
           좋아요한 상품 ({likedProducts.length})
@@ -35,8 +41,8 @@ export function LikesTabs({
         <button
           onClick={() => setActiveTab("booths")}
           className={`flex-1 py-2 text-center text-sm ${activeTab === "booths"
-              ? "bg-primary text-white"
-              : "bg-zinc-900 text-zinc-400"
+            ? "bg-primary text-white"
+            : "bg-zinc-900 text-zinc-400"
             }`}
         >
           팔로우한 부스 ({followedBooths.length})
@@ -57,9 +63,10 @@ export function LikesTabs({
 
               return (
                 <li key={likeId}>
-                  <Link
-                    href={`/booths/${product.boothId}/products/${product.id}`}
-                    className="flex items-center gap-3 rounded border border-zinc-800 p-3 hover:bg-zinc-900"
+                  <button
+                    type="button"
+                    onClick={() => setOpenProductId(product.id)}
+                    className="flex w-full items-center gap-3 rounded border border-zinc-800 p-3 text-left hover:bg-zinc-900"
                   >
                     {product.mainImage ? (
                       <Image
@@ -91,7 +98,7 @@ export function LikesTabs({
                         )}
                       </div>
                     </div>
-                  </Link>
+                  </button>
                 </li>
               );
             })}
@@ -127,6 +134,15 @@ export function LikesTabs({
             </li>
           ))}
         </ul>
+      )}
+
+      {openProduct && (
+        <ImageLightbox
+          images={[openProduct.mainImage, ...openProduct.sampleImages].filter(Boolean)}
+          alt={openProduct.name}
+          isOpen={!!openProductId}
+          onClose={() => setOpenProductId(null)}
+        />
       )}
     </div>
   );

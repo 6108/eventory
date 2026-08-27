@@ -28,7 +28,7 @@ export function useMyOrderRequests() {
           status: r.status,
           createdAt: r.created_at,
           updatedAt: r.updated_at,
-          boothName: r.booths?.name ?? null,
+          boothName: r.booths?.booth_name ?? null,
           order: r.orders
             ? {
               id: r.orders.id,

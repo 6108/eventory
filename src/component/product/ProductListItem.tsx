@@ -1,23 +1,26 @@
+"use client";
+
+import { useState, useCallback } from "react";
 import { ProductSummary, productCategories } from "@/src/types/product";
-import { EVENT_ID as eventId } from "@/src/constants/event";
 import Image from "next/image";
-import Link from "next/link";
-import Badge from "../booth/Badge";
 import Like from "./Like";
 import QuickAddButton from "../cart/QuickAddButton";
+import ImageLightbox from "./ImageLightbox";
+import { EVENT_ID as eventId } from "@/src/constants/event";
+
 
 interface ProductListItemProps {
   productInfo: ProductSummary;
-  boothName?: string;
   currentUserId?: string;
 }
 
 export default function ProductListItem({
   productInfo,
-  boothName,
   currentUserId,
 }: ProductListItemProps) {
   const isOwner = !!currentUserId && productInfo.artistIds?.includes(currentUserId);
+
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   const category = productCategories.find(
     (item) => item.value === productInfo.category
@@ -27,11 +30,25 @@ export default function ProductListItem({
     (item) => item.value === productInfo.subCategory
   );
 
+  const images = [productInfo.mainImage, ...productInfo.sampleImages].filter(Boolean);
+
+  const openLightbox = useCallback(() => setIsLightboxOpen(true), []);
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      openLightbox();
+    }
+  }
+
   return (
-    <div className="relative flex flex-col gap-4 rounded-md p-2 hover:bg-primary/40 transition-colors">
-      <Link
-        href={`/${eventId}/products/${productInfo.id}`}
-        className="flex flex-col gap-4 cursor-pointer"
+    <div className="relative flex flex-col gap-4 rounded-xl border border-primary/40  hover:bg-primary/40 hover:border-primary/70 transition-colors">
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={openLightbox}
+        onKeyDown={handleKeyDown}
+        className="flex flex-col gap-2 cursor-pointer text-left"
       >
         <div className="relative aspect-square w-full">
           <Image
@@ -39,49 +56,48 @@ export default function ProductListItem({
             alt={productInfo.name}
             fill
             sizes="(max-width: 768px) 50vw, 33vw"
-            className="object-cover rounded"
+            className="object-cover rounded-t-xl"
           />
 
-          <div className="flex justify-between">
+          <div className="absolute top-2 right-2">
             <Like productId={productInfo.id} isOwner={isOwner} />
           </div>
 
-          <Badge />
+          <div className="absolute bottom-2 right-2">
+            <QuickAddButton product={productInfo} />
+          </div>
         </div>
 
-        <div className="flex flex-col justify-center w-full">
-          <span className="text-xs text-zinc-500">
-            {category?.label}
-            {" > "}
-            {subCategory?.label}
-          </span>
-
-          <div className="flex min-w-0 truncate text-sm text-zinc-400">
-            <span className="truncate">
-              {boothName}
+        <div className="flex flex-col justify-center w-full p-2">
+          {/* 부스 정보 - 한 줄, 눈에 띄지 않게 */}
+          <div className="flex items-center gap-1 text-xs text-zinc-500">
+            <span className="rounded  px-1 py-0.5 font-medium text-zinc-400">
+              [{productInfo.boothNumber}]
             </span>
-
-            <span className="shrink-0">
-              {" - "}
-              {productInfo.artistNames.join(", ")}
-            </span>
+            <span className="truncate">{productInfo.boothName}</span>
           </div>
 
-          <h3 className="text-base text-zinc-300 line-clamp-2 min-h-20">
+          {/* 상품명 - 핵심 정보, 가장 크고 진하게 */}
+          <h3 className="text- font-medium text-zinc-100 line-clamp-2 min-h-10 mt-1">
             {productInfo.name}
           </h3>
 
-          <p className="text-xl font-semibold">
+          {/* 가격 - 시선이 마지막에 꽂히는 자리 */}
+          <p className="text-md font-bold text-primary mt-0.5">
             {productInfo.price.toLocaleString()}원
           </p>
         </div>
-      </Link>
-
-      {/* Link 바깥에 위치 -> 모달 배경 클릭 등으로 인한 버블링이
-          Link의 클릭 핸들러(페이지 이동)까지 닿지 않음 */}
-      <div className="absolute bottom-[168px] right-3">
-        <QuickAddButton product={productInfo} />
       </div>
+
+      <ImageLightbox
+        images={images}
+        alt={productInfo.name}
+        isOpen={isLightboxOpen}
+        onClose={() => setIsLightboxOpen(false)}
+        eventId={eventId}
+        boothId={productInfo.boothId}
+        boothName={productInfo.boothName}
+      />
     </div>
   );
 }

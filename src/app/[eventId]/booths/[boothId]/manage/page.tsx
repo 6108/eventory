@@ -12,7 +12,7 @@ export default async function Page({
 
   const { data: booth } = await supabase
     .from("booths")
-    .select("id, name, booth_number")
+    .select("id, booth_name, booth_number")
     .eq("id", boothId)
     .single();
 
@@ -38,7 +38,7 @@ export default async function Page({
         <div className="flex items-center gap-2">
           <span className="h-5 w-1 rounded-full bg-primary" />
           <p className="text-lg font-semibold tracking-tight text-zinc-100">
-            {booth.name}
+            {booth.booth_name}
           </p>
         </div>
         <p className=" text-zinc-500">부스 번호: {booth.booth_number}</p>

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import dynamic from "next/dynamic";
 import { FormField } from "./FormField";
 import { ProductImageField } from "./ProductImageField";
 import { CategorySelect } from "./CategorySelect";
@@ -16,6 +15,7 @@ import { useArtistSelection } from "@/src/hooks/useArtistSelection";
 import { useProductMutation } from "@/src/hooks/useProductMutation";
 import type { Product } from "@/src/types/product";
 import { User } from "@/src/types/user";
+import { ProductSampleImagesField } from "./ProductSampleImagesField";
 
 interface ProductFormProps {
   eventId: string;
@@ -24,16 +24,6 @@ interface ProductFormProps {
   productId?: string;
   product?: Product;
 }
-
-const ProductDescriptionEditor = dynamic(
-  () => import("./ProductDescriptionEditor"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-60 animate-pulse rounded border border-zinc-800 bg-zinc-900" />
-    ),
-  }
-);
 
 export default function ProductForm({
   eventId,
@@ -60,6 +50,10 @@ export default function ProductForm({
   });
 
   const [image, setImage] = useState<File | null>(null);
+  const [sampleImageFiles, setSampleImageFiles] = useState<File[]>([]);
+  const [keptSampleImageUrls, setKeptSampleImageUrls] = useState<string[]>(
+    product?.sampleImages ?? []
+  );
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -79,7 +73,7 @@ export default function ProductForm({
       return;
     }
 
-    submit(form, image, selectedArtistIds);
+    submit(form, image, selectedArtistIds, sampleImageFiles, keptSampleImageUrls);
   }
 
   return (
@@ -97,6 +91,14 @@ export default function ProductForm({
         initialPreviewUrl={product?.mainImage}
         onImageChange={setImage}
         hint={isEdit ? "비워두면 기존 이미지가 유지돼요." : undefined}
+      />
+
+      <ProductSampleImagesField
+        initialUrls={product?.sampleImages}
+        onChange={(files, keptUrls) => {
+          setSampleImageFiles(files);
+          setKeptSampleImageUrls(keptUrls);
+        }}
       />
 
       <FormField label="가격">
@@ -148,14 +150,6 @@ export default function ProductForm({
           value={form.purchaseLimit}
           onChange={(e) => updateField("purchaseLimit", e.target.value)}
           placeholder="비워두면 제한 없음"
-        />
-      </FormField>
-
-      <FormField label="상품 설명">
-        <ProductDescriptionEditor
-          value={form.description}
-          onChange={(value) => updateField("description", value)}
-          boothId={boothId}
         />
       </FormField>
 

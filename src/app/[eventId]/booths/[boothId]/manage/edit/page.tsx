@@ -24,7 +24,7 @@ export default async function Page({
 
   const { data: booth } = await supabase
     .from("booths")
-    .select("id, name, description, category")
+    .select("id, booth_name, description, category")
     .eq("id", boothId)
     .single();
 
@@ -41,7 +41,7 @@ export default async function Page({
       <EditBoothForm
         boothId={boothId}
         eventId={eventId}
-        boothName={booth.name}
+        boothName={booth.booth_name}
         description={booth.description}
         category={booth.category}
       />

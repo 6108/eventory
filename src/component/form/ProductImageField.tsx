@@ -80,6 +80,7 @@ export function ProductImageField({
             src={previewUrl}
             alt="상품 이미지 미리보기"
             fill
+            sizes="192px"
             className="object-cover"
             unoptimized={isNewFile}
           />

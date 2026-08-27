@@ -110,9 +110,11 @@ export type ProductSummary = {
   id: string;
   boothId: string;
   boothName: string;
+  boothNumber: string;
   artistIds: string[];
   artistNames: string[];
   mainImage: string;
+  sampleImages: string[];
   name: string;
   price: number;
   category: ProductCategory;

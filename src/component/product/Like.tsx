@@ -28,8 +28,8 @@ export default function Like({ productId, isOwner = false }: LikeProps) {
   const handleClick = () => {
     if (!userId) {
       openConfirmModal({
-        title: "로그인이 필요해요",
-        message: "좋아요는 로그인 후 이용할 수 있어요.",
+        title: "로그인 필요",
+        message: "좋아요는 로그인 후 이용할 수 있습니다.",
         confirmText: "로그인",
         cancelText: "취소",
         onConfirm: () => login(),

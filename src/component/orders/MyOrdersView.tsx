@@ -28,9 +28,9 @@ export default function MyOrdersView() {
   async function handleCancel(requestId: string) {
     try {
       await cancelRequest(requestId);
-      toast.success("주문을 취소했어요.");
+      toast.success("주문을 취소했습니다.");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "취소에 실패했어요.");
+      toast.error(err instanceof Error ? err.message : "취소에 실패했습니다.");
     }
   }
 
@@ -43,7 +43,7 @@ export default function MyOrdersView() {
 
         {sentRequests.length === 0 ? (
           <p className="rounded border border-zinc-800 p-4 text-sm text-zinc-500">
-            보낸 주문이 없어요.
+            보낸 주문이 없습니다.
           </p>
         ) : (
           <ul className="flex flex-col gap-2">
@@ -79,8 +79,8 @@ export default function MyOrdersView() {
                 */}
                 <p className="mt-2 text-[11px] text-zinc-600">
                   {r.status === "requested"
-                    ? "아직 부스러가 확인하지 않았어요. 마음이 바뀌면 취소할 수 있어요."
-                    : "부스러가 확인해서 담았어요. 부스 앞에서 변경 사항이 있다면 직접 말씀해주세요."}
+                    ? "아직 부스러가 확인하지 않았습니다. 마음이 바뀌면 취소할 수 있습니다."
+                    : "부스러가 확인해서 담았습니다. 부스 앞에서 변경 사항이 있다면 직접 말씀해주세요."}
                 </p>
               </li>
             ))}
@@ -93,7 +93,7 @@ export default function MyOrdersView() {
 
         {completedRequests.length === 0 ? (
           <p className="rounded border border-zinc-800 p-4 text-sm text-zinc-500">
-            아직 결제 완료된 주문이 없어요.
+            아직 결제 완료된 주문이 없습니다.
           </p>
         ) : (
           <ul className="flex flex-col gap-2">

@@ -20,7 +20,7 @@ export async function GET() {
     .from("order_requests")
     .select(
       `id, booth_id, status, created_at, updated_at,
-      booths ( name ),
+      booths ( booth_name ),
       order_request_items (
         id,
         order_request_id,

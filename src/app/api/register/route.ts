@@ -27,7 +27,7 @@ export async function POST(request: Request) {
 
   if (error) {
     console.error(error);
-    return NextResponse.json({ error: "연결 중 문제가 발생했어요." }, { status: 500 });
+    return NextResponse.json({ error: "연결 중 문제가 발생했습니다." }, { status: 500 });
   }
 
   if (!boothId) {

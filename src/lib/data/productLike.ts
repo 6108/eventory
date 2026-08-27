@@ -12,7 +12,7 @@ export async function getLikedProducts(userId: string): Promise<LikedProduct[]> 
       `
       id, created_at,
       products (
-        id, booth_id, artist_ids, artist_names, main_image_url, name, price,
+        id, booth_id, artist_ids, artist_names, main_image, name, price,
         category, sub_category, remaining_quantity
       )
       `
@@ -38,7 +38,7 @@ export async function getLikedProducts(userId: string): Promise<LikedProduct[]> 
           boothId: product.booth_id,
           artistIds: product.artist_ids ?? [],
           artistNames: product.artist_names ?? [],
-          mainImage: product.main_image_url ?? "",
+          mainImage: product.main_image ?? "",
           name: product.name,
           price: product.price,
           category: product.category as ProductCategory,

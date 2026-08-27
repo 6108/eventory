@@ -12,6 +12,7 @@ export async function POST(
   const {
     name,
     mainImageUrl,
+    sampleImageUrls,
     price,
     category,
     subCategory,
@@ -98,7 +99,8 @@ export async function POST(
     .from("products")
     .insert({
       booth_id: boothId,
-      main_image_url: mainImageUrl.trim(),
+      main_image: mainImageUrl.trim(),
+      sample_images: Array.isArray(sampleImageUrls) ? sampleImageUrls : [],
       name: name.trim(),
       price: Number(price),
       category,
@@ -117,7 +119,7 @@ export async function POST(
       artist_names: artistNames,
     })
     .select(
-      "id, booth_id, main_image_url, sample_images, name, price, category, sub_category, initial_quantity, purchase_limit, description, remaining_quantity, artist_ids, artist_names"
+      "id, booth_id, main_image, sample_images, name, price, category, sub_category, initial_quantity, purchase_limit, description, remaining_quantity, artist_ids, artist_names"
     )
     .single();
 

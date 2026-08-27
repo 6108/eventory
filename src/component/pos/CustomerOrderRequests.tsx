@@ -79,7 +79,7 @@ export default function OrderRequests({ boothId, products }: Props) {
     try {
       await setStatus(request.id, "checked");
     } catch {
-      toast.error("상태 변경에 실패했어요.");
+      toast.error("상태 변경에 실패했습니다.");
     }
   }
 
@@ -93,7 +93,7 @@ export default function OrderRequests({ boothId, products }: Props) {
     try {
       await setStatus(request.id, "requested");
     } catch {
-      toast.error("되돌리기에 실패했어요.");
+      toast.error("되돌리기에 실패했습니다.");
     }
   }
 
@@ -101,7 +101,7 @@ export default function OrderRequests({ boothId, products }: Props) {
     try {
       await setStatus(request.id, "cancelled");
     } catch {
-      toast.error("삭제에 실패했어요.");
+      toast.error("삭제에 실패했습니다.");
     }
   }
 
@@ -115,13 +115,13 @@ export default function OrderRequests({ boothId, products }: Props) {
   return (
     <div className="h-full overflow-y-auto p-4">
       <p className="mb-4 rounded border border-zinc-800 bg-zinc-900 p-3 text-xs text-zinc-400">
-        손님이 미리 보낸 주문이에요. 대기 순서가 아니라 참고용이에요 — 아무거나 먼저 확인해서 담아도 괜찮아요.
-        손님이 다시 보내면 이전 내용은 최신 내용으로 바뀌어요.
+        손님이 담아둔 상품 목록입니다.
+        손님이 다시 담으면 이전 내용은 최신 내용으로 바뀝니다.
       </p>
 
       {requests.length === 0 ? (
         <div className="rounded border border-zinc-800 p-6 text-center text-sm text-zinc-500">
-          아직 들어온 주문 요청이 없어요.
+          손님이 장바구니를 확정하면 이곳에 표시됩니다.
         </div>
       ) : (
         <ul className="flex flex-col gap-2">
@@ -192,8 +192,8 @@ function RequestCard({
 
           <p className="mt-1 text-[11px] text-zinc-600">
             {checked
-              ? "잘못 눌렀다면 다시 눌러서 되돌릴 수 있어요."
-              : "탭하면 판매 화면에 담겨요."}
+              ? "잘못 눌렀다면 다시 눌러서 되돌릴 수 있습니다."
+              : "탭하면 판매 화면에 담깁니다."}
           </p>
         </button>
 

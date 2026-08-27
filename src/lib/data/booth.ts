@@ -10,7 +10,7 @@ export async function getBooth(
   const { data, error } = await supabase
     .from("booths")
     .select(
-      "id, event_id, booth_number, name, category, description, artist_names"
+      "id, event_id, booth_number, booth_name, category, description, artist_names"
     )
     .eq("id", boothId)
     .single();
@@ -24,7 +24,7 @@ export async function getBooth(
     id: data.id,
     eventId: data.event_id,
     boothNumber: data.booth_number,
-    boothName: data.name,
+    boothName: data.booth_name,
     artistNames: data.artist_names ?? [],
     category: data.category,
     description: data.description ?? "",
@@ -38,7 +38,7 @@ export async function getBooths(): Promise<Booth[]> {
   const { data, error } = await supabase
     .from("booths")
     .select(
-      "id, event_id, booth_number, name, category, description, artist_names"
+      "id, event_id, booth_number, booth_name, category, description, artist_names"
     )
     .order("booth_number", { ascending: true });
 
@@ -51,7 +51,7 @@ export async function getBooths(): Promise<Booth[]> {
     id: booth.id,
     eventId: booth.event_id,
     boothNumber: booth.booth_number,
-    boothName: booth.name,
+    boothName: booth.booth_name,
     artistNames: booth.artist_names ?? [],
     category: booth.category,
     description: booth.description ?? "",
@@ -80,7 +80,7 @@ export async function getMyBooths(
     .from("booth_artists")
     .select(
       `booth_id, artist_name,
-      booths ( id, event_id, booth_number, name, events ( id, name ) )`
+      booths ( id, event_id, booth_number, booth_name, events ( id, name ) )`
     )
     .eq("artist_id", userId);
 
@@ -113,7 +113,7 @@ export async function getMyBooths(
     eventGroup.booths.push({
       boothId: booth.id,
       boothNumber: booth.booth_number,
-      boothName: booth.name,
+      boothName: booth.booth_name,
       artistName: boothArtist.artist_name ?? "",
     });
   }
@@ -131,7 +131,7 @@ export async function getFollowedBooths(userId: string): Promise<FollowedBooth[]
       `
       id, created_at,
       booths (
-        id, event_id, booth_number, name, artist_names, category, description
+        id, event_id, booth_number, booth_name, artist_names, category, description
       )
       `
     )
@@ -155,7 +155,7 @@ export async function getFollowedBooths(userId: string): Promise<FollowedBooth[]
           id: booth.id,
           eventId: booth.event_id,
           boothNumber: booth.booth_number,
-          boothName: booth.name,
+          boothName: booth.booth_name,
           artistNames: booth.artist_names ?? [],
           category: booth.category as "ADULT" | "GENERAL",
           description: booth.description ?? "",

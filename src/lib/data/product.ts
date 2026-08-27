@@ -9,9 +9,9 @@ export async function getProductSummaries(boothId?: string): Promise<ProductSumm
   let query = supabase
     .from("products")
     .select(
-      `id, booth_id, artist_ids, artist_names, main_image_url, name, price, 
+      `id, booth_id, artist_ids, artist_names, main_image, sample_images, name, price, 
       category, sub_category, initial_quantity, remaining_quantity, purchase_limit,
-      booths ( name ),
+      booths ( booth_name, booth_number ),
       product_options ( id, name, price, initial_quantity, remaining_quantity )`
     )
     .order("created_at", { ascending: false });
@@ -24,16 +24,19 @@ export async function getProductSummaries(boothId?: string): Promise<ProductSumm
 
   if (error) {
     console.error("상품 조회 실패:", error);
+    console.error("상품 조회 실패 상세:", JSON.stringify(error, null, 2));
     return [];
   }
 
   return (productData ?? []).map((product) => ({
     id: product.id,
     boothId: product.booth_id,
-    boothName: product.booths?.name ?? "",
+    boothName: product.booths?.booth_name ?? "",
+    boothNumber: product.booths?.booth_number ?? "",
     artistIds: product.artist_ids ?? [],
     artistNames: product.artist_names ?? [],
-    mainImage: product.main_image_url ?? "",
+    sampleImages: product.sample_images ?? [],
+    mainImage: product.main_image ?? "",
     name: product.name,
     price: product.price,
     category: product.category as ProductCategory,
@@ -59,7 +62,7 @@ export async function getProduct(productId: string, boothId?: string): Promise<P
   let query = supabase
     .from("products")
     .select(
-      `id, booth_id, main_image_url, sample_images, name, price, category, sub_category,
+      `id, booth_id, main_image, sample_images, name, price, category, sub_category,
       initial_quantity, remaining_quantity, purchase_limit, description, artist_ids, artist_names,
       product_options ( id, name, price, initial_quantity, remaining_quantity )`
     )
@@ -81,7 +84,7 @@ export async function getProduct(productId: string, boothId?: string): Promise<P
     boothId: productData.booth_id,
     artistIds: productData.artist_ids ?? [],
     artistNames: productData.artist_names ?? [],
-    mainImage: productData.main_image_url ?? "",
+    mainImage: productData.main_image ?? "",
     sampleImages: productData.sample_images ?? [],
     name: productData.name,
     price: productData.price,
@@ -108,7 +111,7 @@ export async function getPosProducts(boothId: string): Promise<PosProduct[]> {
   const { data, error } = await supabase
     .from("products")
     .select(
-      `id, name, price, main_image_url, category, sub_category,
+      `id, name, price, main_image, category, sub_category,
       initial_quantity, remaining_quantity, purchase_limit,
       product_options ( id, name, price, initial_quantity, remaining_quantity )`
     )
@@ -124,7 +127,7 @@ export async function getPosProducts(boothId: string): Promise<PosProduct[]> {
     id: product.id,
     name: product.name,
     price: product.price,
-    mainImage: product.main_image_url ?? "",
+    mainImage: product.main_image ?? "",
     category: product.category as ProductCategory,
     subCategory: product.sub_category as ProductSubCategory,
     initialQuantity: product.initial_quantity,

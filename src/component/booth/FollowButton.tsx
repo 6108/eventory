@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { Heart } from "lucide-react";
 
-type Props = {
+interface FollowButtonProps {
   boothId: string;
   currentUserId?: string;
   initialFollowed?: boolean;
@@ -13,7 +13,7 @@ export default function FollowButton({
   boothId,
   currentUserId,
   initialFollowed = false,
-}: Props) {
+}: FollowButtonProps) {
   const [isFollowed, setIsFollowed] = useState(initialFollowed);
   const [isPending, startTransition] = useTransition();
 
@@ -45,8 +45,8 @@ export default function FollowButton({
       onClick={handleClick}
       disabled={isPending}
       className={`flex items-center gap-1.5 rounded border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 ${isFollowed
-          ? "border-primary bg-primary/10 text-primary"
-          : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-white"
+        ? "border-primary bg-primary/10 text-primary"
+        : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-white"
         }`}
     >
       <Heart size={16} className={isFollowed ? "fill-primary" : ""} />

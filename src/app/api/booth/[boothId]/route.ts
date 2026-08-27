@@ -35,7 +35,7 @@ export async function PUT(
       category,
     })
     .eq("id", boothId)
-    .select("id, name, description, category")
+    .select("id, booth_name, description, category")
     .single();
 
   if (error) {
