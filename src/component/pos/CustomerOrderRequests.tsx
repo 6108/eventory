@@ -14,7 +14,7 @@ interface Props {
 
 export default function OrderRequests({ boothId, products }: Props) {
   const isActive = useIsActiveTab("requests");
-  const { requests, isLoading, setStatus } = useOrderRequests(boothId, isActive);
+  const { requests, isLoading, pendingRequestId, setStatus } = useOrderRequests(boothId, isActive);
   const addItem = useOrderStore((s) => s.addItem);
   const decrementBy = useOrderStore((s) => s.decrementBy);
   const markRequestChecked = useOrderStore((s) => s.markRequestChecked);
@@ -129,6 +129,7 @@ export default function OrderRequests({ boothId, products }: Props) {
             <RequestCard
               key={request.id}
               request={request}
+              pending={pendingRequestId === request.id}
               onCheck={() => handleCheck(request)}
               onDelete={() => handleCancel(request)}
             />
@@ -143,6 +144,7 @@ export default function OrderRequests({ boothId, products }: Props) {
               key={request.id}
               request={request}
               checked
+              pending={pendingRequestId === request.id}
               onUndo={() => handleUndo(request)}
             />
           ))}
@@ -155,12 +157,14 @@ export default function OrderRequests({ boothId, products }: Props) {
 function RequestCard({
   request,
   checked = false,
+  pending = false,
   onCheck,
   onUndo,
   onDelete,
 }: {
   request: OrderRequest;
   checked?: boolean;
+  pending?: boolean;
   onCheck?: () => void;
   onUndo?: () => void;
   onDelete?: () => void;
@@ -173,8 +177,9 @@ function RequestCard({
       <div className="flex items-start justify-between gap-2">
         <button
           type="button"
+          disabled={pending}
           onClick={checked ? onUndo : onCheck}
-          className="min-w-0 flex-1 text-left"
+          className="min-w-0 flex-1 text-left disabled:opacity-50"
         >
           <p className="text-sm font-medium text-white">
             {request.customerNickname}
@@ -191,17 +196,20 @@ function RequestCard({
           </ul>
 
           <p className="mt-1 text-[11px] text-zinc-600">
-            {checked
-              ? "잘못 눌렀다면 다시 눌러서 되돌릴 수 있습니다."
-              : "탭하면 판매 화면에 담깁니다."}
+            {pending
+              ? "처리중..."
+              : checked
+                ? "잘못 눌렀다면 다시 눌러서 되돌릴 수 있습니다."
+                : "탭하면 판매 화면에 담깁니다."}
           </p>
         </button>
 
         {!checked && (
           <button
             type="button"
+            disabled={pending}
             onClick={onDelete}
-            className="shrink-0 text-xs text-zinc-600 hover:text-red-400"
+            className="shrink-0 text-xs text-zinc-600 hover:text-red-400 disabled:opacity-50"
           >
             지우기
           </button>

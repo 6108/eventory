@@ -29,6 +29,11 @@ export default function CartView() {
 
   const groups = groupedByBooth();
 
+  // 부스별 카드에 각각 들어있던 안내 문구를 상단에서 한 번만 보여주도록 통일
+  // (부스가 여러 개면 카드마다 같은 문구가 반복돼서 위로 올림)
+  const totalQuantity = groups.reduce((sum, g) => sum + g.totalQuantity, 0);
+  const totalAmount = groups.reduce((sum, g) => sum + g.totalAmount, 0);
+
   return (
     <div className="mx-auto flex w-full max-w-lg flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -49,11 +54,38 @@ export default function CartView() {
           장바구니가 비어있습니다.
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
-          {groups.map((group) => (
-            <CartBoothGroup key={group.boothId} group={group} />
-          ))}
-        </div>
+        <>
+          {/*
+            주문 요청은 "대기열"이 아니라 부스러의 실수 방지를 돕는 편의 도구임을 명시.
+            보냈다고 자동으로 결제/재고 반영되는 게 아니라는 점, 부스 앞에서 직접
+            말로 확인해야 확실하다는 점을 오해 없이 전달하는 게 목적.
+          */}
+          <p className="text-center text-xs text-zinc-500">
+            이 요청은 구매할 상품을 부스러에게 미리 알려두는 기능입니다.
+            <br />
+            실제 구매는 부스에서 직접 진행해 주세요.
+            <br />
+            부스 앞에서 닉네임을 말씀해 주시면, 부스러가 요청 내용을 확인하고 상품을 담아드립니다.
+            <br />
+            요청을 보내자마자 결제되거나 재고가 확정되는 것은 아니며,
+            같은 부스에 다시 요청하면 이전 요청은 새 내용으로 변경됩니다.
+          </p>
+
+          <div className="flex items-center justify-between rounded border border-zinc-800 bg-zinc-900 px-4 py-3">
+            <span className="text-sm text-zinc-400">
+              전체 합계 ({totalQuantity}개)
+            </span>
+            <span className="text-lg font-semibold text-white">
+              {totalAmount.toLocaleString()}원
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            {groups.map((group) => (
+              <CartBoothGroup key={group.boothId} group={group} />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

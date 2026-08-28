@@ -8,7 +8,7 @@ interface Props {
 }
 
 export default function PrepaidChecklist({ boothId }: Props) {
-  const { rows, headers, isLoading, toggleRow } = usePrepaidRows(boothId);
+  const { rows, headers, isLoading, pendingIds, toggleRow } = usePrepaidRows(boothId);
 
   if (isLoading) {
     return <div className="p-6 text-sm text-zinc-500">불러오는 중...</div>;
@@ -46,8 +46,9 @@ export default function PrepaidChecklist({ boothId }: Props) {
                 <input
                   type="checkbox"
                   checked={row.checked}
+                  disabled={pendingIds.has(row.id)}
                   onChange={() => toggleRow(row.id)}
-                  className="h-5 w-5"
+                  className="h-5 w-5 disabled:opacity-50"
                 />
               </td>
               {headers.map((h) => (

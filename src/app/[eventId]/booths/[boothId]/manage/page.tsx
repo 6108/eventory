@@ -74,6 +74,13 @@ export default async function Page({
       >
         선입금 관리
       </Link>
+
+      <Link
+        href={`/${eventId}/booths/${boothId}/manage/stats`}
+        className="rounded bg-primary px-4 py-2 text-sm text-white text-center"
+      >
+        정산 · 통계
+      </Link>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 
 import { useCartStore } from "@/src/store/cartStore";
 import { Modal } from "@/src/component/common/Modal";
+import IconActionButton from "@/src/component/common/IconActionButton";
 import type { ProductSummary } from "@/src/types/product";
 
 interface QuickAddButtonProps {
@@ -17,7 +18,7 @@ export default function QuickAddButton({
 }: QuickAddButtonProps) {
   const addItem = useCartStore((s) => s.addItem);
 
-  const hasOptions = product.options.length > 0;
+  const hasOptions = (product.options ?? []).length > 0;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -70,6 +71,7 @@ export default function QuickAddButton({
       productName: product.name,
       boothId: product.boothId,
       boothName: product.boothName,
+      boothNumber: product.boothNumber,
       optionName,
       price: product.price,
       image: product.mainImage,
@@ -154,15 +156,12 @@ export default function QuickAddButton({
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <button
-        type="button"
+      <IconActionButton
         onClick={handleButtonClick}
         disabled={!hasOptions && isSoldOut}
-        className="flex shrink-0 items-center gap-1 rounded border border-zinc-800 bg-zinc-900 px-2 py-1.5 text-xs text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
-      >
-        <ShoppingCart size={14} />
-        담기
-      </button>
+        icon={<ShoppingCart size={14} />}
+        label="담기"
+      />
 
       {hasOptions && (
         <Modal
@@ -176,7 +175,7 @@ export default function QuickAddButton({
             {/* 상품 정보 */}
             <div>
               <p className="text-xs text-zinc-500">
-                {product.boothName}
+                {product.boothName} ({product.boothNumber})
               </p>
 
               <h3 className="text-base text-white">

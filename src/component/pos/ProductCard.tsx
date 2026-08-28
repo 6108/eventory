@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { useOrderStore } from "@/src/store/orderStore";
@@ -11,6 +12,23 @@ export default function ProductCard({
   product: PosProduct;
 }) {
   const addItem = useOrderStore((s) => s.addItem);
+
+  // store의 items 배열(참조 안정적) 자체만 구독하고,
+  // 옵션별 합산은 useMemo로 계산 (selector가 매번 새 객체를 만들면
+  // zustand가 값이 바뀐 걸로 판단해 무한 리렌더가 발생함)
+  const items = useOrderStore((s) => s.items);
+
+  const quantityByOptionId = useMemo(() => {
+    const map: Record<string, number> = {};
+
+    for (const item of items) {
+      if (item.productId !== product.id) continue;
+      const key = item.optionId ?? "__none__";
+      map[key] = (map[key] ?? 0) + item.quantity;
+    }
+
+    return map;
+  }, [items, product.id]);
 
   const hasOptions = product.options.length > 0;
 
@@ -30,6 +48,16 @@ export default function ProductCard({
     : product.initialQuantity;
 
   const isSoldOut = totalRemaining !== null && totalRemaining <= 0;
+
+  // 담은 개수만큼 화면상 재고에서 즉시 차감해서 보여줌 (옵션 있으면 옵션별 합산, 없으면 단일)
+  const totalAdded = Object.values(quantityByOptionId).reduce(
+    (sum, q) => sum + q,
+    0
+  );
+  const displayRemaining =
+    totalRemaining === null
+      ? null
+      : Math.max(totalRemaining - totalAdded, 0);
 
   function handleAdd(option?: ProductOption) {
     const remainingQuantity = option
@@ -85,10 +113,25 @@ export default function ProductCard({
     });
   }
 
+  const cardClickable = !hasOptions && !isSoldOut;
+
   return (
     <div
+      onClick={cardClickable ? () => handleAdd() : undefined}
+      role={!hasOptions ? "button" : undefined}
+      tabIndex={cardClickable ? 0 : undefined}
+      onKeyDown={
+        cardClickable
+          ? (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              handleAdd();
+            }
+          }
+          : undefined
+      }
       className={`overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900 ${isSoldOut ? "opacity-40" : ""
-        }`}
+        } ${cardClickable ? "cursor-pointer hover:bg-zinc-800" : ""}`}
     >
       {/* 상품 이미지 */}
       <div className="relative aspect-square w-full bg-zinc-800">
@@ -109,32 +152,27 @@ export default function ProductCard({
 
       {/* 상품 정보 */}
       <div className="p-3">
-        <div className="mb-2">
+        <div className={hasOptions ? "mb-2" : ""}>
           <p className="text-sm font-medium text-white">{product.name}</p>
 
           {/* 총 수량 / 남은 수량 */}
           <p className="mt-1 text-xs text-zinc-400">
-            총 {totalQuantity === null ? "무제한" : `${totalQuantity}개`}
-            {" · "}
-            남은{" "}
-            {totalRemaining === null
-              ? "무제한"
-              : `${Math.max(totalRemaining, 0)}개`}
+            {totalQuantity === null
+              ? "제한없음"
+              : `${totalQuantity}개 중 ${displayRemaining === null ? "∞" : `${displayRemaining}개`} 남음`}
           </p>
         </div>
 
-        {/* 옵션 없는 상품 */}
+        {/* 옵션 없는 상품: 카드 전체 클릭으로 담기 */}
         {!hasOptions && (
-          <button
-            onClick={() => handleAdd()}
-            disabled={isSoldOut}
-            className="flex w-full items-center justify-between rounded border border-zinc-700 px-3 py-2 text-left hover:bg-zinc-800 disabled:cursor-not-allowed"
-          >
-            <span className="text-sm text-zinc-300">담기</span>
-            <span className="text-sm font-medium text-white">
-              {product.price.toLocaleString()}원
+          <div className="mt-1 text-right">
+            <span
+              className={`text-sm font-medium ${isSoldOut ? "text-red-500" : "text-white"
+                }`}
+            >
+              {isSoldOut ? "품절" : `${product.price.toLocaleString()}원`}
             </span>
-          </button>
+          </div>
         )}
 
         {/* 옵션 있는 상품 */}
@@ -145,10 +183,19 @@ export default function ProductCard({
                 option.remainingQuantity !== null &&
                 option.remainingQuantity <= 0;
 
+              const addedQuantity = quantityByOptionId[option.id] ?? 0;
+              const optionDisplayRemaining =
+                option.remainingQuantity === null
+                  ? null
+                  : Math.max(option.remainingQuantity - addedQuantity, 0);
+
               return (
                 <button
                   key={option.id}
-                  onClick={() => handleAdd(option)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAdd(option);
+                  }}
                   disabled={soldOut}
                   className="flex w-full items-center justify-between rounded border border-zinc-700 px-3 py-2 text-left hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
                 >
@@ -158,26 +205,21 @@ export default function ProductCard({
                     </p>
 
                     <p className="mt-0.5 text-xs text-zinc-500">
-                      총{" "}
                       {option.initialQuantity === null
-                        ? "무제한"
-                        : `${option.initialQuantity}개`}
-                      {" · "}
-                      남은{" "}
-                      {option.remainingQuantity === null
-                        ? "무제한"
-                        : `${Math.max(option.remainingQuantity, 0)}개`}
+                        ? "제한없음"
+                        : `${option.initialQuantity}/ ${optionDisplayRemaining === null ? "∞" : `${optionDisplayRemaining}`}`}
                     </p>
                   </div>
 
                   <div className="ml-3 shrink-0 text-right">
-                    <p className="text-sm font-medium text-white">
-                      {(option.price ?? product.price).toLocaleString()}원
+                    <p
+                      className={`text-sm font-medium ${soldOut ? "text-red-500" : "text-white"
+                        }`}
+                    >
+                      {soldOut
+                        ? "품절"
+                        : `${(option.price ?? product.price).toLocaleString()}원`}
                     </p>
-
-                    {soldOut && (
-                      <p className="text-xs text-red-500">품절</p>
-                    )}
                   </div>
                 </button>
               );

@@ -7,6 +7,7 @@ import Like from "./Like";
 import QuickAddButton from "../cart/QuickAddButton";
 import ImageLightbox from "./ImageLightbox";
 import { EVENT_ID as eventId } from "@/src/constants/event";
+import { ImageIcon } from "lucide-react";
 
 
 interface ProductListItemProps {
@@ -19,6 +20,8 @@ export default function ProductListItem({
   currentUserId,
 }: ProductListItemProps) {
   const isOwner = !!currentUserId && productInfo.artistIds?.includes(currentUserId);
+  const isSoldOut =
+    productInfo.remainingQuantity !== null && productInfo.remainingQuantity <= 0;
 
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
@@ -56,20 +59,37 @@ export default function ProductListItem({
             alt={productInfo.name}
             fill
             sizes="(max-width: 768px) 50vw, 33vw"
-            className="object-cover rounded-t-xl"
+            className={`object-cover rounded-t-xl ${isSoldOut ? "opacity-40" : ""
+              }`}
           />
+
+          {isSoldOut && (
+            <div className="absolute inset-0 flex items-center justify-center rounded-t-xl bg-black/40">
+              <span className="rounded bg-black/70 px-3 py-1 text-sm font-semibold text-white">
+                품절
+              </span>
+            </div>
+          )}
+
+          {productInfo.sampleImages.length > 0 && (
+            <div className="absolute top-2 left-2 flex items-center gap-0.5 rounded-full bg-black/60 px-2 py-0.5 text-[10px] text-white">
+              <ImageIcon className="h-3 w-3" />
+              <span>{productInfo.sampleImages.length}</span>
+            </div>
+          )}
 
           <div className="absolute top-2 right-2">
             <Like productId={productInfo.id} isOwner={isOwner} />
           </div>
 
-          <div className="absolute bottom-2 right-2">
-            <QuickAddButton product={productInfo} />
-          </div>
+          {!isSoldOut && (
+            <div className="absolute bottom-2 right-2">
+              <QuickAddButton product={productInfo} />
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col justify-center w-full p-2">
-          {/* 부스 정보 - 한 줄, 눈에 띄지 않게 */}
           <div className="flex items-center gap-1 text-xs text-zinc-500">
             <span className="rounded  px-1 py-0.5 font-medium text-zinc-400">
               [{productInfo.boothNumber}]
@@ -77,14 +97,17 @@ export default function ProductListItem({
             <span className="truncate">{productInfo.boothName}</span>
           </div>
 
-          {/* 상품명 - 핵심 정보, 가장 크고 진하게 */}
           <h3 className="text- font-medium text-zinc-100 line-clamp-2 min-h-10 mt-1">
             {productInfo.name}
           </h3>
 
-          {/* 가격 - 시선이 마지막에 꽂히는 자리 */}
           <p className="text-md font-bold text-primary mt-0.5">
             {productInfo.price.toLocaleString()}원
+            {productInfo.purchaseLimit != null && (
+              <span className="ml-1 text-sm font-medium text-muted-foreground">
+                (1인 {productInfo.purchaseLimit}개 한정)
+              </span>
+            )}
           </p>
         </div>
       </div>
@@ -97,6 +120,8 @@ export default function ProductListItem({
         eventId={eventId}
         boothId={productInfo.boothId}
         boothName={productInfo.boothName}
+        currentUserId={currentUserId}
+        product={productInfo}
       />
     </div>
   );

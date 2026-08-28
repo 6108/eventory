@@ -7,6 +7,9 @@ import Image from "next/image";
 import { FollowedBooth } from "@/src/types/booth";
 import { LikedProduct } from "@/src/types/product";
 import ImageLightbox from "@/src/component/product/ImageLightbox";
+import QuickAddButton from "@/src/component/cart/QuickAddButton";
+import { EVENT_ID as eventId } from "@/src/constants/event";
+import { useAuth } from "@/src/hooks/useAuth";
 
 export function LikesTabs({
   likedProducts,
@@ -15,6 +18,7 @@ export function LikesTabs({
   likedProducts: LikedProduct[];
   followedBooths: FollowedBooth[];
 }) {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<"products" | "booths">(
     "products"
   );
@@ -63,42 +67,46 @@ export function LikesTabs({
 
               return (
                 <li key={likeId}>
-                  <button
-                    type="button"
-                    onClick={() => setOpenProductId(product.id)}
-                    className="flex w-full items-center gap-3 rounded border border-zinc-800 p-3 text-left hover:bg-zinc-900"
-                  >
-                    {product.mainImage ? (
-                      <Image
-                        src={product.mainImage}
-                        alt={product.name}
-                        width={56}
-                        height={56}
-                        className="rounded object-cover w-14 h-14 shrink-0"
-                      />
-                    ) : (
-                      <div className="w-14 h-14 shrink-0 rounded bg-zinc-800" />
-                    )}
-
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-white truncate">
-                        {product.name}
-                      </p>
-                      {product.artistNames.length > 0 && (
-                        <p className="text-xs text-zinc-400 truncate">
-                          {product.artistNames.join(", ")}
-                        </p>
+                  <div className="flex w-full items-center gap-3 rounded border border-zinc-800 p-3 hover:bg-zinc-900">
+                    <button
+                      type="button"
+                      onClick={() => setOpenProductId(product.id)}
+                      className="flex flex-1 min-w-0 items-center gap-3 text-left"
+                    >
+                      {product.mainImage ? (
+                        <Image
+                          src={product.mainImage}
+                          alt={product.name}
+                          width={56}
+                          height={56}
+                          className="rounded object-cover w-14 h-14 shrink-0"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 shrink-0 rounded bg-zinc-800" />
                       )}
-                      <div className="flex items-center gap-2 mt-1">
-                        <p className="text-sm text-primary">
-                          {product.price.toLocaleString()}원
+
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-white truncate">
+                          {product.name}
                         </p>
-                        {soldOut && (
-                          <span className="text-xs text-zinc-500">품절</span>
+                        {product.artistNames.length > 0 && (
+                          <p className="text-xs text-zinc-400 truncate">
+                            {product.artistNames.join(", ")}
+                          </p>
                         )}
+                        <div className="flex items-center gap-2 mt-1">
+                          <p className="text-sm text-primary">
+                            {product.price.toLocaleString()}원
+                          </p>
+                          {soldOut && (
+                            <span className="text-xs text-zinc-500">품절</span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </button>
+                    </button>
+
+                    {!soldOut && <QuickAddButton product={product} />}
+                  </div>
                 </li>
               );
             })}
@@ -113,7 +121,7 @@ export function LikesTabs({
           {followedBooths.map(({ followId, booth }) => (
             <li key={followId}>
               <Link
-                href={`/booths/${booth.id}`}
+                href={`/${eventId}/booths/${booth.id}`}
                 className="flex items-center justify-between gap-3 rounded border border-zinc-800 p-3 hover:bg-zinc-900"
               >
                 <div className="min-w-0">
@@ -138,10 +146,15 @@ export function LikesTabs({
 
       {openProduct && (
         <ImageLightbox
-          images={[openProduct.mainImage, ...openProduct.sampleImages].filter(Boolean)}
+          images={[openProduct.mainImage, ...(openProduct.sampleImages ?? [])].filter(Boolean)}
           alt={openProduct.name}
           isOpen={!!openProductId}
           onClose={() => setOpenProductId(null)}
+          eventId={eventId}
+          boothId={openProduct.boothId}
+          boothName={openProduct.boothName}
+          currentUserId={user?.id}
+          product={openProduct}
         />
       )}
     </div>

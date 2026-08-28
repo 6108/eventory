@@ -79,83 +79,77 @@ export const useCartStore = create<CartState>()(
 
       increment: (productId, optionId) =>
         set((state) => {
-          let boothId: string | null = null;
-
-          const nextItems = state.items.map((cartItem) => {
-            if (cartItem.productId !== productId || cartItem.optionId !== optionId) {
-              return cartItem;
-            }
-
-            const nextQuantity = cartItem.quantity + 1;
-
-            if (cartItem.purchaseLimit != null && nextQuantity > cartItem.purchaseLimit) {
-              return cartItem;
-            }
-
-            if (
-              cartItem.remainingQuantity != null &&
-              nextQuantity > cartItem.remainingQuantity
-            ) {
-              return cartItem;
-            }
-
-            boothId = cartItem.boothId;
-            return { ...cartItem, quantity: nextQuantity };
-          });
-
-          if (!boothId) {
-            return { items: nextItems };
-          }
-
           const nextSentBoothIds = { ...state.sentBoothIds };
-          delete nextSentBoothIds[boothId];
 
-          return { items: nextItems, sentBoothIds: nextSentBoothIds };
+          return {
+            items: state.items.map((item) => {
+              if (item.productId !== productId || item.optionId !== optionId) {
+                return item;
+              }
+
+              const nextQuantity = item.quantity + 1;
+
+              if (
+                item.purchaseLimit != null &&
+                nextQuantity > item.purchaseLimit
+              ) {
+                return item;
+              }
+
+              if (
+                item.remainingQuantity != null &&
+                nextQuantity > item.remainingQuantity
+              ) {
+                return item;
+              }
+
+              delete nextSentBoothIds[item.boothId];
+
+              return { ...item, quantity: nextQuantity };
+            }),
+            sentBoothIds: nextSentBoothIds,
+          };
         }),
 
       decrement: (productId, optionId) =>
         set((state) => {
-          const target = state.items.find(
-            (cartItem) => cartItem.productId === productId && cartItem.optionId === optionId
-          );
+          const nextSentBoothIds = { ...state.sentBoothIds };
 
           const nextItems = state.items
-            .map((cartItem) =>
-              cartItem.productId === productId && cartItem.optionId === optionId
-                ? { ...cartItem, quantity: cartItem.quantity - 1 }
-                : cartItem
-            )
-            .filter((cartItem) => cartItem.quantity > 0);
+            .map((item) => {
+              if (item.productId !== productId || item.optionId !== optionId) {
+                return item;
+              }
 
-          if (!target) {
-            return { items: nextItems };
-          }
+              delete nextSentBoothIds[item.boothId];
 
-          const nextSentBoothIds = { ...state.sentBoothIds };
-          delete nextSentBoothIds[target.boothId];
+              return { ...item, quantity: item.quantity - 1 };
+            })
+            .filter((item) => item.quantity > 0);
 
-          return { items: nextItems, sentBoothIds: nextSentBoothIds };
+          return {
+            items: nextItems,
+            sentBoothIds: nextSentBoothIds,
+          };
         }),
 
       removeItem: (productId, optionId) =>
         set((state) => {
           const target = state.items.find(
-            (cartItem) => cartItem.productId === productId && cartItem.optionId === optionId
+            (item) => item.productId === productId && item.optionId === optionId
           );
-
-          const nextItems = state.items.filter(
-            (cartItem) =>
-              !(cartItem.productId === productId && cartItem.optionId === optionId)
-          );
-
-          if (!target) {
-            return { items: nextItems };
-          }
 
           const nextSentBoothIds = { ...state.sentBoothIds };
-          delete nextSentBoothIds[target.boothId];
+          if (target) {
+            delete nextSentBoothIds[target.boothId];
+          }
 
-          return { items: nextItems, sentBoothIds: nextSentBoothIds };
+          return {
+            items: state.items.filter(
+              (item) => !(item.productId === productId && item.optionId === optionId)
+            ),
+            sentBoothIds: nextSentBoothIds,
+          };
         }),
 
       clearBooth: (boothId) =>
@@ -164,7 +158,7 @@ export const useCartStore = create<CartState>()(
           delete nextSentBoothIds[boothId];
 
           return {
-            items: state.items.filter((cartItem) => cartItem.boothId !== boothId),
+            items: state.items.filter((item) => item.boothId !== boothId),
             sentBoothIds: nextSentBoothIds,
           };
         }),
@@ -173,11 +167,13 @@ export const useCartStore = create<CartState>()(
 
       markBoothSent: (boothId) =>
         set((state) => ({
-          sentBoothIds: { ...state.sentBoothIds, [boothId]: new Date().toISOString() },
+          sentBoothIds: {
+            ...state.sentBoothIds,
+            [boothId]: new Date().toISOString(),
+          },
         })),
 
-      totalQuantity: () =>
-        get().items.reduce((sum, cartItem) => sum + cartItem.quantity, 0),
+      totalQuantity: () => get().items.reduce((sum, item) => sum + item.quantity, 0),
 
       groupedByBooth: () => {
         const items = get().items;
@@ -194,6 +190,7 @@ export const useCartStore = create<CartState>()(
             map.set(cartItem.boothId, {
               boothId: cartItem.boothId,
               boothName: cartItem.boothName,
+              boothNumber: cartItem.boothNumber,
               items: [cartItem],
               totalAmount: cartItem.price * cartItem.quantity,
               totalQuantity: cartItem.quantity,
@@ -205,10 +202,7 @@ export const useCartStore = create<CartState>()(
       },
     }),
     {
-      name: "cart-storage", // localStorage key
-      // TODO: 로그인 시 서버(계정)에 저장된 장바구니와 병합하는 로직은 아직 없음.
-      // 지금은 비로그인/로그인 구분 없이 항상 로컬(브라우저)에만 저장됨.
-      // 로그인 계정 기반으로 넘어갈 때 이 부분부터 손보면 됨 (기획서 "비로그인 → 로그인 병합" 항목)
+      name: "boothspot-cart",
     }
   )
 );

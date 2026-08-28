@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight, Store } from "lucide-react";
 import FollowButton from "../booth/FollowButton"; // 실제 경로에 맞게 수정
+import QuickAddButton from "../cart/QuickAddButton";
+import type { ProductSummary } from "@/src/types/product";
 
 interface ImageLightboxProps {
   images: string[];
@@ -16,6 +18,7 @@ interface ImageLightboxProps {
   boothName: string;
   currentUserId?: string;
   initialFollowed?: boolean;
+  product?: ProductSummary;
 }
 
 export default function ImageLightbox({
@@ -28,6 +31,7 @@ export default function ImageLightbox({
   boothName,
   currentUserId,
   initialFollowed,
+  product,
 }: ImageLightboxProps) {
   const [index, setIndex] = useState(0);
   const router = useRouter();
@@ -54,7 +58,7 @@ export default function ImageLightbox({
   function goToBooth(e: React.MouseEvent) {
     e.stopPropagation();
     handleClose();
-    router.push(`/events/${eventId}/booths/${boothId}`); // 실제 라우트 구조에 맞게 수정
+    router.push(`/${eventId}/booths/${boothId}`);
   }
 
   return (
@@ -137,11 +141,19 @@ export default function ImageLightbox({
             <span className="truncate text-sm font-medium">{boothName}</span>
           </button>
 
-          <FollowButton
-            boothId={boothId}
-            currentUserId={currentUserId}
-            initialFollowed={initialFollowed}
-          />
+          <div className="flex shrink-0 items-center gap-2">
+            {product &&
+              (product.remainingQuantity === null ||
+                product.remainingQuantity > 0) && (
+                <QuickAddButton product={product} />
+              )}
+
+            <FollowButton
+              boothId={boothId}
+              currentUserId={currentUserId}
+              initialFollowed={initialFollowed}
+            />
+          </div>
         </div>
       </div>
     </div>

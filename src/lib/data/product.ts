@@ -2,8 +2,10 @@
 import { createClient } from "@/src/lib/supabase/server";
 import { PosProduct, Product, ProductCategory, ProductOption, ProductSubCategory, ProductSummary } from "@/src/types/product";
 
-// 상품(요약버전) 조회 - boothId 주면 그 부스만, 안 주면 전체
-export async function getProductSummaries(boothId?: string): Promise<ProductSummary[]> {
+// 상품(요약버전) 조회 - boothId 주면 그 부스만, 배열이면 해당 부스들, 안 주면 전체
+export async function getProductSummaries(
+  boothId?: string | string[]
+): Promise<ProductSummary[]> {
   const supabase = await createClient();
 
   let query = supabase
@@ -16,7 +18,10 @@ export async function getProductSummaries(boothId?: string): Promise<ProductSumm
     )
     .order("created_at", { ascending: false });
 
-  if (boothId) {
+  if (Array.isArray(boothId)) {
+    // 빈 배열이면 어차피 결과 없음이 맞으니 그대로 in([]) 호출 (Supabase가 빈 결과 반환)
+    query = query.in("booth_id", boothId);
+  } else if (boothId) {
     query = query.eq("booth_id", boothId);
   }
 
@@ -53,6 +58,32 @@ export async function getProductSummaries(boothId?: string): Promise<ProductSumm
       })
     ),
   }));
+}
+
+// 내가 팔로우한 부스들의 상품만 조회
+export async function getFollowedBoothProducts(
+  userId: string
+): Promise<ProductSummary[]> {
+  const supabase = await createClient();
+
+  const { data: follows, error: followError } = await supabase
+    .from("booth_follows")
+    .select("booth_id")
+    .eq("user_id", userId);
+
+  if (followError) {
+    console.error("팔로우 부스 조회 실패:", followError);
+    return [];
+  }
+
+  const boothIds = (follows ?? []).map((f) => f.booth_id);
+
+  // 팔로우한 부스가 하나도 없으면 쿼리 자체를 안 날리고 빈 배열 반환
+  if (boothIds.length === 0) {
+    return [];
+  }
+
+  return getProductSummaries(boothIds);
 }
 
 // 단일 상품 상세 조회 (boothId 주면 해당 부스 소유 검증까지)

@@ -64,9 +64,15 @@ export function useOrderRequests(boothId: string, enabled: boolean) {
     await setStatusMutation.mutateAsync({ requestId, status });
   }
 
+  // 어떤 요청 카드가 현재 서버 요청 중인지 (연타/중복 클릭 방지용)
+  const pendingRequestId = setStatusMutation.isPending
+    ? setStatusMutation.variables?.requestId ?? null
+    : null;
+
   return {
     requests: requests ?? [],
     isLoading,
+    pendingRequestId,
     refetch: () => queryClient.invalidateQueries({ queryKey: key }),
     setStatus,
   };

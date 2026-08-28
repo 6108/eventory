@@ -6,7 +6,7 @@ import { useMyOrderRequests } from "@/src/hooks/useMyOrderRequests";
 
 export default function MyOrdersView() {
   const hasMounted = useHasMounted();
-  const { requests, isLoading, cancelRequest } = useMyOrderRequests();
+  const { requests, isLoading, pendingRequestId, cancelRequest } = useMyOrderRequests();
 
   if (!hasMounted || isLoading) {
     return (
@@ -55,9 +55,10 @@ export default function MyOrdersView() {
                   {r.status === "requested" ? (
                     <button
                       onClick={() => handleCancel(r.id)}
-                      className="text-xs text-zinc-500 hover:text-red-400"
+                      disabled={pendingRequestId === r.id}
+                      className="text-xs text-zinc-500 hover:text-red-400 disabled:opacity-50"
                     >
-                      취소
+                      {pendingRequestId === r.id ? "취소중..." : "취소"}
                     </button>
                   ) : (
                     <span className="text-xs text-zinc-500">부스러 확인함</span>

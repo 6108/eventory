@@ -9,11 +9,13 @@ import type { Product } from "@/src/types/product";
 interface AddToCartButtonProps {
   product: Product;
   boothName: string;
+  boothNumber: string;
 }
 
 export default function AddToCartButton({
   product,
   boothName,
+  boothNumber,
 }: AddToCartButtonProps) {
   const addItem = useCartStore((s) => s.addItem);
 
@@ -45,6 +47,7 @@ export default function AddToCartButton({
       productName: product.name,
       boothId: product.boothId,
       boothName,
+      boothNumber,
       optionName: selectedOption?.name ?? null,
       price: product.price,
       image: product.mainImage,

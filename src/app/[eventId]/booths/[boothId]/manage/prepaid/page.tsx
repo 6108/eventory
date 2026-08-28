@@ -1,3 +1,4 @@
+// src/app/[eventId]/booths/[boothId]/manage/prepaid/page.tsx (변경된 부분)
 "use client";
 
 import { usePrepaidRows } from "@/src/hooks/usePrepaidRows";
@@ -11,7 +12,7 @@ export default function Page({
 }) {
   const { boothId } = use(params);
 
-  const { rows, headers, isLoading, toggleRow, setRows, setHeaders } =
+  const { rows, headers, isLoading, pendingIds, toggleRow, setRows, setHeaders } =
     usePrepaidRows(boothId);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -54,8 +55,9 @@ export default function Page({
         return;
       }
 
-      const saved = await res.json();
-      const loaded = saved.rows.map((r: any) => ({
+      const saved: { rows: { id: string; row_data: Record<string, string>; checked: boolean }[] } =
+        await res.json();
+      const loaded = saved.rows.map((r) => ({
         id: r.id,
         cells: r.row_data,
         checked: r.checked,
@@ -131,8 +133,9 @@ export default function Page({
                     <input
                       type="checkbox"
                       checked={row.checked}
+                      disabled={pendingIds.has(row.id)}
                       onChange={() => toggleRow(row.id)}
-                      className="h-5 w-5"
+                      className="h-5 w-5 disabled:opacity-50"
                     />
                   </td>
                   {headers.map((h) => (

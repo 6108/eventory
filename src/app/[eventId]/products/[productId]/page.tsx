@@ -98,7 +98,11 @@ export default async function Page({
           </p>
         </div>
 
-        <AddToCartButton product={product} boothName={booth.boothName} />
+        <AddToCartButton
+          product={product}
+          boothName={booth.boothName}
+          boothNumber={booth.boothNumber}
+        />
 
         {product.description && (
           <div

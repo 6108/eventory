@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/src/hooks/useAuth";
+import { PROFILE_QUERY_KEY } from "@/src/hooks/useProfile";
 
 interface ProfileFormProps {
   name: string;
@@ -13,7 +15,8 @@ export default function ProfileForm({
   name,
 }: ProfileFormProps) {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+  const queryClient = useQueryClient();
 
   const [value, setValue] = useState(name);
   const [saving, setSaving] = useState(false);
@@ -54,6 +57,11 @@ export default function ProfileForm({
         );
         return;
       }
+
+      // 네비게이션 등에서 쓰는 public.users 프로필 캐시 무효화
+      queryClient.invalidateQueries({
+        queryKey: PROFILE_QUERY_KEY(user?.id),
+      });
 
       toast.success("이름이 수정되었습니다.");
       router.refresh();

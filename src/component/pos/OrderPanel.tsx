@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useOrderStore } from "@/src/store/orderStore";
 
@@ -10,6 +11,8 @@ interface OrderPanelProps {
 }
 
 export default function OrderPanel({ boothId }: OrderPanelProps) {
+  const router = useRouter();
+
   const items = useOrderStore((s) => s.items);
   const increment = useOrderStore((s) => s.increment);
   const decrement = useOrderStore((s) => s.decrement);
@@ -47,6 +50,8 @@ export default function OrderPanel({ boothId }: OrderPanelProps) {
 
       toast.success("판매가 등록되었습니다.");
       clear();
+      // 방금 판매로 줄어든 재고를 화면에 반영하기 위해 서버 컴포넌트(상품 목록) 재실행
+      router.refresh();
     } catch {
       toast.error("주문 등록 중 오류가 발생했습니다.");
     } finally {

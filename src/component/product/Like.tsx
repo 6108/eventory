@@ -47,12 +47,13 @@ export default function Like({ productId, isOwner = false }: LikeProps) {
     >
       <button
         type="button"
+        disabled={toggleLike.isPending}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
           handleClick();
         }}
-        className="flex h-8 w-8 flex-col items-center justify-center rounded-full bg-zinc-300/70 text-primary backdrop-blur-sm transition-colors hover:bg-zinc-200"
+        className="flex h-8 w-8 flex-col items-center justify-center rounded-full bg-zinc-300/70 text-primary backdrop-blur-sm transition-colors hover:bg-zinc-200 disabled:opacity-50"
       >
         <Heart size={18} className={liked ? "fill-primary" : ""} />
 

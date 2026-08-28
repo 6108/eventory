@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Heart } from "lucide-react";
+import IconActionButton from "../common/IconActionButton";
 
 interface FollowButtonProps {
   boothId: string;
@@ -41,16 +42,12 @@ export default function FollowButton({
   }
 
   return (
-    <button
+    <IconActionButton
       onClick={handleClick}
       disabled={isPending}
-      className={`flex items-center gap-1.5 rounded border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 ${isFollowed
-        ? "border-primary bg-primary/10 text-primary"
-        : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-white"
-        }`}
-    >
-      <Heart size={16} className={isFollowed ? "fill-primary" : ""} />
-      {isPending ? "처리중..." : isFollowed ? "팔로잉" : "팔로우"}
-    </button>
+      active={isFollowed}
+      icon={<Heart size={14} className={isFollowed ? "fill-primary" : ""} />}
+      label={isPending ? "처리중..." : isFollowed ? "팔로잉" : "팔로우"}
+    />
   );
 }

@@ -9,6 +9,7 @@ export type CartItem = {
   boothId: string;
   optionId: string | null;
   productName: string;
+  boothNumber: string;
   boothName: string;
   optionName: string | null; // 옵션 있으면 표시용 이름 (선택 화면에서 담을 때 같이 저장)
   price: number;
@@ -21,6 +22,7 @@ export type CartItem = {
 // 부스별로 묶은 장바구니 (화면 렌더링/주문서 전송 단위)
 export type CartGroup = {
   boothId: string;
+  boothNumber: string;
   boothName: string;
   items: CartItem[];
   totalAmount: number;

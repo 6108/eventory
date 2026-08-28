@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { EVENT_ID as eventId } from "@/src/constants/event";
 import { useAuth } from "@/src/hooks/useAuth";
+import { useProfile } from "@/src/hooks/useProfile";
 import { BoothMenu } from "./BoothMenu";
 import { UserMenuItem } from "./UserMenuItem";
 import { useBoothStore } from "@/src/store/boothStore";
@@ -11,6 +12,7 @@ import { UserMenuSection } from "./UserMenuSection";
 
 export function UserMenu() {
   const { user, logout } = useAuth();
+  const { profile } = useProfile(user?.id);
   const { boothId, checked, fetchBoothId } = useBoothStore();
 
   const [open, setOpen] = useState(false);
@@ -42,13 +44,14 @@ export function UserMenu() {
 
   if (!user) return null;
 
-  const nickname = user.user_metadata?.name ?? "My";
+  const nickname = profile?.name ?? "My";
 
   return (
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="text-sm text-primary hover:text-white"
+        className="max-w-24 truncate text-sm text-primary hover:text-white"
+        title={nickname}
       >
         {nickname}
       </button>
