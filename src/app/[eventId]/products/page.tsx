@@ -24,7 +24,7 @@ export default async function Page({
 
   return (
     <Suspense fallback={<div>불러오는 중...</div>}>
-      <ProductExplorer products={products} currentUserId={user?.id} />
+      <ProductExplorer products={products} currentUserId={user?.id} showFollowingFilter />
     </Suspense>
   );
 }

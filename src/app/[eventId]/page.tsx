@@ -203,7 +203,7 @@ export default function Page() {
             Footer
         ======================================== */}
         <footer className="px-5 pb-8 pt-8 text-center sm:px-8">
-          <p className="text-[11px] text-zinc-600">
+          <p className="text-sm text-zinc-600">
             © {new Date().getFullYear()} {EVENT_INFO.name}
           </p>
         </footer>

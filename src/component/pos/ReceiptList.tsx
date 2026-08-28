@@ -226,13 +226,13 @@ function CancelQuantityModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4">
+    <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 p-4">
       <div className="w-full max-w-xs rounded-lg bg-zinc-900 p-5">
         <p className="mb-1 text-sm font-medium text-white">
-          {item.productName ?? item.productId} 취소
+          {item.productName ?? item.productId}
         </p>
         {item.optionName && <p className="mb-1 text-xs text-zinc-500">{item.optionName}</p>}
-        <p className="mb-4 text-sm text-zinc-500">최대 {remaining}개까지 취소 가능합니다.</p>
+        <p className="mb-4 text-sm text-zinc-500">취소할 수량을 선택해주세요.</p>
 
         <div className="mb-4 flex items-center justify-center gap-2">
           <button
@@ -274,9 +274,9 @@ function CancelQuantityModal({
           <button
             onClick={handleConfirm}
             disabled={isSubmitting}
-            className="rounded-md bg-red-600 px-3 py-1.5 text-sm text-white hover:bg-red-500 disabled:opacity-50"
+            className="rounded-md bg-primary px-3 py-1.5 text-sm text-white hover:bg-red-500 disabled:opacity-50"
           >
-            {isSubmitting ? "처리 중..." : "환불 확정"}
+            {isSubmitting ? "처리 중..." : "환불"}
           </button>
         </div>
       </div>

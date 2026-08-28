@@ -7,7 +7,7 @@ type Props = {
 export function UserMenuSection({ label, children }: Props) {
   return (
     <div>
-      <p className="px-4 pt-1.5 pb-1 text-[11px] font-medium uppercase tracking-wide text-zinc-600">
+      <p className="px-4 pt-1.5 pb-1 text-sm font-medium uppercase tracking-wide text-zinc-600">
         {label}
       </p>
       {children}

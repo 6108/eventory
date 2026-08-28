@@ -50,7 +50,7 @@ export default function OrderRequests({ boothId, products }: Props) {
 
       if (!info) {
         toast.error(
-          `${item.productName}은(는) 더 이상 판매하지 않는 상품이에요. 손님에게 확인해주세요.`
+          `${item.productName}은(는) 더 이상 판매하지 않는 상품입니다. 손님에게 확인해주세요.`
         );
         continue;
       }

@@ -8,14 +8,12 @@ import { PosProduct, ProductOption } from "@/src/types/product";
 
 export default function ProductCard({
   product,
+  priority = false,
 }: {
   product: PosProduct;
+  priority?: boolean;
 }) {
   const addItem = useOrderStore((s) => s.addItem);
-
-  // store의 items 배열(참조 안정적) 자체만 구독하고,
-  // 옵션별 합산은 useMemo로 계산 (selector가 매번 새 객체를 만들면
-  // zustand가 값이 바뀐 걸로 판단해 무한 리렌더가 발생함)
   const items = useOrderStore((s) => s.items);
 
   const quantityByOptionId = useMemo(() => {
@@ -23,6 +21,7 @@ export default function ProductCard({
 
     for (const item of items) {
       if (item.productId !== product.id) continue;
+
       const key = item.optionId ?? "__none__";
       map[key] = (map[key] ?? 0) + item.quantity;
     }
@@ -32,7 +31,6 @@ export default function ProductCard({
 
   const hasOptions = product.options.length > 0;
 
-  // 옵션이 있으면 옵션 재고를 합산
   const totalRemaining = hasOptions
     ? product.options.reduce(
       (sum, option) => sum + (option.remainingQuantity ?? 0),
@@ -49,11 +47,11 @@ export default function ProductCard({
 
   const isSoldOut = totalRemaining !== null && totalRemaining <= 0;
 
-  // 담은 개수만큼 화면상 재고에서 즉시 차감해서 보여줌 (옵션 있으면 옵션별 합산, 없으면 단일)
   const totalAdded = Object.values(quantityByOptionId).reduce(
     (sum, q) => sum + q,
     0
   );
+
   const displayRemaining =
     totalRemaining === null
       ? null
@@ -72,13 +70,12 @@ export default function ProductCard({
     const optionId = option?.id ?? null;
     const unitPrice = option?.price ?? product.price;
 
-    // 이미 담긴 수량 확인 (재고/구매제한은 "이미 담은 것 + 이번에 담을 것" 기준으로 판단해야 함)
-    // 렌더링에 쓰는 값이 아니라 클릭 시점에만 필요한 값이라 훅으로 구독하지 않고
-    // getState()로 그 순간의 최신 상태만 읽는다 (구독하면 다른 상품 담을 때도 이 카드가 리렌더됨)
     const orderItems = useOrderStore.getState().items;
+
     const existing = orderItems.find(
       (i) => i.productId === product.id && i.optionId === optionId
     );
+
     const currentQuantity = existing?.quantity ?? 0;
     const nextQuantity = currentQuantity + 1;
 
@@ -140,6 +137,7 @@ export default function ProductCard({
             src={product.mainImage}
             alt={product.name}
             fill
+            priority={priority}
             sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 12vw"
             className="object-cover"
           />
@@ -153,29 +151,33 @@ export default function ProductCard({
       {/* 상품 정보 */}
       <div className="p-3">
         <div className={hasOptions ? "mb-2" : ""}>
-          <p className="text-sm font-medium text-white">{product.name}</p>
+          <p className="text-sm font-medium text-white">
+            {product.name}
+          </p>
 
-          {/* 총 수량 / 남은 수량 */}
           <p className="mt-1 text-xs text-zinc-400">
             {totalQuantity === null
               ? "제한없음"
-              : `${totalQuantity}개 중 ${displayRemaining === null ? "∞" : `${displayRemaining}개`} 남음`}
+              : `${totalQuantity}개 중 ${displayRemaining === null
+                ? "∞"
+                : `${displayRemaining}개`
+              } 남음`}
           </p>
         </div>
 
-        {/* 옵션 없는 상품: 카드 전체 클릭으로 담기 */}
         {!hasOptions && (
           <div className="mt-1 text-right">
             <span
               className={`text-sm font-medium ${isSoldOut ? "text-red-500" : "text-white"
                 }`}
             >
-              {isSoldOut ? "품절" : `${product.price.toLocaleString()}원`}
+              {isSoldOut
+                ? "품절"
+                : `${product.price.toLocaleString()}원`}
             </span>
           </div>
         )}
 
-        {/* 옵션 있는 상품 */}
         {hasOptions && (
           <div className="space-y-1.5">
             {product.options.map((option) => {
@@ -183,11 +185,16 @@ export default function ProductCard({
                 option.remainingQuantity !== null &&
                 option.remainingQuantity <= 0;
 
-              const addedQuantity = quantityByOptionId[option.id] ?? 0;
+              const addedQuantity =
+                quantityByOptionId[option.id] ?? 0;
+
               const optionDisplayRemaining =
                 option.remainingQuantity === null
                   ? null
-                  : Math.max(option.remainingQuantity - addedQuantity, 0);
+                  : Math.max(
+                    option.remainingQuantity - addedQuantity,
+                    0
+                  );
 
               return (
                 <button
@@ -207,18 +214,25 @@ export default function ProductCard({
                     <p className="mt-0.5 text-xs text-zinc-500">
                       {option.initialQuantity === null
                         ? "제한없음"
-                        : `${option.initialQuantity}/ ${optionDisplayRemaining === null ? "∞" : `${optionDisplayRemaining}`}`}
+                        : `${option.initialQuantity}/${optionDisplayRemaining === null
+                          ? "∞"
+                          : optionDisplayRemaining
+                        }`}
                     </p>
                   </div>
 
                   <div className="ml-3 shrink-0 text-right">
                     <p
-                      className={`text-sm font-medium ${soldOut ? "text-red-500" : "text-white"
+                      className={`text-sm font-medium ${soldOut
+                          ? "text-red-500"
+                          : "text-white"
                         }`}
                     >
                       {soldOut
                         ? "품절"
-                        : `${(option.price ?? product.price).toLocaleString()}원`}
+                        : `${(
+                          option.price ?? product.price
+                        ).toLocaleString()}원`}
                     </p>
                   </div>
                 </button>

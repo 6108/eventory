@@ -22,7 +22,6 @@ export async function POST(
   const { data, error } = await supabase.rpc("cancel_order_item", {
     p_order_item_id: orderItemId,
     p_cancel_quantity: quantity,
-    p_booth_id: boothId,
   });
 
   if (error) {

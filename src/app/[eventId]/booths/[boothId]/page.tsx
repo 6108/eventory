@@ -32,54 +32,72 @@ export default async function Page({
 
   const [products, initialFollowed] = await Promise.all([
     getProductSummaries(boothId),
-    user ? isFollowingBooth(user.id, boothId) : Promise.resolve(false),
+    user
+      ? isFollowingBooth(user.id, boothId)
+      : Promise.resolve(false),
   ]);
+
+  const isAdult = booth.category === "ADULT";
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
-      {/* Booth header */}
-      <header className="border-b border-zinc-800 pb-8">
-        <div className="flex items-start justify-between gap-6">
-          <div className="min-w-0">
-            <p className="mb-3 text-xs font-medium uppercase tracking-widest text-zinc-500">
-              {booth.boothNumber}
-            </p>
+      {/* Booth */}
+      <header className="border-b border-zinc-800 pb-10">
+        <div className="flex items-start justify-between gap-8">
+          {/* Info */}
+          <div className="min-w-0 flex-1">
+            {/* Meta */}
+            <div className="flex items-center gap-2 text-md font-medium text-zinc-300">
+              <span>[{booth.boothNumber}]</span>
+              <span>
+                {booth.category === "ADULT" ? "성인 부스" : "일반 부스"}
+              </span>
+            </div>
 
-            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            {/* Name */}
+            <h1 className="mt-3 text-4xl font-bold tracking-tight text-white sm:text-5xl">
               {booth.boothName}
             </h1>
 
-            <p className="mt-3 text-sm text-zinc-400">
-              {booth.artistNames.join(" · ")}
-            </p>
+            {/* Description */}
+            {booth.description && (
+              <p className="mt-5 max-w-2xl whitespace-pre-wrap text-base leading-7 text-zinc-300">
+                {booth.description}
+              </p>
+            )}
+
+            {/* Artists */}
+            {booth.artistNames.length > 0 && (
+              <div className="mt-6 flex flex-wrap gap-2">
+                {booth.artistNames.map((artistName) => (
+                  <span
+                    key={artistName}
+                    className="rounded-full border border-primary px-3 py-1 text-sm font-medium text-zinc-300"
+                  >
+                    {artistName}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
-          <FollowButton
-            boothId={booth.id}
-            currentUserId={user?.id}
-            initialFollowed={initialFollowed}
-          />
-        </div>
-
-        <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-zinc-500">
-          <span>{booth.category}</span>
-
-          <span className="text-zinc-700">•</span>
-
-          <span>작가 {booth.artistNames.length}명</span>
+          {/* Follow */}
+          <div className="shrink-0 pt-6">
+            <FollowButton
+              boothId={booth.id}
+              currentUserId={user?.id}
+              initialFollowed={initialFollowed}
+            />
+          </div>
         </div>
       </header>
 
       {/* Products */}
       <section className="pt-10">
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-white">
-            판매 제품
+        <div className="mb-6 flex items-baseline ">
+          <h2 className="text-2xl font-semibold text-white">
+            판매 제품 {products.length}개
           </h2>
-
-          <p className="mt-1 text-sm text-zinc-500">
-            {products.length}개의 상품
-          </p>
         </div>
 
         <ProductExplorer
@@ -87,6 +105,7 @@ export default async function Page({
           currentUserId={user?.id}
         />
       </section>
+
     </main>
   );
 }

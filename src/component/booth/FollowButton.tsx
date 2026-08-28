@@ -1,31 +1,51 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Heart } from "lucide-react";
+import { UserPlus, UserCheck } from "lucide-react";
+import toast from "react-hot-toast";
 import IconActionButton from "../common/IconActionButton";
+import { useAuth } from "@/src/hooks/useAuth";
+import { useConfirmModalStore } from "@/src/store/confirmModalStore";
 
 interface FollowButtonProps {
   boothId: string;
   currentUserId?: string;
   initialFollowed?: boolean;
+  /** 팔로우 상태가 바뀐 직후(낙관적 업데이트 시점) 호출됨. 목록에서 제거하는 등의 용도 */
+  onToggle?: (followed: boolean) => void;
 };
 
 export default function FollowButton({
   boothId,
   currentUserId,
   initialFollowed = false,
+  onToggle,
 }: FollowButtonProps) {
   const [isFollowed, setIsFollowed] = useState(initialFollowed);
   const [isPending, startTransition] = useTransition();
+  const { login } = useAuth();
+  const openConfirmModal = useConfirmModalStore((s) => s.openConfirmModal);
 
-  async function handleClick() {
+  async function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
+    // Link나 부모의 클릭 핸들러(예: 페이지 이동, 라이트박스 열기)로
+    // 이벤트가 번지지 않도록 항상 막는다.
+    e.preventDefault();
+    e.stopPropagation();
+
     if (!currentUserId) {
-      alert("로그인이 필요합니다.");
+      openConfirmModal({
+        title: "로그인 필요",
+        message: "부스 팔로우는 로그인 후 이용할 수 있습니다.",
+        confirmText: "로그인",
+        cancelText: "취소",
+        onConfirm: () => login(),
+      });
       return;
     }
 
     const next = !isFollowed;
     setIsFollowed(next); // 낙관적 업데이트
+    onToggle?.(next);
 
     startTransition(async () => {
       try {
@@ -37,6 +57,10 @@ export default function FollowButton({
       } catch (error) {
         console.error(error);
         setIsFollowed(!next); // 실패 시 롤백
+        onToggle?.(!next);
+        toast.error(
+          next ? "팔로우에 실패했습니다." : "언팔로우에 실패했습니다."
+        );
       }
     });
   }
@@ -46,7 +70,13 @@ export default function FollowButton({
       onClick={handleClick}
       disabled={isPending}
       active={isFollowed}
-      icon={<Heart size={14} className={isFollowed ? "fill-primary" : ""} />}
+      icon={
+        isFollowed ? (
+          <UserCheck size={14} />
+        ) : (
+          <UserPlus size={14} />
+        )
+      }
       label={isPending ? "처리중..." : isFollowed ? "팔로잉" : "팔로우"}
     />
   );

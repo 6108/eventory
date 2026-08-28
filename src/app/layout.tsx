@@ -21,7 +21,26 @@ export default function RootLayout({
     <html lang="ko" className="h-full max-w-7xl mx-auto">
       <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-300">
         <Providers>
-          <Toaster />
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: "#18181b",   // zinc-900
+                color: "#fafafa",
+                border: "1px solid #27272a", // zinc-800
+                fontSize: "14px",
+                borderRadius: "8px",
+                padding: "12px 16px",
+              },
+              success: {
+                iconTheme: { primary: "#22c55e", secondary: "#18181b" },
+              },
+              error: {
+                iconTheme: { primary: "#ef4444", secondary: "#18181b" },
+              },
+            }}
+          />
           <DisableContextMenu />
           <ConfirmModal />
           <Navbar />

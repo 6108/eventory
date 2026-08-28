@@ -7,23 +7,60 @@ import { Modal } from "@/src/component/common/Modal";
 interface Props {
   item: OrderItem;
   onClose: () => void;
-  onConfirm: (quantity: number) => Promise<void>;
+  onConfirm: (cancelQuantity: number) => Promise<void>;
 }
 
-export default function CancelQuantityModal({ item, onClose, onConfirm }: Props) {
-  const remaining = item.quantity - item.cancelledQuantity;
-  const [quantity, setQuantity] = useState(remaining);
+export default function CancelQuantityModal({
+  item,
+  onClose,
+  onConfirm,
+}: Props) {
+  // 전체 주문 수량에서 이미 취소된 수량을 제외한
+  // 현재 추가로 취소할 수 있는 수량
+  const cancellableQuantity =
+    item.quantity - item.cancelledQuantity;
+
+  // 이번에 취소할 수량
+  // 기본값은 취소 가능한 수량 전체
+  const [cancelQuantity, setCancelQuantity] =
+    useState(cancellableQuantity);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function decreaseQuantity() {
+    setCancelQuantity((quantity) => Math.max(1, quantity - 1));
+  }
+
+  function increaseQuantity() {
+    setCancelQuantity((quantity) =>
+      Math.min(cancellableQuantity, quantity + 1)
+    );
+  }
+
+  function handleQuantityChange(
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const value = Number(event.target.value) || 1;
+
+    setCancelQuantity(
+      Math.min(cancellableQuantity, Math.max(1, value))
+    );
+  }
 
   async function handleConfirm() {
     setIsSubmitting(true);
     setError(null);
+
     try {
-      await onConfirm(quantity);
+      await onConfirm(cancelQuantity);
       onClose();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "취소 처리에 실패했습니다.");
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "취소 처리에 실패했습니다."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -31,16 +68,36 @@ export default function CancelQuantityModal({ item, onClose, onConfirm }: Props)
 
   return (
     <Modal isOpen onClose={onClose} maxWidth="xs">
-      <p className="mb-1 text-sm font-medium text-white">
-        {item.productName ?? item.productId} 취소
-      </p>
-      {item.optionName && <p className="mb-1 text-xs text-zinc-500">{item.optionName}</p>}
-      <p className="mb-4 text-sm text-zinc-500">최대 {remaining}개까지 취소 가능합니다.</p>
+      {/* 상품 정보 */}
+      <div className="mb-4">
+        <p className="text-sm font-medium text-white">
+          {item.productName ?? item.productId}
+        </p>
 
+        {item.optionName && (
+          <p className="mt-1 text-xs text-zinc-500">
+            {item.optionName}
+          </p>
+        )}
+      </div>
+
+      {/* 취소 수량 안내 */}
+      <div className="mb-4">
+        <p className="text-sm text-zinc-300">
+          취소할 수량을 선택해주세요.
+        </p>
+        <p className="mt-1 text-xs text-zinc-500">
+          최대 {cancellableQuantity}개까지 취소할 수 있습니다.
+        </p>
+      </div>
+
+      {/* 수량 선택 */}
       <div className="mb-4 flex items-center justify-center gap-2">
         <button
-          onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-          className="h-8 w-8 rounded-md border border-zinc-700 text-white hover:bg-zinc-800"
+          type="button"
+          onClick={decreaseQuantity}
+          disabled={isSubmitting || cancelQuantity <= 1}
+          className="h-8 w-8 rounded-md border border-zinc-700 text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
           -
         </button>
@@ -48,38 +105,51 @@ export default function CancelQuantityModal({ item, onClose, onConfirm }: Props)
         <input
           type="number"
           min={1}
-          max={remaining}
-          value={quantity}
-          onChange={(e) =>
-            setQuantity(Math.min(remaining, Math.max(1, Number(e.target.value) || 1)))
-          }
-          className="h-8 w-16 rounded-md border border-zinc-700 bg-transparent text-center text-white"
+          max={cancellableQuantity}
+          value={cancelQuantity}
+          onChange={handleQuantityChange}
+          disabled={isSubmitting}
+          className="h-8 w-16 rounded-md border border-zinc-700 bg-transparent text-center text-white outline-none focus:border-zinc-500 disabled:opacity-50"
         />
 
         <button
-          onClick={() => setQuantity((q) => Math.min(remaining, q + 1))}
-          className="h-8 w-8 rounded-md border border-zinc-700 text-white hover:bg-zinc-800"
+          type="button"
+          onClick={increaseQuantity}
+          disabled={
+            isSubmitting ||
+            cancelQuantity >= cancellableQuantity
+          }
+          className="h-8 w-8 rounded-md border border-zinc-700 text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
           +
         </button>
       </div>
 
-      {error && <p className="mb-3 text-xs text-red-500">{error}</p>}
+      {/* 에러 */}
+      {error && (
+        <p className="mb-3 text-xs text-red-500">
+          {error}
+        </p>
+      )}
 
+      {/* 버튼 */}
       <div className="flex justify-end gap-2">
         <button
+          type="button"
           onClick={onClose}
           disabled={isSubmitting}
-          className="rounded-md px-3 py-1.5 text-sm text-zinc-400 hover:text-white"
+          className="rounded-md px-3 py-1.5 text-sm text-zinc-400 hover:text-white disabled:opacity-50"
         >
           닫기
         </button>
+
         <button
+          type="button"
           onClick={handleConfirm}
           disabled={isSubmitting}
-          className="rounded-md bg-red-600 px-3 py-1.5 text-sm text-white hover:bg-red-500 disabled:opacity-50"
+          className="rounded-md bg-red-600 px-3 py-1.5 text-sm text-white hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isSubmitting ? "처리 중..." : "환불 확정"}
+          {isSubmitting ? "처리 중..." : "취소 및 환불"}
         </button>
       </div>
     </Modal>

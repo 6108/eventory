@@ -1,4 +1,3 @@
-// src/component/product/ProductExplorer.tsx
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -11,9 +10,14 @@ import { ProductSummary } from "@/src/types/product";
 interface ProductExplorerProps {
   products: ProductSummary[];
   currentUserId?: string;
+  showFollowingFilter?: boolean;
 }
 
-export default function ProductExplorer({ products, currentUserId }: ProductExplorerProps) {
+export default function ProductExplorer({
+  products,
+  currentUserId,
+  showFollowingFilter = false,
+}: ProductExplorerProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -39,21 +43,24 @@ export default function ProductExplorer({ products, currentUserId }: ProductExpl
       params.set("following", "true");
     }
 
-    router.push(`${pathname}?${params.toString()}`);
+    const query = params.toString();
+
+    router.push(query ? `${pathname}?${query}` : pathname);
   }
 
   return (
     <div className="flex flex-col gap-6">
       {/* 팔로우한 부스만 보기 */}
-      {currentUserId && (
+      {showFollowingFilter && currentUserId && (
         <button
+          type="button"
           onClick={toggleFollowingFilter}
-          className={`self-start rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${isFollowingOnly
-            ? "border-primary bg-primary text-white"
-            : "border-zinc-700 text-zinc-400 hover:border-zinc-500"
+          className={`self-start rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors
+            border-primary bg-primary text-white
+            
             }`}
         >
-          {isFollowingOnly ? "팔로우한 부스만 보는 중" : "팔로우한 부스만 보기"}
+          {isFollowingOnly ? "전체 상품 보기" : "팔로우한 부스 상품만 보기"}
         </button>
       )}
 
@@ -68,6 +75,7 @@ export default function ProductExplorer({ products, currentUserId }: ProductExpl
           />
         ))}
       </div>
+
       {/* 타입 */}
       {subCategories.length > 0 && (
         <div className="flex gap-2 overflow-x-auto font-bold">
@@ -81,8 +89,12 @@ export default function ProductExplorer({ products, currentUserId }: ProductExpl
           ))}
         </div>
       )}
+
       {/* 상품 */}
-      <ProductList products={filteredProducts} currentUserId={currentUserId} />
+      <ProductList
+        products={filteredProducts}
+        currentUserId={currentUserId}
+      />
     </div>
   );
 }

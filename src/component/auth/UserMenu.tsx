@@ -50,7 +50,7 @@ export function UserMenu() {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="max-w-24 truncate text-sm text-primary hover:text-white"
+        className="max-w-24 truncate text-md text-primary hover:text-white"
         title={nickname}
       >
         {nickname}

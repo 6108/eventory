@@ -46,10 +46,6 @@ export default function QuickAddButton({
     remainingQuantity !== null &&
     remainingQuantity <= 0;
 
-  /**
-   * 선택한 옵션이 바뀌었는데
-   * 현재 수량이 새로운 재고보다 많아지는 경우 보정
-   */
   useEffect(() => {
     if (
       remainingQuantity !== null &&
