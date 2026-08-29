@@ -1,5 +1,5 @@
 import { EVENT_ID as eventId } from "@/src/constants/event";
-import { UserMenuItem } from "./UserMenuItem";
+import UserMenuItem from "./UserMenuItem";
 
 type Props = {
   boothId: string | null;
@@ -7,7 +7,7 @@ type Props = {
   onNavigate: () => void;
 };
 
-export function BoothMenu({ boothId, loading, onNavigate }: Props) {
+export default function BoothMenu({ boothId, loading, onNavigate }: Props) {
   if (loading) {
     return null;
   }

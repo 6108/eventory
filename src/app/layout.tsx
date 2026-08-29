@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "@/src/styles/globals.css";
-import { Navbar } from "../component/layout/Navbar";
-import { Footer } from "../component/layout/Footer";
+import Navbar from "../component/layout/Navbar";
+import Footer from "../component/layout/Footer";
 import DisableContextMenu from "../component/common/DisableContextMenu";
 import { Toaster } from "react-hot-toast";
 import ConfirmModal from "../component/common/ConfirmModal";

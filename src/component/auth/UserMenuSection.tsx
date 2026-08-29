@@ -4,7 +4,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-export function UserMenuSection({ label, children }: Props) {
+export default function UserMenuSection({ label, children }: Props) {
   return (
     <div>
       <p className="px-4 pt-1.5 pb-1 text-sm font-medium uppercase tracking-wide text-zinc-600">

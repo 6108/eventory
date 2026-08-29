@@ -1,7 +1,7 @@
 "use client";
 
 import { useConfirmModalStore } from "@/src/store/confirmModalStore";
-import { Modal } from "./Modal";
+import Modal from "./Modal";
 
 export default function ConfirmModal() {
   const { isOpen, title, message, confirmText, cancelText, handleConfirm, handleCancel } =

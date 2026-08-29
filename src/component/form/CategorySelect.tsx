@@ -11,7 +11,7 @@ type Props = {
   onSubCategoryChange: (subCategory: string) => void;
 };
 
-export function CategorySelect({
+export default function CategorySelect({
   category,
   subCategory,
   onCategoryChange,

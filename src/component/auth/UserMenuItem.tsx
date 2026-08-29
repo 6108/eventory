@@ -8,7 +8,7 @@ type Props = {
   onClick?: () => void;
 };
 
-export function UserMenuItem({ href, children, onClick }: Props) {
+export default function UserMenuItem({ href, children, onClick }: Props) {
   return (
     <Link
       href={href}

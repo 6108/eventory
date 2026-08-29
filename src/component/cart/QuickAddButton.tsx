@@ -5,7 +5,7 @@ import { ShoppingCart } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { useCartStore } from "@/src/store/cartStore";
-import { Modal } from "@/src/component/common/Modal";
+import Modal from "@/src/component/common/Modal";
 import IconActionButton from "@/src/component/common/IconActionButton";
 import type { ProductSummary } from "@/src/types/product";
 

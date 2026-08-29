@@ -6,7 +6,7 @@ interface FormActionsProps {
   loadingLabel: string;
 }
 
-export function FormActions({
+export default function FormActions({
   onCancel,
   loading,
   submitLabel,

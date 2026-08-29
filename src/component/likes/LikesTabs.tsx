@@ -13,7 +13,7 @@ import FollowButton from "@/src/component/booth/FollowButton";
 import { EVENT_ID as eventId } from "@/src/constants/event";
 import { useAuth } from "@/src/hooks/useAuth";
 
-export function LikesTabs({
+export default function LikesTabs({
   likedProducts: initialLikedProducts,
   followedBooths: initialFollowedBooths,
 }: {

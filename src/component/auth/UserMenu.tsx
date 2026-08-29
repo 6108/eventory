@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 import { EVENT_ID as eventId } from "@/src/constants/event";
 import { useAuth } from "@/src/hooks/useAuth";
 import { useProfile } from "@/src/hooks/useProfile";
-import { BoothMenu } from "./BoothMenu";
-import { UserMenuItem } from "./UserMenuItem";
+import BoothMenu from "./BoothMenu";
+import UserMenuItem from "./UserMenuItem";
 import { useBoothStore } from "@/src/store/boothStore";
-import { UserMenuSection } from "./UserMenuSection";
+import UserMenuSection from "./UserMenuSection";
 
-export function UserMenu() {
+export default function UserMenu() {
   const { user, logout } = useAuth();
   const { profile } = useProfile(user?.id);
   const { boothId, checked, fetchBoothId } = useBoothStore();

@@ -11,7 +11,7 @@ interface ModalProps {
 
 const maxWidthClass = { xs: "max-w-xs", sm: "max-w-sm", md: "max-w-md" };
 
-export function Modal({ isOpen, onClose, children, maxWidth = "sm" }: ModalProps) {
+export default function Modal({ isOpen, onClose, children, maxWidth = "sm" }: ModalProps) {
   if (!isOpen) return null;
 
   return (

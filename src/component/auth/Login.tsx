@@ -1,9 +1,9 @@
 "use client";
 
 import { useAuth } from "@/src/hooks/useAuth";
-import { UserMenu } from "./UserMenu";
+import UserMenu from "./UserMenu";
 
-export function Login() {
+export default function Login() {
   const { user, loading, login } = useAuth();
 
   if (loading) {

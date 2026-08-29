@@ -13,7 +13,7 @@ interface ProductImageFieldProps {
   hint?: string;
 }
 
-export function ProductImageField({
+export default function ProductImageField({
   initialPreviewUrl = null,
   onImageChange,
   required = false,

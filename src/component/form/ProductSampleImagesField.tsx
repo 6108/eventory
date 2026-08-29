@@ -20,7 +20,7 @@ interface ProductSampleImagesFieldProps {
   onChange: (files: File[], keptExistingUrls: string[]) => void;
 }
 
-export function ProductSampleImagesField({
+export default function ProductSampleImagesField({
   initialUrls = [],
   onChange,
 }: ProductSampleImagesFieldProps) {

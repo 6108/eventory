@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { OrderItem } from "@/src/hooks/useOrders";
-import { Modal } from "@/src/component/common/Modal";
+import Modal from "@/src/component/common/Modal";
 
 interface Props {
   item: OrderItem;

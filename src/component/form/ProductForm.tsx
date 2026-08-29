@@ -3,19 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { FormField } from "./FormField";
-import { ProductImageField } from "./ProductImageField";
-import { CategorySelect } from "./CategorySelect";
-import { ArtistSelectField } from "./ArtistSelectField";
-import { ProductOptionsField } from "./ProductOptionsField";
-import { FormActions } from "./FormActions";
+import FormField from "./FormField";
+import ProductImageField from "./ProductImageField";
+import CategorySelect from "./CategorySelect";
+import ArtistSelectField from "./ArtistSelectField";
+import ProductOptionsField from "./ProductOptionsField";
+import FormActions from "./FormActions";
 import { Input } from "@/src/component/common/Input";
 import { useProductForm } from "@/src/hooks/useProductForm";
 import { useArtistSelection } from "@/src/hooks/useArtistSelection";
 import { useProductMutation } from "@/src/hooks/useProductMutation";
 import type { Product } from "@/src/types/product";
 import { User } from "@/src/types/user";
-import { ProductSampleImagesField } from "./ProductSampleImagesField";
+import ProductSampleImagesField from "./ProductSampleImagesField";
 
 interface ProductFormProps {
   eventId: string;

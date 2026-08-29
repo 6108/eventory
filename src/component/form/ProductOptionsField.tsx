@@ -1,5 +1,5 @@
 // src/component/form/ProductOptionsField.tsx
-import { FormField } from "./FormField";
+import FormField from "./FormField";
 import { Input } from "@/src/component/common/Input";
 import type { ProductOptionFormState } from "@/src/types/form";
 
@@ -10,7 +10,7 @@ interface Props {
   onRemove: (index: number) => void;
 }
 
-export function ProductOptionsField({ options, onAdd, onUpdate, onRemove }: Props) {
+export default function ProductOptionsField({ options, onAdd, onUpdate, onRemove }: Props) {
   return (
     <FormField label="옵션">
       <div className="flex flex-col gap-2">

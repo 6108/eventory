@@ -5,7 +5,7 @@ import { useOrderStore } from "@/src/store/orderStore";
 import type { PosProduct } from "@/src/types/product";
 import type { OrderRequest } from "@/src/types/request";
 import { useOrderRequests } from "@/src/hooks/useOrderRequests";
-import { useIsActiveTab } from "./PosTabContext";
+import useIsActiveTab from "./PosTabContext";
 
 interface Props {
   boothId: string;
