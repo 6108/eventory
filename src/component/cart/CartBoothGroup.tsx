@@ -73,9 +73,10 @@ export default function CartBoothGroup({ group }: CartBoothGroupProps) {
       <div className="flex items-center justify-between">
         <Link
           href={`/${eventId}/booths/${group.boothId}`}
-          className="text-sm font-medium text-white hover:underline"
+          className="flex min-w-0 items-center gap-1 text-sm font-medium text-white hover:underline"
         >
-          {group.boothName}
+          <span className="shrink-0 text-zinc-400">[{group.boothNumber}]</span>
+          <span className="min-w-0 truncate">{group.boothName}</span>
         </Link>
 
         <button
