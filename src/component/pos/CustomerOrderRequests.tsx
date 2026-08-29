@@ -5,7 +5,7 @@ import { useOrderStore } from "@/src/store/orderStore";
 import type { PosProduct } from "@/src/types/product";
 import type { OrderRequest } from "@/src/types/request";
 import { useOrderRequests } from "@/src/hooks/useOrderRequests";
-import useIsActiveTab from "./PosTabContext";
+import useIsActiveTab, { usePosTabSwitch } from "./PosTabContext";
 
 interface OrderRequestsProps {
   boothId: string;
@@ -16,9 +16,11 @@ export default function OrderRequests({ boothId, products }: OrderRequestsProps)
   const isActive = useIsActiveTab("requests");
   const { requests, isLoading, pendingRequestId, setStatus } = useOrderRequests(boothId, isActive);
   const addItem = useOrderStore((s) => s.addItem);
+  const clear = useOrderStore((s) => s.clear);
   const decrementBy = useOrderStore((s) => s.decrementBy);
   const markRequestChecked = useOrderStore((s) => s.markRequestChecked);
   const unmarkRequestChecked = useOrderStore((s) => s.unmarkRequestChecked);
+  const setTab = usePosTabSwitch();
 
   function findProductPrice(productId: string, optionId: string | null) {
     const product = products.find((p) => p.id === productId);
@@ -39,6 +41,11 @@ export default function OrderRequests({ boothId, products }: OrderRequestsProps)
   }
 
   async function handleCheck(request: OrderRequest) {
+    // 손님별로 결제를 분리하기 위해, 확인을 누르는 순간 현재 판매 화면을 비움.
+    // (여러 손님 요청을 연달아 체크하면 하나의 주문으로 합쳐져서 인당 구매 제한이
+    //  무의미해지는 문제가 있었음 - QA 5-6 관련)
+    clear();
+
     const added: {
       productId: string;
       optionId: string | null;
@@ -84,6 +91,10 @@ export default function OrderRequests({ boothId, products }: OrderRequestsProps)
     } catch {
       toast.error("상태 변경에 실패했습니다.");
     }
+
+    // 확인한 손님의 주문이 담긴 판매 화면으로 바로 이동시켜서
+    // 결제를 마치기 전에 다른 손님 요청을 또 체크하는 상황을 방지
+    setTab("sell");
   }
 
   async function handleUndo(request: OrderRequest) {

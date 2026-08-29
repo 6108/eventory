@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PosTabProvider } from "./PosTabContext";
-
-type TabKey = "sell" | "requests" | "prepaid" | "receipt";
+import { PosTabProvider, TabKey } from "./PosTabContext";
 
 interface PosTabsProps {
   sellContent: React.ReactNode;
@@ -23,7 +21,7 @@ export default function PosTabs({ sellContent, requestsContent, prepaidContent, 
   ];
 
   return (
-    <PosTabProvider value={tab}>
+    <PosTabProvider value={{ tab, setTab }}>
       <div className="h-full">
         <div className="flex border-b border-zinc-800 px-4">
           {tabs.map((t) => (

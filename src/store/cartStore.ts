@@ -24,6 +24,16 @@ interface CartState {
   clearAll: () => void;
   markBoothSent: (boothId: string) => void;
   clearBlocked: () => void;
+  // 서버에서 가져온 최신 상품 정보로 장바구니 아이템의 제한값을 갱신
+  // (담은 이후 작가가 구매 제한을 새로 걸거나 바꿔도 장바구니에 반영되도록)
+  syncLimits: (
+    updates: {
+      productId: string;
+      optionId: string | null;
+      purchaseLimit: number | null;
+      remainingQuantity: number | null;
+    }[]
+  ) => void;
 
   // 파생 데이터
   totalQuantity: () => number;
@@ -50,15 +60,25 @@ export const useCartStore = create<CartState>()(
           delete nextSentBoothIds[cartItem.boothId];
 
           if (existing) {
+            // 담을 때마다 최신 purchaseLimit/remainingQuantity로 갱신
+            // (작가가 그 사이 구매 제한을 새로 걸거나 바꿨을 수 있으므로,
+            //  캐시된 옛 값이 아니라 지금 막 조회된 cartItem 값을 기준으로 판단)
             const nextQuantity = existing.quantity + cartItem.quantity;
 
-            // 구매 제한만 담기 단계에서 차단. 재고는 확인하지 않고 그냥 담게 둠
-            // (얼마나 남았는지 노출하고 싶지 않음 + 최종 검증은 전송 시점에 서버가 수행)
             if (
-              existing.purchaseLimit != null &&
-              nextQuantity > existing.purchaseLimit
+              cartItem.purchaseLimit != null &&
+              nextQuantity > cartItem.purchaseLimit
             ) {
               return {
+                items: state.items.map((i) =>
+                  i.productId === cartItem.productId && i.optionId === cartItem.optionId
+                    ? {
+                      ...i,
+                      purchaseLimit: cartItem.purchaseLimit,
+                      remainingQuantity: cartItem.remainingQuantity,
+                    }
+                    : i
+                ),
                 lastBlocked: {
                   productId: existing.productId,
                   optionId: existing.optionId,
@@ -70,7 +90,12 @@ export const useCartStore = create<CartState>()(
             return {
               items: state.items.map((i) =>
                 i.productId === cartItem.productId && i.optionId === cartItem.optionId
-                  ? { ...i, quantity: nextQuantity }
+                  ? {
+                    ...i,
+                    quantity: nextQuantity,
+                    purchaseLimit: cartItem.purchaseLimit,
+                    remainingQuantity: cartItem.remainingQuantity,
+                  }
                   : i
               ),
               sentBoothIds: nextSentBoothIds,
@@ -187,6 +212,60 @@ export const useCartStore = create<CartState>()(
       clearAll: () => set({ items: [], sentBoothIds: {}, lastBlocked: null }),
 
       clearBlocked: () => set({ lastBlocked: null }),
+
+      syncLimits: (updates) =>
+        set((state) => {
+          if (updates.length === 0) return state;
+
+          const nextSentBoothIds = { ...state.sentBoothIds };
+          let blocked: CartLimitBlock = null;
+
+          const items = state.items.map((item) => {
+            const update = updates.find(
+              (u) =>
+                u.productId === item.productId && u.optionId === item.optionId
+            );
+
+            if (!update) return item;
+
+            const limitChanged = update.purchaseLimit !== item.purchaseLimit;
+            const stockChanged =
+              update.remainingQuantity !== item.remainingQuantity;
+
+            if (!limitChanged && !stockChanged) return item;
+
+            // 새 구매 제한이 기존에 담아둔 수량보다 작으면 담긴 수량을 제한까지 줄임
+            let nextQuantity = item.quantity;
+            if (
+              update.purchaseLimit != null &&
+              nextQuantity > update.purchaseLimit
+            ) {
+              nextQuantity = update.purchaseLimit;
+              blocked = {
+                productId: item.productId,
+                optionId: item.optionId,
+                reason: "purchaseLimit",
+              };
+            }
+
+            if (nextQuantity !== item.quantity) {
+              delete nextSentBoothIds[item.boothId];
+            }
+
+            return {
+              ...item,
+              purchaseLimit: update.purchaseLimit,
+              remainingQuantity: update.remainingQuantity,
+              quantity: nextQuantity,
+            };
+          });
+
+          return {
+            items: items.filter((item) => item.quantity > 0),
+            sentBoothIds: nextSentBoothIds,
+            lastBlocked: blocked ?? state.lastBlocked,
+          };
+        }),
 
       markBoothSent: (boothId) =>
         set((state) => ({

@@ -13,11 +13,6 @@ export default function CartItemRow({ item }: CartItemRowProps) {
   const increment = useCartStore((s) => s.increment);
   const decrement = useCartStore((s) => s.decrement);
   const removeItem = useCartStore((s) => s.removeItem);
-  const lastBlocked = useCartStore((s) => s.lastBlocked);
-
-  const isBlocked =
-    lastBlocked?.productId === item.productId &&
-    lastBlocked?.optionId === item.optionId;
 
   // 구매 제한만 하드 캡으로 버튼 비활성화. 재고는 담기 단계에서 체크하지 않음
   const isMaxedByLimit =
@@ -50,32 +45,24 @@ export default function CartItemRow({ item }: CartItemRowProps) {
         <p className="text-sm text-primary">{item.price.toLocaleString()}원</p>
       </div>
 
-      <div className="flex flex-col items-center gap-1">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => decrement(item.productId, item.optionId)}
-            className="h-7 w-7 rounded bg-zinc-800 text-white"
-          >
-            −
-          </button>
-          <span className="w-5 text-center text-sm text-white">
-            {item.quantity}
-          </span>
-          <button
-            onClick={() => increment(item.productId, item.optionId)}
-            disabled={isMaxedByLimit}
-            aria-disabled={isMaxedByLimit}
-            className="h-7 w-7 rounded bg-zinc-800 text-white disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            +
-          </button>
-        </div>
-
-        {isBlocked && (
-          <p className="whitespace-nowrap text-[11px] text-red-400">
-            구매 제한 수량입니다
-          </p>
-        )}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => decrement(item.productId, item.optionId)}
+          className="h-7 w-7 rounded bg-zinc-800 text-white"
+        >
+          −
+        </button>
+        <span className="w-5 text-center text-sm text-white">
+          {item.quantity}
+        </span>
+        <button
+          onClick={() => increment(item.productId, item.optionId)}
+          disabled={isMaxedByLimit}
+          aria-disabled={isMaxedByLimit}
+          className="h-7 w-7 rounded bg-zinc-800 text-white disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          +
+        </button>
       </div>
 
       <button

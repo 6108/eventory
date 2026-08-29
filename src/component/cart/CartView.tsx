@@ -1,6 +1,7 @@
 // src/component/cart/CartView.tsx
 "use client";
 
+import { useEffect } from "react";
 import { useCartStore } from "@/src/store/cartStore";
 import { useHasMounted } from "@/src/hooks/useHasMounted";
 import CartBoothGroup from "./CartBoothGroup";
@@ -15,8 +16,35 @@ export default function CartView() {
   const items = useCartStore((s) => s.items);
   const groupedByBooth = useCartStore((s) => s.groupedByBooth);
   const clearAll = useCartStore((s) => s.clearAll);
+  const syncLimits = useCartStore((s) => s.syncLimits);
 
   const openConfirmModal = useConfirmModalStore((s) => s.openConfirmModal);
+
+  // 장바구니 화면 진입 시, 담긴 상품들의 구매제한/재고를 최신 값으로 동기화.
+  // 작가가 그 사이 구매제한을 새로 걸거나 바꿔도 반영되게 하기 위함 (QA 2-4 관련)
+  useEffect(() => {
+    if (!hasMounted || items.length === 0) return;
+
+    const productIds = [...new Set(items.map((item) => item.productId))];
+
+    fetch(`/api/products/limits?ids=${productIds.join(",")}`)
+      .then((res) => res.json())
+      .then((data: {
+        limits: {
+          productId: string;
+          optionId: string | null;
+          purchaseLimit: number | null;
+          remainingQuantity: number | null;
+        }[];
+      }) => {
+        syncLimits(data.limits);
+      })
+      .catch((err) => {
+        // 동기화 실패해도 장바구니 자체는 그대로 보여줌 (전송 시점에 서버가 최종 검증)
+        console.error("구매제한 동기화 실패:", err);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasMounted]); // 진입 시 1회만 동기화
 
   if (!hasMounted) {
     return (

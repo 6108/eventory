@@ -314,3 +314,62 @@ export async function getPosProducts(boothId: string): Promise<PosProduct[]> {
     ),
   }));
 }
+
+// src/lib/data/product.ts 에 추가
+
+export type ProductLimitInfo = {
+  productId: string;
+  optionId: string | null;
+  purchaseLimit: number | null;
+  remainingQuantity: number | null;
+};
+
+// 장바구니 동기화용 - 여러 상품의 "지금" 구매제한/재고만 가볍게 조회.
+// 옵션이 있는 상품은 옵션별 remainingQuantity를 optionId 기준으로 함께 내려준다.
+export async function getProductLimits(
+  productIds: string[]
+): Promise<ProductLimitInfo[]> {
+  if (productIds.length === 0) return [];
+
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("products")
+    .select(
+      `id, remaining_quantity, purchase_limit,
+      product_options ( id, remaining_quantity )`
+    )
+    .in("id", productIds);
+
+  if (error) {
+    console.error("구매제한/재고 조회 실패:", error);
+    return [];
+  }
+
+  const result: ProductLimitInfo[] = [];
+
+  for (const product of data ?? []) {
+    const options = product.product_options ?? [];
+
+    if (options.length === 0) {
+      result.push({
+        productId: product.id,
+        optionId: null,
+        purchaseLimit: product.purchase_limit,
+        remainingQuantity: product.remaining_quantity,
+      });
+      continue;
+    }
+
+    for (const option of options) {
+      result.push({
+        productId: product.id,
+        optionId: option.id,
+        purchaseLimit: product.purchase_limit,
+        remainingQuantity: option.remaining_quantity,
+      });
+    }
+  }
+
+  return result;
+}
