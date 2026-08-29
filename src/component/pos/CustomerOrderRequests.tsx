@@ -124,7 +124,10 @@ export default function OrderRequests({ boothId, products }: OrderRequestsProps)
   }
 
   const activeRequests = requests.filter((r) => r.status === "requested");
-  const checkedRequests = requests.filter((r) => r.status === "checked");
+  // "확인함" 상태여도 결제(orderId 연결)까지 끝난 건 더 이상 대기 목록에 보일 필요 없음
+  const checkedRequests = requests.filter(
+    (r) => r.status === "checked" && !r.orderId
+  );
 
   return (
     <div className="h-full overflow-y-auto p-4">

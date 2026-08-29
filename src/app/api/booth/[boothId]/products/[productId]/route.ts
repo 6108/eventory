@@ -1,6 +1,13 @@
 // src/app/api/booth/[boothId]/products/[productId]/route.ts
+
 import { NextResponse } from "next/server";
 import { requireBoothArtist } from "@/src/lib/auth/requireBoothArtist";
+
+type ProductOptionInput = {
+  id?: string;
+  name: string;
+  initialQuantity: number;
+};
 
 export async function PATCH(
   request: Request,
@@ -23,8 +30,15 @@ export async function PATCH(
     options,
   } = body;
 
+  // =========================
+  // 기본 유효성 검사
+  // =========================
+
   if (!name?.trim()) {
-    return NextResponse.json({ error: "작품명을 입력해주세요." }, { status: 400 });
+    return NextResponse.json(
+      { error: "작품명을 입력해주세요." },
+      { status: 400 }
+    );
   }
 
   if (!category || !subCategory) {
@@ -62,11 +76,22 @@ export async function PATCH(
     );
   }
 
+  // =========================
+  // 인증
+  // =========================
+
   const authResult = await requireBoothArtist(boothId);
-  if (authResult instanceof NextResponse) return authResult;
+
+  if (authResult instanceof NextResponse) {
+    return authResult;
+  }
+
   const { supabase } = authResult;
 
-  // 수정 대상 작품이 이 부스 소유가 맞는지 확인
+  // =========================
+  // 작품 존재 여부 확인
+  // =========================
+
   const { data: existing, error: existingError } = await supabase
     .from("products")
     .select("id")
@@ -75,24 +100,43 @@ export async function PATCH(
     .single();
 
   if (existingError || !existing) {
-    return NextResponse.json({ error: "작품을 찾을 수 없습니다." }, { status: 404 });
+    return NextResponse.json(
+      { error: "작품을 찾을 수 없습니다." },
+      { status: 404 }
+    );
   }
 
-  // 작가 이름 스냅샷 재생성 — 클라이언트가 보낸 이름을 믿지 않고 서버에서 직접 조회
+  // =========================
+  // 작가 정보 조회
+  // =========================
+
   const { data: artistData, error: artistError } = await supabase
     .from("users")
     .select("id, name")
     .in("id", artistIds);
 
-  if (artistError || !artistData || artistData.length !== artistIds.length) {
+  if (
+    artistError ||
+    !artistData ||
+    artistData.length !== artistIds.length
+  ) {
     return NextResponse.json(
       { error: "유효하지 않은 작가가 포함되어 있습니다." },
       { status: 400 }
     );
   }
 
-  const nameMap = new Map(artistData.map((a) => [a.id, a.name]));
-  const artistNames = artistIds.map((id: string) => nameMap.get(id)!);
+  const nameMap = new Map(
+    artistData.map((artist) => [artist.id, artist.name])
+  );
+
+  const artistNames = artistIds.map(
+    (id: string) => nameMap.get(id)!
+  );
+
+  // =========================
+  // 옵션 여부
+  // =========================
 
   const hasOptions = options.length > 0;
 
@@ -102,11 +146,17 @@ export async function PATCH(
       ? null
       : Number(initialQuantity);
 
-  const { data: product, error } = await supabase
+  // =========================
+  // 상품 수정
+  // =========================
+
+  const { data: product, error: productError } = await supabase
     .from("products")
     .update({
       main_image: mainImageUrl.trim(),
-      sample_images: Array.isArray(sampleImageUrls) ? sampleImageUrls : [],
+      sample_images: Array.isArray(sampleImageUrls)
+        ? sampleImageUrls
+        : [],
       name: name.trim(),
       price: Number(price),
       category,
@@ -116,7 +166,9 @@ export async function PATCH(
       remaining_quantity: productInitialQuantity,
 
       purchase_limit:
-        purchaseLimit === null || purchaseLimit === "" ? null : Number(purchaseLimit),
+        purchaseLimit === null || purchaseLimit === ""
+          ? null
+          : Number(purchaseLimit),
 
       description: description?.trim() ?? "",
       artist_ids: artistIds,
@@ -125,54 +177,240 @@ export async function PATCH(
     .eq("id", productId)
     .eq("booth_id", boothId)
     .select(
-      "id, booth_id, main_image, sample_images, name, price, category, sub_category, initial_quantity, purchase_limit, description, remaining_quantity, artist_ids, artist_names"
+      `
+        id,
+        booth_id,
+        main_image,
+        sample_images,
+        name,
+        price,
+        category,
+        sub_category,
+        initial_quantity,
+        purchase_limit,
+        description,
+        remaining_quantity,
+        artist_ids,
+        artist_names
+      `
     )
     .single();
 
-  if (error) {
-    console.error(error);
-    return NextResponse.json({ error: "작품 수정에 실패했습니다." }, { status: 500 });
-  }
+  if (productError) {
+    console.error(productError);
 
-  // 기존 옵션 전체 삭제 후 재생성 (옵션 구성 자체가 바뀔 수 있으므로)
-  const { error: deleteOptionsError } = await supabase
-    .from("product_options")
-    .delete()
-    .eq("product_id", productId);
-
-  if (deleteOptionsError) {
-    console.error(deleteOptionsError);
     return NextResponse.json(
-      { error: "작품 옵션 수정에 실패했습니다." },
+      { error: "작품 수정에 실패했습니다." },
       { status: 500 }
     );
   }
 
-  if (hasOptions) {
-    const optionRows = options.map(
-      (option: { name: string; initialQuantity: number }) => ({
-        product_id: productId,
+  // ============================================================
+  // 옵션 수정
+  // ============================================================
+
+  // 기존 옵션 조회
+  const {
+    data: existingOptions,
+    error: existingOptionsError,
+  } = await supabase
+    .from("product_options")
+    .select(
+      `
+        id,
+        product_id,
+        name,
+        initial_quantity,
+        remaining_quantity
+      `
+    )
+    .eq("product_id", productId);
+
+  if (existingOptionsError) {
+    console.error(existingOptionsError);
+
+    return NextResponse.json(
+      { error: "기존 작품 옵션을 불러오지 못했습니다." },
+      { status: 500 }
+    );
+  }
+
+  const currentOptions = existingOptions ?? [];
+
+  // 기존 옵션을 ID로 빠르게 찾기 위한 Map
+  const existingOptionMap = new Map(
+    currentOptions.map((option) => [option.id, option])
+  );
+
+  // 현재 요청에 포함된 기존 옵션 ID
+  const incomingOptionIds = new Set(
+    (options as ProductOptionInput[])
+      .map((option) => option.id)
+      .filter((id): id is string => Boolean(id))
+  );
+
+  // ============================================================
+  // 1. 기존 옵션 수정
+  // ============================================================
+
+  for (const option of options as ProductOptionInput[]) {
+    // id가 없으면 새 옵션이므로 여기서는 건너뜀
+    if (!option.id) {
+      continue;
+    }
+
+    // 이 상품의 기존 옵션인지 확인
+    const existingOption = existingOptionMap.get(option.id);
+
+    if (!existingOption) {
+      return NextResponse.json(
+        { error: "유효하지 않은 작품 옵션이 포함되어 있습니다." },
+        { status: 400 }
+      );
+    }
+
+    if (!option.name?.trim()) {
+      return NextResponse.json(
+        { error: "옵션명을 입력해주세요." },
+        { status: 400 }
+      );
+    }
+
+    if (
+      option.initialQuantity === undefined ||
+      option.initialQuantity === null ||
+      Number(option.initialQuantity) < 0
+    ) {
+      return NextResponse.json(
+        { error: "옵션 재고를 올바르게 입력해주세요." },
+        { status: 400 }
+      );
+    }
+
+    const { error: updateOptionError } = await supabase
+      .from("product_options")
+      .update({
         name: option.name.trim(),
         initial_quantity: Number(option.initialQuantity),
-        remaining_quantity: Number(option.initialQuantity),
       })
-    );
+      .eq("id", option.id)
+      .eq("product_id", productId);
 
-    const { error: optionError } = await supabase
-      .from("product_options")
-      .insert(optionRows);
+    if (updateOptionError) {
+      console.error(updateOptionError);
 
-    if (optionError) {
-      console.error(optionError);
       return NextResponse.json(
-        { error: "작품 옵션 추가에 실패했습니다." },
+        { error: "작품 옵션 수정에 실패했습니다." },
         { status: 500 }
       );
     }
   }
 
-  return NextResponse.json({ product });
+  // ============================================================
+  // 2. 새 옵션 추가
+  // ============================================================
+
+  const newOptions = (options as ProductOptionInput[])
+    .filter((option) => !option.id)
+    .map((option) => ({
+      product_id: productId,
+      name: option.name.trim(),
+      initial_quantity: Number(option.initialQuantity),
+      remaining_quantity: Number(option.initialQuantity),
+    }));
+
+  if (newOptions.length > 0) {
+    const { error: insertOptionError } = await supabase
+      .from("product_options")
+      .insert(newOptions);
+
+    if (insertOptionError) {
+      console.error(insertOptionError);
+
+      return NextResponse.json(
+        { error: "새 작품 옵션 추가에 실패했습니다." },
+        { status: 500 }
+      );
+    }
+  }
+
+  // ============================================================
+  // 3. 삭제된 기존 옵션 처리
+  // ============================================================
+
+  const deletedOptions = currentOptions.filter(
+    (option) => !incomingOptionIds.has(option.id)
+  );
+
+  for (const option of deletedOptions) {
+    // ----------------------------------------------------------
+    // 이 옵션을 주문에서 사용했는지 확인
+    // ----------------------------------------------------------
+
+    const {
+      count,
+      error: orderItemCheckError,
+    } = await supabase
+      .from("order_items")
+      .select("id", {
+        count: "exact",
+        head: true,
+      })
+      .eq("option_id", option.id);
+
+    if (orderItemCheckError) {
+      console.error(orderItemCheckError);
+
+      return NextResponse.json(
+        { error: "옵션 사용 여부를 확인하지 못했습니다." },
+        { status: 500 }
+      );
+    }
+
+    // ----------------------------------------------------------
+    // 주문에서 사용된 옵션이면 삭제하지 않음
+    // ----------------------------------------------------------
+
+    if ((count ?? 0) > 0) {
+      console.log(
+        `옵션 ${option.id}는 주문에서 사용되어 삭제하지 않습니다.`
+      );
+
+      continue;
+    }
+
+    // ----------------------------------------------------------
+    // 주문에서 한 번도 사용되지 않았다면 실제 삭제
+    // ----------------------------------------------------------
+
+    const { error: deleteOptionError } = await supabase
+      .from("product_options")
+      .delete()
+      .eq("id", option.id)
+      .eq("product_id", productId);
+
+    if (deleteOptionError) {
+      console.error(deleteOptionError);
+
+      return NextResponse.json(
+        { error: "삭제된 작품 옵션 처리에 실패했습니다." },
+        { status: 500 }
+      );
+    }
+  }
+
+  // ============================================================
+  // 완료
+  // ============================================================
+
+  return NextResponse.json({
+    product,
+  });
 }
+
+// ================================================================
+// DELETE PRODUCT
+// ================================================================
 
 export async function DELETE(
   request: Request,
@@ -181,7 +419,11 @@ export async function DELETE(
   const { boothId, productId } = await params;
 
   const authResult = await requireBoothArtist(boothId);
-  if (authResult instanceof NextResponse) return authResult;
+
+  if (authResult instanceof NextResponse) {
+    return authResult;
+  }
+
   const { supabase } = authResult;
 
   const { error } = await supabase
@@ -192,8 +434,14 @@ export async function DELETE(
 
   if (error) {
     console.error(error);
-    return NextResponse.json({ error: "작품 삭제에 실패했습니다." }, { status: 500 });
+
+    return NextResponse.json(
+      { error: "작품 삭제에 실패했습니다." },
+      { status: 500 }
+    );
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({
+    success: true,
+  });
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useOrderStore } from "@/src/store/orderStore";
 
@@ -11,6 +12,7 @@ interface OrderPanelProps {
 
 export default function OrderPanel({ boothId }: OrderPanelProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const items = useOrderStore((s) => s.items);
   const checkedRequests = useOrderStore((s) => s.checkedRequests);
@@ -87,6 +89,11 @@ export default function OrderPanel({ boothId }: OrderPanelProps) {
         } else {
           toast.success("판매가 등록되었습니다.");
         }
+
+        // 결제 완료(orderId 연결)된 요청은 "확인한 주문" 목록에서 빠져야 하므로,
+        // 손님 주문 탭이 비활성 상태라 폴링이 멈춰있어도 캐시를 바로 무효화해서
+        // 다음에 그 탭을 열 때 최신 상태(완료 항목 제외)로 보이게 함
+        queryClient.invalidateQueries({ queryKey: ["orderRequests", boothId] });
       } else {
         toast.success("판매가 등록되었습니다.");
       }
