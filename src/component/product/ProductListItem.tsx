@@ -112,18 +112,18 @@ export default function ProductListItem({
           </div>
 
           {/* 작품명 */}
-          <h3 className="mt-1 line-clamp-2 min-h-6 overflow-hidden break-keep font-medium leading-5 text-zinc-100 sm:min-h-7">
+          <h3 className="line-clamp-2 min-h-6 overflow-hidden break-keep font-medium  text-zinc-100 sm:min-h-7">
             {productInfo.name}
           </h3>
 
           {/* 가격 + 담기 */}
-          <div className="mt-auto flex min-w-0 items-end justify-between gap-1 ">
+          <div className="mt-auto flex min-w-0 items-end justify-between gap-1">
             {/* 가격 영역 */}
             <div className="min-w-0 flex-1">
               {/* 수량 제한 */}
               <div className="h-4">
                 {!isSoldOut && productInfo.purchaseLimit != null && (
-                  <p className="whitespace-nowrap text-[clamp(10px,2.5vw,15px)] font-medium leading-4 text-zinc-400">
+                  <p className="whitespace-nowrap text-[clamp(10px,2.5vw,13px)] font-medium leading-4 text-zinc-400">
                     (1인 {productInfo.purchaseLimit}개 한정)
                   </p>
                 )}
