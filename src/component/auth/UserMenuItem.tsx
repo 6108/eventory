@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 
-type Props = {
+interface UserMenuItemProps {
   href: string;
   children: React.ReactNode;
   onClick?: () => void;
 };
 
-export default function UserMenuItem({ href, children, onClick }: Props) {
+export default function UserMenuItem({ href, children, onClick }: UserMenuItemProps) {
   return (
     <Link
       href={href}

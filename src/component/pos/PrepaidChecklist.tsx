@@ -3,11 +3,11 @@
 import { usePrepaidRows } from "@/src/hooks/usePrepaidRows";
 
 
-interface Props {
+interface PrepaidChecklistProps {
   boothId: string;
 }
 
-export default function PrepaidChecklist({ boothId }: Props) {
+export default function PrepaidChecklist({ boothId }: PrepaidChecklistProps) {
   const { rows, headers, isLoading, pendingIds, toggleRow } = usePrepaidRows(boothId);
 
   if (isLoading) {

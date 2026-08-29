@@ -3,14 +3,14 @@ import FormField from "./FormField";
 import { Input } from "@/src/component/common/Input";
 import type { ProductOptionFormState } from "@/src/types/form";
 
-interface Props {
+interface ProductOptionsFieldProps {
   options: ProductOptionFormState[];
   onAdd: () => void;
   onUpdate: (index: number, key: "name" | "initialQuantity", value: string) => void;
   onRemove: (index: number) => void;
 }
 
-export default function ProductOptionsField({ options, onAdd, onUpdate, onRemove }: Props) {
+export default function ProductOptionsField({ options, onAdd, onUpdate, onRemove }: ProductOptionsFieldProps) {
   return (
     <FormField label="옵션">
       <div className="flex flex-col gap-2">

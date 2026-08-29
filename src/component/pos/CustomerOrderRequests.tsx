@@ -7,12 +7,12 @@ import type { OrderRequest } from "@/src/types/request";
 import { useOrderRequests } from "@/src/hooks/useOrderRequests";
 import useIsActiveTab from "./PosTabContext";
 
-interface Props {
+interface OrderRequestsProps {
   boothId: string;
   products: PosProduct[];
 }
 
-export default function OrderRequests({ boothId, products }: Props) {
+export default function OrderRequests({ boothId, products }: OrderRequestsProps) {
   const isActive = useIsActiveTab("requests");
   const { requests, isLoading, pendingRequestId, setStatus } = useOrderRequests(boothId, isActive);
   const addItem = useOrderStore((s) => s.addItem);

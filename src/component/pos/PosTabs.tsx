@@ -5,14 +5,14 @@ import { PosTabProvider } from "./PosTabContext";
 
 type TabKey = "sell" | "requests" | "prepaid" | "receipt";
 
-interface Props {
+interface PosTabsProps {
   sellContent: React.ReactNode;
   requestsContent: React.ReactNode;
   prepaidContent: React.ReactNode;
   receiptContent: React.ReactNode;
 }
 
-export default function PosTabs({ sellContent, requestsContent, prepaidContent, receiptContent }: Props) {
+export default function PosTabs({ sellContent, requestsContent, prepaidContent, receiptContent }: PosTabsProps) {
   const [tab, setTab] = useState<TabKey>("sell");
 
   const tabs: { key: TabKey; label: string }[] = [

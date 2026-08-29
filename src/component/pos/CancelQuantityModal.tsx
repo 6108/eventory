@@ -4,7 +4,7 @@ import { useState } from "react";
 import { OrderItem } from "@/src/hooks/useOrders";
 import Modal from "@/src/component/common/Modal";
 
-interface Props {
+interface CancelQuantityModalProps {
   item: OrderItem;
   onClose: () => void;
   onConfirm: (cancelQuantity: number) => Promise<void>;
@@ -14,7 +14,7 @@ export default function CancelQuantityModal({
   item,
   onClose,
   onConfirm,
-}: Props) {
+}: CancelQuantityModalProps) {
   // 전체 주문 수량에서 이미 취소된 수량을 제외한
   // 현재 추가로 취소할 수 있는 수량
   const cancellableQuantity =

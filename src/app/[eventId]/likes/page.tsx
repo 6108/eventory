@@ -2,7 +2,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/src/lib/supabase/server";
 import { getLikedProducts } from "@/src/lib/data/productLike";
-import { LikesTabs } from "@/src/component/likes/LikesTabs";
+import LikesTabs from "@/src/component/likes/LikesTabs";
 import { getFollowedBooths } from "@/src/lib/data/booth";
 
 export default async function Page() {

@@ -3,16 +3,16 @@
 import { useState } from "react";
 import { Order, OrderItem } from "@/src/hooks/useOrders";
 import { formatDateTime } from "@/src/lib/format";
-import { Modal } from "@/src/component/common/Modal";
+import Modal from "@/src/component/common/Modal";
 import CancelQuantityModal from "./CancelQuantityModal";
 
-interface Props {
+interface ReceiptDetailModalProps {
   order: Order;
   onClose: () => void;
   onCancelItem: (itemId: string, quantity: number) => Promise<void>;
 }
 
-export default function ReceiptDetailModal({ order, onClose, onCancelItem }: Props) {
+export default function ReceiptDetailModal({ order, onClose, onCancelItem }: ReceiptDetailModalProps) {
   const [cancelTarget, setCancelTarget] = useState<OrderItem | null>(null);
   const isCancelled = order.status === "cancelled";
   const items = order.items ?? [];

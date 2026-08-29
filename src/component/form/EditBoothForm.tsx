@@ -4,8 +4,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { FormField } from "./FormField";
-import { FormActions } from "./FormActions";
+import FormField from "./FormField";
+import FormActions from "./FormActions";
 import { Input } from "@/src/component/common/Input";
 import { Textarea } from "@/src/component/common/Textarea";
 import type { BoothFormState } from "@/src/types/form";

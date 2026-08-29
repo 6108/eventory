@@ -4,7 +4,7 @@
 import { productCategories } from "@/src/types/product";
 import { Select } from "@/src/component/common/Select";
 
-type Props = {
+interface CategorySelectProps {
   category: string;
   subCategory: string;
   onCategoryChange: (category: string) => void;
@@ -16,7 +16,7 @@ export default function CategorySelect({
   subCategory,
   onCategoryChange,
   onSubCategoryChange,
-}: Props) {
+}: CategorySelectProps) {
   const selectedCategory = productCategories.find(
     (item) => item.value === category
   );

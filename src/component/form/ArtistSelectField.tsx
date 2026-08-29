@@ -1,13 +1,13 @@
 import { User } from "@/src/types/user";
 import FormField from "./FormField";
 
-interface Props {
+interface ArtistSelectFieldProps {
   artists: User[];
   selectedArtistIds: string[];
   onToggle: (artistId: string) => void;
 }
 
-export default function ArtistSelectField({ artists, selectedArtistIds, onToggle }: Props) {
+export default function ArtistSelectField({ artists, selectedArtistIds, onToggle }: ArtistSelectFieldProps) {
   return (
     <FormField label="작가">
       {artists.length === 0 ? (

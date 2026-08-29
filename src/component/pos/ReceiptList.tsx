@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { useOrders, Order, OrderItem } from "@/src/hooks/useOrders";
 
-interface Props {
+interface ReceiptListProps {
   boothId: string;
 }
 
-export default function ReceiptList({ boothId }: Props) {
+export default function ReceiptList({ boothId }: ReceiptListProps) {
   const { orders, isLoading, cancelItem } = useOrders(boothId);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
