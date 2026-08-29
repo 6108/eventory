@@ -4,18 +4,20 @@
 import { useCartStore } from "@/src/store/cartStore";
 import { useHasMounted } from "@/src/hooks/useHasMounted";
 import CartBoothGroup from "./CartBoothGroup";
+import Link from "next/link";
+import { EVENT_ID as eventId } from "@/src/constants/event";
+import { useConfirmModalStore } from "@/src/store/confirmModalStore";
+
 
 export default function CartView() {
   const hasMounted = useHasMounted();
 
-  // groupedByBooth()는 매 렌더마다 새 배열/객체를 만들기 때문에
-  // items를 구독해서 리렌더 트리거만 받고, 그룹핑은 그때그때 계산해서 씀
   const items = useCartStore((s) => s.items);
   const groupedByBooth = useCartStore((s) => s.groupedByBooth);
   const clearAll = useCartStore((s) => s.clearAll);
 
-  // 마운트 전에는 localStorage 값을 아직 몰라서 서버와 똑같이 "빈 상태"로만 렌더링
-  // (여기서 실제 items를 그리면 서버 결과 [] 와 클라이언트 결과가 달라져 hydration 에러 발생)
+  const openConfirmModal = useConfirmModalStore((s) => s.openConfirmModal);
+
   if (!hasMounted) {
     return (
       <div className="mx-auto flex w-full max-w-lg flex-col gap-4">
@@ -29,10 +31,18 @@ export default function CartView() {
 
   const groups = groupedByBooth();
 
-  // 부스별 카드에 각각 들어있던 안내 문구를 상단에서 한 번만 보여주도록 통일
-  // (부스가 여러 개면 카드마다 같은 문구가 반복돼서 위로 올림)
   const totalQuantity = groups.reduce((sum, g) => sum + g.totalQuantity, 0);
   const totalAmount = groups.reduce((sum, g) => sum + g.totalAmount, 0);
+
+  function handleClearAll() {
+    openConfirmModal({
+      title: "전체 비우기",
+      message: "담아둔 항목을 모두 삭제하시겠습니까?",
+      confirmText: "삭제",
+      cancelText: "취소",
+      onConfirm: () => clearAll(),
+    });
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-lg flex-col gap-4">
@@ -41,7 +51,7 @@ export default function CartView() {
 
         {items.length > 0 && (
           <button
-            onClick={clearAll}
+            onClick={handleClearAll}
             className="text-xs text-zinc-500 hover:text-red-400"
           >
             전체 비우기
@@ -51,15 +61,18 @@ export default function CartView() {
 
       {groups.length === 0 ? (
         <div className="rounded border border-zinc-800 p-6 text-center text-sm text-zinc-400">
-          갖고싶은 회지와 굿즈 목록을 만들어 봅시다
+          <Link
+            href={`/${eventId}/products`}
+          >
+            <p className="text-sm font-medium text-primary">
+              갖고싶은 회지와 굿즈 탐색하기 &gt;
+            </p>
+
+          </Link>
         </div>
+
       ) : (
         <>
-          {/*
-            주문 요청은 "대기열"이 아니라 부스러의 실수 방지를 돕는 편의 도구임을 명시.
-            보냈다고 자동으로 결제/재고 반영되는 게 아니라는 점, 부스 앞에서 직접
-            말로 확인해야 확실하다는 점을 오해 없이 전달하는 게 목적.
-          */}
           <p className="text-center text-xs leading-5 text-zinc-500">
             구매할 작품을 미리 담아서 전송하면, 부스에서 닉네임으로 목록을 확인할 수 있습니다.
             <br />

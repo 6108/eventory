@@ -16,7 +16,7 @@ export function Modal({ isOpen, onClose, children, maxWidth = "sm" }: ModalProps
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center bg-black/70 p-4 z-[999]"
+      className="fixed inset-0 flex items-center justify-center bg-black/70 p-4 z-999"
       onClick={onClose}
     >
       <div

@@ -63,7 +63,7 @@ export default function ImageLightbox({
 
   return (
     <div
-      className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-black/90 p-4"
+      className="fixed inset-0 z-200 flex flex-col items-center justify-center bg-black/90 p-4"
       onClick={handleClose}
     >
       <button
