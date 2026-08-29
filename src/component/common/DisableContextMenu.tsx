@@ -8,10 +8,20 @@ export default function DisableContextMenu() {
       e.preventDefault();
     };
 
+    const handleDragStart = (e: DragEvent) => {
+      const target = e.target as HTMLElement;
+
+      if (target.tagName === "IMG") {
+        e.preventDefault();
+      }
+    };
+
     document.addEventListener("contextmenu", handleContextMenu);
+    document.addEventListener("dragstart", handleDragStart);
 
     return () => {
       document.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("dragstart", handleDragStart);
     };
   }, []);
 
