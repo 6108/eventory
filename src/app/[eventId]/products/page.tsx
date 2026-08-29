@@ -15,8 +15,6 @@ export default async function Page({
     data: { user },
   } = await supabase.auth.getUser();
 
-  // 로그인 안 한 유저가 URL을 직접 조작해 following=true로 들어와도
-  // 무시하고 전체 상품을 보여준다 (버튼 자체도 비로그인 시 숨김 처리됨)
   const products =
     following === "true" && user
       ? await getFollowedBoothProducts(user.id)

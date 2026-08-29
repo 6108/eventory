@@ -47,17 +47,34 @@ export default async function Page({
           {/* Info */}
           <div className="min-w-0 flex-1">
             {/* Meta */}
-            <div className="flex items-center gap-2 text-md font-medium text-zinc-300">
-              <span>[{booth.boothNumber}]</span>
-              <span>
-                {booth.category === "ADULT" ? "성인 부스" : "일반 부스"}
-              </span>
+            <div className="min-w-0 flex-1">
+              {/* Meta */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 text-md font-medium text-zinc-400">
+                    <span>[{booth.boothNumber}]</span>
+                    <span>
+                      {booth.category === "ADULT" ? "성인 부스" : "일반 부스"}
+                    </span>
+                  </div>
+
+                  {/* Name */}
+                  <h1 className="pt-1 text-2xl font-bold tracking-tight text-white sm:text-4xl">
+                    {booth.boothName}
+                  </h1>
+                </div>
+
+                {/* Follow */}
+                <div className="ml-auto shrink-0">
+                  <FollowButton
+                    boothId={booth.id}
+                    currentUserId={user?.id}
+                    initialFollowed={initialFollowed}
+                  />
+                </div>
+              </div>
             </div>
 
-            {/* Name */}
-            <h1 className="mt-3 text-4xl font-bold tracking-tight text-white sm:text-5xl">
-              {booth.boothName}
-            </h1>
 
             {/* Description */}
             {booth.description && (
@@ -81,21 +98,14 @@ export default async function Page({
             )}
           </div>
 
-          {/* Follow */}
-          <div className="shrink-0 pt-6">
-            <FollowButton
-              boothId={booth.id}
-              currentUserId={user?.id}
-              initialFollowed={initialFollowed}
-            />
-          </div>
+
         </div>
       </header>
 
       {/* Products */}
       <section className="pt-10">
         <div className="mb-6 flex items-baseline ">
-          <h2 className="text-2xl font-semibold text-white">
+          <h2 className="text-xl sm:text-2xl font-semibold text-white">
             판매 제품 {products.length}개
           </h2>
         </div>

@@ -28,7 +28,7 @@ export default function ReceiptList({ boothId }: Props) {
           const firstItem = items[0];
           const itemSummary = firstItem
             ? firstItem.productName ?? firstItem.productId
-            : "상품 없음";
+            : "작품 없음";
           const additionalCount = Math.max(items.length - 1, 0);
 
           return (
@@ -171,7 +171,7 @@ function ReceiptDetailModal({
 
         <div className="border-t border-zinc-800 pt-4">
           <div className="mb-2 flex justify-between text-xs text-zinc-500">
-            <span>상품</span>
+            <span>작품</span>
             <span>{order.totalQuantity}개</span>
           </div>
 

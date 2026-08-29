@@ -46,6 +46,9 @@ export async function getBoothOrderRequests(
     boothId: row.booth_id,
     customerId: row.customer_id,
     customerNickname: row.customer_nickname,
+    // 부스(POS)쪽 목록에서는 부스명/영수증 데이터가 필요 없어 조회하지 않음.
+    boothName: null,
+    order: null,
     status: row.status as OrderRequestStatus,
     orderId: row.order_id,
     createdAt: row.created_at,

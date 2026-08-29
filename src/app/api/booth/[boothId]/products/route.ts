@@ -25,14 +25,14 @@ export async function POST(
 
   if (!name?.trim()) {
     return NextResponse.json(
-      { error: "상품명을 입력해주세요." },
+      { error: "작품명을 입력해주세요." },
       { status: 400 }
     );
   }
 
   if (!category || !subCategory) {
     return NextResponse.json(
-      { error: "상품 카테고리를 선택해주세요." },
+      { error: "작품 카테고리를 선택해주세요." },
       { status: 400 }
     );
   }
@@ -53,14 +53,14 @@ export async function POST(
 
   if (!Array.isArray(artistIds) || artistIds.length === 0) {
     return NextResponse.json(
-      { error: "상품 작가를 선택해주세요." },
+      { error: "작품 작가를 선택해주세요." },
       { status: 400 }
     );
   }
 
   if (!Array.isArray(options)) {
     return NextResponse.json(
-      { error: "상품 옵션이 올바르지 않습니다." },
+      { error: "작품 옵션이 올바르지 않습니다." },
       { status: 400 }
     );
   }
@@ -127,12 +127,12 @@ export async function POST(
     console.error(error);
 
     return NextResponse.json(
-      { error: "상품 추가에 실패했습니다." },
+      { error: "작품 추가에 실패했습니다." },
       { status: 500 }
     );
   }
 
-  // 옵션이 있는 경우 상품 수량은 null이고 옵션별 수량을 저장
+  // 옵션이 있는 경우 작품 수량은 null이고 옵션별 수량을 저장
   if (hasOptions) {
     const optionRows = options.map(
       (option: {
@@ -159,7 +159,7 @@ export async function POST(
         .eq("id", product.id);
 
       return NextResponse.json(
-        { error: "상품 옵션 추가에 실패했습니다." },
+        { error: "작품 옵션 추가에 실패했습니다." },
         { status: 500 }
       );
     }

@@ -93,7 +93,7 @@ export default function ReceiptDetailModal({ order, onClose, onCancelItem }: Pro
 
         <div className="border-t border-zinc-800 pt-4">
           <div className="mb-2 flex justify-between text-xs text-zinc-500">
-            <span>상품</span>
+            <span>작품</span>
             <span>{order.totalQuantity}개</span>
           </div>
 

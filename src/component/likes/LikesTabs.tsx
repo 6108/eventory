@@ -76,7 +76,7 @@ export function LikesTabs({
             : "bg-zinc-900 text-zinc-400"
             }`}
         >
-          좋아요한 상품 ({likedProducts.length})
+          좋아요한 작품 ({likedProducts.length})
         </button>
         <button
           onClick={() => setActiveTab("booths")}
@@ -92,7 +92,7 @@ export function LikesTabs({
       {activeTab === "products" ? (
         likedProducts.length === 0 ? (
           <div className="rounded border border-zinc-800 p-6 text-center text-sm text-zinc-400">
-            아직 좋아요한 상품이 없습니다.
+            아직 좋아요한 작품이 없습니다.
           </div>
         ) : (
           <ul className="flex flex-col gap-2">

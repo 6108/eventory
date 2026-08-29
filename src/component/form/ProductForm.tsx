@@ -64,12 +64,12 @@ export default function ProductForm({
     }
 
     if (!form.category || !form.subCategory) {
-      toast.error("상품 카테고리를 선택해주세요.");
+      toast.error("카테고리를 선택해주세요.");
       return;
     }
 
     if (selectedArtistIds.length === 0) {
-      toast.error("상품 작가를 한 명 이상 선택해주세요.");
+      toast.error("작가를 한 명 이상 선택해주세요.");
       return;
     }
 
@@ -78,7 +78,7 @@ export default function ProductForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-      <FormField label="상품명">
+      <FormField label="작품명">
         <Input
           value={form.name}
           onChange={(e) => updateField("name", e.target.value)}
@@ -90,7 +90,7 @@ export default function ProductForm({
         required={!isEdit}
         initialPreviewUrl={product?.mainImage}
         onImageChange={setImage}
-        hint={isEdit ? "비워두면 기존 이미지가 유지돼요." : undefined}
+        hint={isEdit ? "비워두면 기존 이미지가 유지됩니다" : undefined}
       />
 
       <ProductSampleImagesField
@@ -156,7 +156,7 @@ export default function ProductForm({
       <FormActions
         onCancel={() => router.push(`/${eventId}/booths/${boothId}/manage/products`)}
         loading={loading}
-        submitLabel={isEdit ? "상품 수정" : "상품 추가"}
+        submitLabel={isEdit ? "정보 수정" : "정보 추가"}
         loadingLabel={isEdit ? "수정 중..." : "추가 중..."}
       />
 
@@ -167,7 +167,7 @@ export default function ProductForm({
           disabled={deleting}
           className="mt-2 text-sm text-red-400 hover:text-red-300 disabled:opacity-50"
         >
-          {deleting ? "삭제 중..." : "상품 삭제"}
+          {deleting ? "삭제 중..." : "정보 삭제"}
         </button>
       )}
     </form>

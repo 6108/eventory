@@ -52,16 +52,17 @@ export default function ProductListItem({
   }
 
   return (
-    <div className="relative flex flex-col gap-4 rounded-xl border border-primary/40 transition-colors hover:border-primary/70 hover:bg-primary/40">
-      {/* 이미지 */}
+    <div className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-primary/40 transition-colors hover:border-primary/70 hover:bg-primary/40">
+      {/* 이미지 + 작품 정보 */}
       <div
         role="button"
         tabIndex={0}
         onClick={openLightbox}
         onKeyDown={handleKeyDown}
-        className="flex cursor-pointer flex-col gap-2 text-left"
+        className="flex min-w-0 flex-1 cursor-pointer flex-col gap-2 text-left"
       >
-        <div className="relative aspect-square w-full">
+        {/* 이미지 */}
+        <div className="relative aspect-square w-full min-w-0 shrink-0">
           <Image
             src={productInfo.mainImage}
             alt={productInfo.name}
@@ -73,64 +74,70 @@ export default function ProductListItem({
 
           {/* 이미지 개수 + 좋아요 */}
           <div className="absolute inset-0">
-            {/* 좋아요 - 오른쪽 위 */}
-            <div className="absolute top-2 right-2">
+            {/* 좋아요 */}
+            <div className="absolute right-2 top-2">
               <Like
                 productId={productInfo.id}
                 isOwner={isOwner}
               />
             </div>
 
-            {/* 상세 이미지 - 오른쪽 아래 */}
+            {/* 상세 이미지 */}
             {productInfo.sampleImages.length > 0 && (
-              <div className="absolute bottom-2 right-2 flex items-center gap-1 rounded-full bg-black/65 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                <ImageIcon className="h-3.5 w-3.5" />
-                <span>상세 이미지 {productInfo.sampleImages.length}장</span>
+              <div className="absolute bottom-2 right-2 flex max-w-[80%] items-center gap-1 rounded-full bg-black/65 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                <ImageIcon className="h-3.5 w-3.5 shrink-0" />
+
+                <span className="truncate">
+                  상세 이미지 {productInfo.sampleImages.length}장
+                </span>
               </div>
             )}
           </div>
         </div>
 
-        {/* 상품 정보 */}
-        <div className="flex w-full flex-col justify-center p-2">
+        {/* 작품 정보 */}
+        <div className="flex w-full min-w-0 flex-1 flex-col p-2">
           {/* 부스 */}
-          <div className="flex items-center gap-1 text-xs text-zinc-500">
-            <span className="rounded px-1 py-0.5 font-medium text-zinc-400">
+          <div className="flex min-w-0 items-center gap-1 text-sm text-zinc-500 sm:text-md">
+            <span className="shrink-0 rounded py-0.5 font-medium text-zinc-400">
               [{productInfo.boothNumber}]
             </span>
 
-            <span className="truncate">
+            <span className="min-w-0 truncate">
               {productInfo.boothName}
             </span>
           </div>
 
-          {/* 상품명 */}
-          <h3 className="mt-1 line-clamp-2 min-h-10 font-medium text-zinc-100">
+          {/* 작품명 */}
+          <h3 className="mt-1 line-clamp-2 min-h-6 overflow-hidden break-keep font-medium leading-5 text-zinc-100 sm:min-h-7">
             {productInfo.name}
           </h3>
 
           {/* 가격 + 담기 */}
-          <div className="mt-0.5 flex items-center justify-between gap-2">
-            <div className="min-w-0">
-              <p className="text-xl font-bold text-primary">
-                {isSoldOut ? (
-                  <span>품절</span>
-                ) : (
-                  <>
-                    {productInfo.price.toLocaleString()}원
-                  </>
+          <div className="mt-auto flex min-w-0 items-end justify-between gap-1 ">
+            {/* 가격 영역 */}
+            <div className="min-w-0 flex-1">
+              {/* 수량 제한 */}
+              <div className="h-4">
+                {!isSoldOut && productInfo.purchaseLimit != null && (
+                  <p className="whitespace-nowrap text-[clamp(10px,2.5vw,15px)] font-medium leading-4 text-zinc-400">
+                    (1인 {productInfo.purchaseLimit}개 한정)
+                  </p>
                 )}
-              </p>
+              </div>
 
-              {!isSoldOut && productInfo.purchaseLimit != null && (
-                <span className="text-xs font-medium text-muted-foreground">
-                  (1인 {productInfo.purchaseLimit}개 한정)
-                </span>
-              )}
+              {/* 가격 */}
+              <p className="whitespace-nowrap text-[clamp(15px,3.5vw,20px)] font-bold leading-6 text-primary">
+                {isSoldOut
+                  ? "품절"
+                  : `${productInfo.price.toLocaleString()}원`}
+              </p>
             </div>
 
+            {/* 담기 */}
             {!isSoldOut && (
               <div
+                className="shrink-0"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();

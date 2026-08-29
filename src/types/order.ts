@@ -23,3 +23,20 @@ export type Order = {
   createdAt: string;
   synced?: boolean;
 };
+
+export type ReceiptOrderItem = {
+  productName: string;
+  optionName: string | null;
+  unitPrice: number;
+  quantity: number;
+  subtotal: number;
+};
+
+export type ReceiptOrder = {
+  id: string;
+  totalAmount: number;
+  totalQuantity: number;
+  status: "completed" | "cancelled";
+  createdAt: string;
+  items: ReceiptOrderItem[];
+};

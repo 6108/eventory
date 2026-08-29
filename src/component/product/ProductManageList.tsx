@@ -12,8 +12,8 @@ export default function ProductManageList({ eventId, boothId, products }: Produc
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-zinc-800 py-16 text-center">
-        <p className="text-sm font-medium text-zinc-300">등록된 상품이 없습니다</p>
-        <p className="text-xs text-zinc-500">상품을 등록하면 이곳에 표시됩니다</p>
+        <p className="text-sm font-medium text-zinc-300">등록된 작품이 없습니다</p>
+        <p className="text-xs text-zinc-500">작품을 등록하면 이곳에 표시됩니다</p>
       </div>
     );
   }

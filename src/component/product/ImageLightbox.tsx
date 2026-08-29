@@ -68,8 +68,12 @@ export default function ImageLightbox({
     >
       <button
         type="button"
-        onClick={handleClose}
-        className="absolute top-4 right-4 text-zinc-300 hover:text-white"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleClose();
+        }}
+        className="absolute right-4 top-4 z-50 p-2 text-zinc-300 hover:text-white"
+        aria-label="닫기"
       >
         <X size={28} />
       </button>

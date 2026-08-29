@@ -4,7 +4,7 @@ export const EVENT_ID = "redemption0919";
 // 여러 행사를 지원하게 되면 이 내용은 events 테이블 컬럼으로 옮기고
 // 주최자가 직접 입력하는 폼을 만들면 됨 (지금 당장은 과함).
 export const EVENT_INFO = {
-  name: "솔음사헌 배포전 : Redemtion",
+  name: "솔음사헌 배포전 : 𝐑𝐞𝐝𝐞𝐦𝐩𝐭𝐢𝐨𝐧",
 
   // 날짜/시간
   dateLabel: "2026.06.19 (토)",

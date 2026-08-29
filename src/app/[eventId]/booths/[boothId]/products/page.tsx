@@ -15,7 +15,7 @@ export default async function Page({
   const products = await getProductSummaries(boothId);
 
   if (!products) {
-    return <div>상품이 없습니다.</div>;
+    return <div>작품이 없습니다.</div>;
   }
 
   return (

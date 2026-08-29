@@ -1,7 +1,7 @@
 // src/lib/data/productLike.ts
 import { createClient } from "@/src/lib/supabase/client";
 
-// 내가 좋아요 누른 상품 id 전체 조회 (페이지당 1회만 호출)
+// 내가 좋아요 누른 작품 id 전체 조회 (페이지당 1회만 호출)
 export async function getMyLikedProductIds(userId: string): Promise<string[]> {
   const supabase = createClient();
 
@@ -13,7 +13,7 @@ export async function getMyLikedProductIds(userId: string): Promise<string[]> {
   return (data ?? []).map((row) => row.product_id);
 }
 
-// 상품에 달린 전체 좋아요 개수 조회 (작가 본인용)
+// 작품에 달린 전체 좋아요 개수 조회 (작가 본인용)
 export async function getProductLikeCount(productId: string): Promise<number> {
   const supabase = createClient();
 

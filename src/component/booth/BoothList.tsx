@@ -52,11 +52,11 @@ export default function BoothList({
           <option value="ADULT">성인</option>
         </select>
 
-        <div className="flex font-medium py-2">
-          <span className="w-16 text-center">부스번호</span>
-          <span className="flex-1 text-left px-2">부스명</span>
-          <span className="w-24 text-left px-2">작가</span>
-          <span className="w-20 text-center">구분</span>
+        <div className="grid grid-cols-[4rem_minmax(0,1fr)_5rem_3.5rem] items-center py-2 font-medium sm:grid-cols-[4rem_minmax(0,1fr)_6rem_5rem]">
+          <span className="text-center">부스번호</span>
+          <span className="text-left px-2">부스명</span>
+          <span className="text-left px-2">작가</span>
+          <span className="text-center">구분</span>
         </div>
       </div>
 

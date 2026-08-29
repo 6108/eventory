@@ -45,7 +45,7 @@ export default async function Page({
       </div>
 
       <section className="rounded border border-zinc-800 p-4">
-        <h2 className="text-sm font-medium text-white mb-2">등록 코드</h2>
+        <h2 className="text-sm font-medium text-white mb-2">연결 코드</h2>
         <p className="text-sm text-zinc-400 mb-2">
           이 코드를 같은 부스 인원에게 공유하세요.
         </p>
@@ -65,7 +65,7 @@ export default async function Page({
         href={`/${eventId}/booths/${boothId}/manage/products`}
         className="rounded bg-primary px-4 py-2 text-sm text-white text-center"
       >
-        상품 관리
+        회지 & 굿즈 관리
       </Link>
 
       <Link

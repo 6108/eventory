@@ -25,7 +25,7 @@ export async function GET(
   return NextResponse.json({ requests });
 }
 
-// 고객이 주문 요청을 보냄 (로그인 필요).
+// 손님이 주문 요청을 보냄 (로그인 필요).
 // 대기열이 아니라 편의 도구이므로, 손님 한 명당 한 부스에 요청은 항상 1개만 유지 —
 // 재전송 시 새로 만들지 않고 기존 요청을 갱신해서 "최신 내용으로 갱신"되게 함.
 
@@ -47,7 +47,7 @@ export async function POST(
 
   if (!Array.isArray(items) || items.length === 0) {
     return NextResponse.json(
-      { error: "보낼 상품이 없습니다." },
+      { error: "보낼 작품이 없습니다." },
       { status: 400 }
     );
   }
@@ -94,7 +94,7 @@ export async function POST(
 
     if (error.message?.startsWith("empty items")) {
       return NextResponse.json(
-        { error: "보낼 상품이 없습니다." },
+        { error: "보낼 작품이 없습니다." },
         { status: 400 }
       );
     }

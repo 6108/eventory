@@ -1,12 +1,12 @@
 // src/types/form.ts
 
-// 상품 옵션 폼
+// 작품 옵션 폼
 export type ProductOptionFormState = {
   name: string;
   initialQuantity: string;
 };
 
-// 상품 폼
+// 작품 폼
 export type ProductFormState = {
   name: string;
   price: string;

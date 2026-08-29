@@ -71,7 +71,7 @@ export type ProductOption = {
   remainingQuantity: number | null;
 };
 
-// 상품 정보 타입
+// 작품 정보 타입
 export type Product = {
   id: string;
   boothId: string;
@@ -91,7 +91,7 @@ export type Product = {
   subCategory: ProductSubCategory;
 };
 
-// POS에서 사용할 상품 정보 타입
+// POS에서 사용할 작품 정보 타입
 export type PosProduct = {
   id: string;
   name: string;
@@ -105,7 +105,7 @@ export type PosProduct = {
   options: ProductOption[];
 };
 
-// 상품 요약 정보 타입
+// 작품 요약 정보 타입
 export type ProductSummary = {
   id: string;
   boothId: string;
@@ -124,7 +124,7 @@ export type ProductSummary = {
   options: ProductOption[];
 };
 
-// 좋아요한 상품
+// 좋아요한 작품
 export type LikedProduct = {
   likeId: string;
   likedAt: string;

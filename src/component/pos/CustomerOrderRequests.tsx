@@ -45,15 +45,17 @@ export default function OrderRequests({ boothId, products }: Props) {
       quantity: number;
     }[] = [];
 
+
     for (const item of request.items) {
       const info = findProductPrice(item.productId, item.optionId);
 
       if (!info) {
         toast.error(
-          `${item.productName}은(는) 더 이상 판매하지 않는 상품입니다. 손님에게 확인해주세요.`
+          `${item.productName}은(는) 더 이상 판매하지 않는 작품입니다. 손님에게 확인해주세요.`
         );
         continue;
       }
+
 
       addItem({
         id: crypto.randomUUID(),
@@ -73,6 +75,7 @@ export default function OrderRequests({ boothId, products }: Props) {
         quantity: item.quantity,
       });
     }
+
 
     markRequestChecked(request.id, added);
 
@@ -115,13 +118,13 @@ export default function OrderRequests({ boothId, products }: Props) {
   return (
     <div className="h-full overflow-y-auto p-4">
       <p className="mb-4 rounded border border-zinc-800 bg-zinc-900 p-3 text-xs text-zinc-400">
-        손님이 담아둔 상품 목록입니다.
+        손님이 담아둔 작품 목록입니다.
         손님이 다시 담으면 이전 내용은 최신 내용으로 바뀝니다.
       </p>
 
       {requests.length === 0 ? (
         <div className="rounded border border-zinc-800 p-6 text-center text-sm text-zinc-500">
-          손님이 장바구니를 확정하면 이곳에 표시됩니다.
+          손님이 구매하고 싶은 목록을 확정하면 이곳에 표시됩니다.
         </div>
       ) : (
         <ul className="flex flex-col gap-2">

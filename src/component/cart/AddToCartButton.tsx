@@ -30,7 +30,7 @@ export default function AddToCartButton({
     ? product.options.find((o) => o.id === selectedOptionId) ?? null
     : null;
 
-  // 옵션이 있으면 옵션 재고를, 없으면 상품 재고를 기준으로 함
+  // 옵션이 있으면 옵션 재고를, 없으면 작품 재고를 기준으로 함
   const remainingQuantity = hasOptions
     ? selectedOption?.remainingQuantity ?? null
     : product.remainingQuantity;
@@ -56,7 +56,7 @@ export default function AddToCartButton({
       purchaseLimit: product.purchaseLimit,
     });
 
-    toast.success("장바구니에 담았습니다.");
+    toast.success("구매할 목록에 담았습니다.");
     setQuantity(1);
   }
 
@@ -95,7 +95,7 @@ export default function AddToCartButton({
           <button
             type="button"
             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-            className="h-8 w-8 rounded bg-zinc-800 text-white"
+            className="h-11 w-11 rounded bg-zinc-800 text-white"
           >
             −
           </button>
@@ -105,7 +105,7 @@ export default function AddToCartButton({
           <button
             type="button"
             onClick={() => setQuantity((q) => q + 1)}
-            className="h-8 w-8 rounded bg-zinc-800 text-white"
+            className="h-11 w-11 rounded bg-zinc-800 text-white"
           >
             +
           </button>
@@ -117,7 +117,7 @@ export default function AddToCartButton({
           disabled={isSoldOut}
           className="flex-1 rounded bg-primary px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
-          {isSoldOut ? "품절" : "장바구니 담기"}
+          {isSoldOut ? "품절" : "구매할 목록에 추가"}
         </button>
       </div>
     </div>

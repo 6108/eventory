@@ -17,7 +17,7 @@ export default async function Page({
     <div className="px-4 py-6 sm:px-6 md:px-10 lg:px-40">
       <div className="mx-auto max-w-2xl">
         <h1 className="mb-6 text-2xl font-semibold">
-          상품 추가
+          작품 정보 추가
         </h1>
 
         <ProductForm

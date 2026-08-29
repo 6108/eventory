@@ -5,32 +5,36 @@ import CartNavLink from "../cart/CartNavLink";
 
 export function Navbar() {
   return (
-    <nav className="fixed top-0 left-0 right-0 h-14 bg-zinc-950 z-50">
-      <div className="h-full w-full px-6 flex items-center justify-between">
-        <Link
-          href="/"
-          className="font-medium text-base text-[#9B1820] shrink-0"
-        >
-          𝐑𝐞𝐝𝐞𝐦𝐩𝐭𝐢𝐨𝐧
-        </Link>
+    <nav className="fixed max-w-7xl mx-auto top-0 left-0 right-0 z-50 h-auto bg-zinc-950 shadow-[0_4px_20px_rgba(0,0,0,0.6)] sm:h-14">
+      <div className="flex h-full w-full flex-col px-6 sm:flex-row sm:items-center sm:justify-between">
+        {/* Redemption */}
+        <div className="my-2 flex h-8 items-center justify-center sm:my-0 sm:h-full sm:justify-start">
+          <Link
+            href="/"
+            className="shrink-0 text-xl font-medium text-[#9B1820]"
+          >
+            𝐑𝐞𝐝𝐞𝐦𝐩𝐭𝐢𝐨𝐧
+          </Link>
+        </div>
 
-        <div className="flex items-center gap-4 shrink-0">
+        {/* Navigation */}
+        <div className="flex h-8 items-center justify-center gap-4 sm:h-full">
           <Link
             href={`/${eventId}/booths`}
-            className="text-primary hover:text-white whitespace-nowrap"
+            className="whitespace-nowrap text-primary hover:text-white"
           >
             부스
           </Link>
 
           <Link
             href={`/${eventId}/products`}
-            className="text-primary hover:text-white whitespace-nowrap"
+            className="whitespace-nowrap text-primary hover:text-white"
           >
             회지 & 굿즈
           </Link>
-          {/* 장바구니 */}
+
           <CartNavLink />
-          {/* 로그인. 로그인 후엔 유저 메뉴 드롭다운으로 바뀜 */}
+
           <Login />
         </div>
       </div>

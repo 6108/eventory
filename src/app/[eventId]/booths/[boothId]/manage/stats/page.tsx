@@ -162,9 +162,9 @@ export default async function Page({
         )}
       </section>
 
-      {/* 상품별 판매 */}
+      {/* 작품별 판매 */}
       <section className="flex flex-col gap-2">
-        <h2 className="text-sm font-medium text-white">상품별 판매</h2>
+        <h2 className="text-sm font-medium text-white">작품별 판매</h2>
         {productStats.length === 0 ? (
           <p className="rounded border border-zinc-800 p-4 text-center text-sm text-zinc-500">
             아직 판매 데이터가 없습니다.
@@ -174,7 +174,7 @@ export default async function Page({
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-zinc-800 text-left text-xs text-zinc-500">
-                  <th className="px-3 py-2 font-normal">상품</th>
+                  <th className="px-3 py-2 font-normal">작품</th>
                   <th className="px-3 py-2 font-normal text-right">수량</th>
                   <th className="px-3 py-2 font-normal text-right">매출</th>
                 </tr>

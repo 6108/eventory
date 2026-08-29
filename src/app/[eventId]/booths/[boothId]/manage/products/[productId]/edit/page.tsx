@@ -17,14 +17,14 @@ export default async function Page({
   const product = await getProduct(productId, boothId);
 
   if (!product) {
-    return <div>상품이 없습니다.</div>;
+    return <div>작품이 없습니다</div>;
   }
 
   const artists = await getBoothArtists(boothId);
 
   return (
     <div className="mx-auto w-full max-w-lg">
-      <h1 className="mb-8 text-xl font-semibold text-white">상품 수정</h1>
+      <h1 className="mb-8 text-xl font-semibold text-white">작품 정보 수정</h1>
       <ProductForm
         eventId={eventId}
         boothId={boothId}

@@ -24,12 +24,12 @@ export async function PATCH(
   } = body;
 
   if (!name?.trim()) {
-    return NextResponse.json({ error: "상품명을 입력해주세요." }, { status: 400 });
+    return NextResponse.json({ error: "작품명을 입력해주세요." }, { status: 400 });
   }
 
   if (!category || !subCategory) {
     return NextResponse.json(
-      { error: "상품 카테고리를 선택해주세요." },
+      { error: "작품 카테고리를 선택해주세요." },
       { status: 400 }
     );
   }
@@ -50,14 +50,14 @@ export async function PATCH(
 
   if (!Array.isArray(artistIds) || artistIds.length === 0) {
     return NextResponse.json(
-      { error: "상품 작가를 선택해주세요." },
+      { error: "작품 작가를 선택해주세요." },
       { status: 400 }
     );
   }
 
   if (!Array.isArray(options)) {
     return NextResponse.json(
-      { error: "상품 옵션이 올바르지 않습니다." },
+      { error: "작품 옵션이 올바르지 않습니다." },
       { status: 400 }
     );
   }
@@ -66,7 +66,7 @@ export async function PATCH(
   if (authResult instanceof NextResponse) return authResult;
   const { supabase } = authResult;
 
-  // 수정 대상 상품이 이 부스 소유가 맞는지 확인
+  // 수정 대상 작품이 이 부스 소유가 맞는지 확인
   const { data: existing, error: existingError } = await supabase
     .from("products")
     .select("id")
@@ -75,7 +75,7 @@ export async function PATCH(
     .single();
 
   if (existingError || !existing) {
-    return NextResponse.json({ error: "상품을 찾을 수 없습니다." }, { status: 404 });
+    return NextResponse.json({ error: "작품을 찾을 수 없습니다." }, { status: 404 });
   }
 
   // 작가 이름 스냅샷 재생성 — 클라이언트가 보낸 이름을 믿지 않고 서버에서 직접 조회
@@ -131,7 +131,7 @@ export async function PATCH(
 
   if (error) {
     console.error(error);
-    return NextResponse.json({ error: "상품 수정에 실패했습니다." }, { status: 500 });
+    return NextResponse.json({ error: "작품 수정에 실패했습니다." }, { status: 500 });
   }
 
   // 기존 옵션 전체 삭제 후 재생성 (옵션 구성 자체가 바뀔 수 있으므로)
@@ -143,7 +143,7 @@ export async function PATCH(
   if (deleteOptionsError) {
     console.error(deleteOptionsError);
     return NextResponse.json(
-      { error: "상품 옵션 수정에 실패했습니다." },
+      { error: "작품 옵션 수정에 실패했습니다." },
       { status: 500 }
     );
   }
@@ -165,7 +165,7 @@ export async function PATCH(
     if (optionError) {
       console.error(optionError);
       return NextResponse.json(
-        { error: "상품 옵션 추가에 실패했습니다." },
+        { error: "작품 옵션 추가에 실패했습니다." },
         { status: 500 }
       );
     }
@@ -192,7 +192,7 @@ export async function DELETE(
 
   if (error) {
     console.error(error);
-    return NextResponse.json({ error: "상품 삭제에 실패했습니다." }, { status: 500 });
+    return NextResponse.json({ error: "작품 삭제에 실패했습니다." }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });

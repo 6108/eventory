@@ -63,7 +63,7 @@ export default function ProductCard({
       : product.remainingQuantity;
 
     if (remainingQuantity !== null && remainingQuantity <= 0) {
-      toast.error("품절된 상품입니다.");
+      toast.error("품절된 작품입니다.");
       return;
     }
 
@@ -130,7 +130,7 @@ export default function ProductCard({
       className={`overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900 ${isSoldOut ? "opacity-40" : ""
         } ${cardClickable ? "cursor-pointer hover:bg-zinc-800" : ""}`}
     >
-      {/* 상품 이미지 */}
+      {/* 작품 이미지 */}
       <div className="relative aspect-square w-full bg-zinc-800">
         {product.mainImage ? (
           <Image
@@ -148,10 +148,10 @@ export default function ProductCard({
         )}
       </div>
 
-      {/* 상품 정보 */}
+      {/* 작품 정보 */}
       <div className="p-3">
         <div className={hasOptions ? "mb-2" : ""}>
-          <p className="text-sm font-medium text-white">
+          <p className="line-clamp-2 break-keep text-sm font-medium leading-5 text-white">
             {product.name}
           </p>
 
@@ -224,8 +224,8 @@ export default function ProductCard({
                   <div className="ml-3 shrink-0 text-right">
                     <p
                       className={`text-sm font-medium ${soldOut
-                          ? "text-red-500"
-                          : "text-white"
+                        ? "text-red-500"
+                        : "text-white"
                         }`}
                     >
                       {soldOut

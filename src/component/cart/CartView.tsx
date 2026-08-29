@@ -19,7 +19,7 @@ export default function CartView() {
   if (!hasMounted) {
     return (
       <div className="mx-auto flex w-full max-w-lg flex-col gap-4">
-        <h1 className="text-xl font-semibold text-white">장바구니</h1>
+        <h1 className="text-xl font-semibold text-white">구매할 것</h1>
         <div className="rounded border border-zinc-800 p-6 text-center text-sm text-zinc-400">
           불러오는 중...
         </div>
@@ -37,7 +37,7 @@ export default function CartView() {
   return (
     <div className="mx-auto flex w-full max-w-lg flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-white">장바구니</h1>
+        <h1 className="text-xl font-semibold text-white">구매할 것</h1>
 
         {items.length > 0 && (
           <button
@@ -51,7 +51,7 @@ export default function CartView() {
 
       {groups.length === 0 ? (
         <div className="rounded border border-zinc-800 p-6 text-center text-sm text-zinc-400">
-          장바구니가 비어있습니다.
+          갖고싶은 회지와 굿즈 목록을 만들어 봅시다
         </div>
       ) : (
         <>
@@ -60,15 +60,10 @@ export default function CartView() {
             보냈다고 자동으로 결제/재고 반영되는 게 아니라는 점, 부스 앞에서 직접
             말로 확인해야 확실하다는 점을 오해 없이 전달하는 게 목적.
           */}
-          <p className="text-center text-xs text-zinc-500">
-            이 요청은 구매할 상품을 부스러에게 미리 알려두는 기능입니다.
+          <p className="text-center text-xs leading-5 text-zinc-500">
+            구매할 작품을 미리 담아서 전송하면, 부스에서 닉네임으로 목록을 확인할 수 있습니다.
             <br />
-            실제 구매는 부스에서 직접 진행해 주세요.
-            <br />
-            부스 앞에서 닉네임을 말씀해 주시면, 부스러가 요청 내용을 확인하고 상품을 담아드립니다.
-            <br />
-            요청을 보내자마자 결제되거나 재고가 확정되는 것은 아니며,
-            같은 부스에 다시 요청하면 이전 요청은 새 내용으로 변경됩니다.
+            실제 구매와 재고 확인은 부스에서 진행됩니다.
           </p>
 
           <div className="flex items-center justify-between rounded border border-zinc-800 bg-zinc-900 px-4 py-3">

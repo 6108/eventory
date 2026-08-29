@@ -60,7 +60,7 @@ export default function RegisterForm() {
       />
 
       <input
-        placeholder="등록 코드"
+        placeholder="등록 연결"
         value={code}
         onChange={(e) => setCode(e.target.value)}
         required

@@ -36,7 +36,7 @@ export default function QuickAddButton({
 
   /**
    * 옵션이 있는 경우 옵션 재고,
-   * 옵션이 없는 경우 상품 재고를 사용한다.
+   * 옵션이 없는 경우 작품 재고를 사용한다.
    */
   const remainingQuantity = hasOptions
     ? selectedOption?.remainingQuantity ?? null
@@ -76,7 +76,7 @@ export default function QuickAddButton({
       purchaseLimit: product.purchaseLimit,
     });
 
-    toast.success("장바구니에 담았습니다.");
+    toast.success("구매할 것에 담았습니다.");
   }
 
   function handleButtonClick(
@@ -92,7 +92,7 @@ export default function QuickAddButton({
     }
 
     if (isSoldOut) {
-      toast.error("품절된 상품입니다.");
+      toast.error("품절된 작품입니다.");
       return;
     }
 
@@ -168,7 +168,7 @@ export default function QuickAddButton({
         >
           <div className="flex flex-col gap-5"
             onClick={(e) => e.stopPropagation()}>
-            {/* 상품 정보 */}
+            {/* 작품 정보 */}
             <div>
               <p className="text-xs text-zinc-500">
                 {product.boothName} ({product.boothNumber})
@@ -240,7 +240,7 @@ export default function QuickAddButton({
                     )
                   }
                   disabled={quantity <= 1}
-                  className="h-8 w-8 rounded bg-zinc-800 text-white disabled:opacity-40"
+                  className="h-11 w-11 rounded bg-zinc-800 text-white disabled:opacity-40"
                 >
                   −
                 </button>
@@ -256,7 +256,7 @@ export default function QuickAddButton({
                     setQuantity((q) => q + 1)
                   }
                   disabled={!canIncrease}
-                  className="h-8 w-8 rounded bg-zinc-800 text-white disabled:opacity-40"
+                  className="h-11 w-11 rounded bg-zinc-800 text-white disabled:opacity-40"
                 >
                   +
                 </button>
@@ -279,7 +279,7 @@ export default function QuickAddButton({
             >
               {isSoldOut
                 ? "품절"
-                : `${quantity}개 장바구니 담기`}
+                : `${quantity}개 구매할 것 담기`}
             </button>
           </div>
         </Modal>

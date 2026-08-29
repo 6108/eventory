@@ -1,17 +1,27 @@
-// src/hooks/useMyOrderRequests.ts
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { MyOrderRequest } from "../types/request";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { OrderRequest } from "../types/request";
+import { ReceiptOrder } from "../types/order";
 
-// Supabase에서 그대로 내려오는 raw 응답 형태 (snake_case)
+
 interface MyOrderRequestRow {
   id: string;
   booth_id: string;
-  status: MyOrderRequest["status"];
+  customer_id: string;
+  status: OrderRequest["status"];
+  order_id: string | null;
   created_at: string;
   updated_at: string;
-  booths?: { booth_name: string | null } | null;
+
+  booths?: {
+    booth_name: string | null;
+  } | null;
+
   order_request_items?: {
     id: string;
     order_request_id: string;
@@ -21,89 +31,164 @@ interface MyOrderRequestRow {
     option_name: string | null;
     quantity: number;
   }[];
+
+  // order_id가 생긴 요청이면 실제 결제 영수증(orders)이 함께 내려옴.
   orders?: {
     id: string;
     total_amount: number;
     total_quantity: number;
-    status: string;
+    status: ReceiptOrder["status"];
     created_at: string;
+    order_items?: {
+      product_name: string;
+      option_name: string | null;
+      unit_price: number;
+      quantity: number;
+      subtotal: number;
+    }[];
   } | null;
 }
 
 const myOrderRequestsKey = ["myOrderRequests"] as const;
 
-function mapRequest(r: MyOrderRequestRow): MyOrderRequest {
+function mapRequest(
+  request: MyOrderRequestRow
+): OrderRequest {
+  const order = request.orders;
+
   return {
-    id: r.id,
-    boothId: r.booth_id,
-    items: (r.order_request_items ?? []).map((item) => ({
-      id: item.id,
-      orderRequestId: item.order_request_id,
-      productId: item.product_id,
-      optionId: item.option_id,
-      productName: item.product_name,
-      optionName: item.option_name,
-      quantity: item.quantity,
-    })),
-    status: r.status,
-    createdAt: r.created_at,
-    updatedAt: r.updated_at,
-    boothName: r.booths?.booth_name ?? null,
-    order: r.orders
+    id: request.id,
+    boothId: request.booth_id,
+    customerId: request.customer_id,
+
+    // 이 API에서는 손님 닉네임을 사용하지 않으므로 빈 문자열.
+    // 필요하면 API에서 customer nickname을 같이 내려줄 수 있음.
+    customerNickname: "",
+
+    boothName: request.booths?.booth_name ?? null,
+
+    items: (request.order_request_items ?? []).map(
+      (item) => ({
+        id: item.id,
+        orderRequestId: item.order_request_id,
+        productId: item.product_id,
+        optionId: item.option_id,
+        productName: item.product_name,
+        optionName: item.option_name,
+        quantity: item.quantity,
+      })
+    ),
+
+    status: request.status,
+    orderId: request.order_id,
+
+    // 구매 이력(order_id가 생긴 요청)은 무조건 영수증 데이터를 채워서 내려준다.
+    order: order
       ? {
-        id: r.orders.id,
-        totalAmount: r.orders.total_amount,
-        totalQuantity: r.orders.total_quantity,
-        status: r.orders.status,
-        createdAt: r.orders.created_at,
+        id: order.id,
+        totalAmount: order.total_amount,
+        totalQuantity: order.total_quantity,
+        status: order.status,
+        createdAt: order.created_at,
+        items: (order.order_items ?? []).map((item) => ({
+          productName: item.product_name,
+          optionName: item.option_name,
+          unitPrice: item.unit_price,
+          quantity: item.quantity,
+          subtotal: item.subtotal,
+        })),
       }
       : null,
+
+    createdAt: request.created_at,
+    updatedAt: request.updated_at,
   };
 }
 
-async function fetchMyOrderRequests(): Promise<MyOrderRequest[]> {
+async function fetchMyOrderRequests(): Promise<OrderRequest[]> {
   const res = await fetch("/api/my/order-requests");
-  const data: { requests?: MyOrderRequestRow[] } = await res.json();
+
+  const data: {
+    requests?: MyOrderRequestRow[];
+    error?: string;
+  } = await res.json();
+
+  if (!res.ok) {
+    throw new Error(
+      data.error ?? "주문내역을 불러오지 못했습니다."
+    );
+  }
+
   return (data.requests ?? []).map(mapRequest);
 }
 
 export function useMyOrderRequests() {
   const queryClient = useQueryClient();
 
-  const { data: requests, isLoading } = useQuery({
+  const {
+    data: requests,
+    isLoading,
+  } = useQuery({
     queryKey: myOrderRequestsKey,
     queryFn: fetchMyOrderRequests,
   });
 
   const cancelMutation = useMutation({
     mutationFn: async (requestId: string) => {
-      const res = await fetch(`/api/order-requests/${requestId}/cancel`, {
-        method: "POST",
-      });
+      const res = await fetch(
+        `/api/order-requests/${requestId}/cancel`,
+        {
+          method: "POST",
+        }
+      );
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "취소에 실패했습니다.");
+
+        throw new Error(
+          data.error ?? "취소에 실패했습니다."
+        );
       }
     },
-    onMutate: async (requestId) => {
-      await queryClient.cancelQueries({ queryKey: myOrderRequestsKey });
-      const prev = queryClient.getQueryData<MyOrderRequest[]>(myOrderRequestsKey) ?? [];
 
-      queryClient.setQueryData<MyOrderRequest[]>(
+    onMutate: async (requestId) => {
+      await queryClient.cancelQueries({
+        queryKey: myOrderRequestsKey,
+      });
+
+      const previous =
+        queryClient.getQueryData<OrderRequest[]>(
+          myOrderRequestsKey
+        ) ?? [];
+
+      queryClient.setQueryData<OrderRequest[]>(
         myOrderRequestsKey,
-        prev.map((r) =>
-          r.id === requestId ? { ...r, status: "cancelled" as const } : r
+        previous.map((request) =>
+          request.id === requestId
+            ? {
+              ...request,
+              status: "cancelled",
+            }
+            : request
         )
       );
 
-      return { prev };
+      return { previous };
     },
-    onError: (_err, _requestId, ctx) => {
-      if (ctx) queryClient.setQueryData(myOrderRequestsKey, ctx.prev);
+
+    onError: (_error, _requestId, context) => {
+      if (context) {
+        queryClient.setQueryData(
+          myOrderRequestsKey,
+          context.previous
+        );
+      }
     },
+
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: myOrderRequestsKey });
+      queryClient.invalidateQueries({
+        queryKey: myOrderRequestsKey,
+      });
     },
   });
 
@@ -111,7 +196,6 @@ export function useMyOrderRequests() {
     await cancelMutation.mutateAsync(requestId);
   }
 
-  // 어떤 요청이 현재 취소 처리 중인지 (연타/중복 클릭 방지용)
   const pendingRequestId = cancelMutation.isPending
     ? cancelMutation.variables ?? null
     : null;
@@ -120,7 +204,11 @@ export function useMyOrderRequests() {
     requests: requests ?? [],
     isLoading,
     pendingRequestId,
-    refetch: () => queryClient.invalidateQueries({ queryKey: myOrderRequestsKey }),
     cancelRequest,
+
+    refetch: () =>
+      queryClient.invalidateQueries({
+        queryKey: myOrderRequestsKey,
+      }),
   };
 }

@@ -1,8 +1,8 @@
 // src/types/cart.ts
 
-// 고객 장바구니 아이템
+// 손님 구매 예상 목록 아이템
 // POS의 OrderItem과 달리 부스 정보(boothId/boothName)를 들고 있음
-// -> 고객은 여러 부스를 돌아다니며 담기 때문에, 담을 때 어느 부스 상품인지 같이 저장해둬야
+// -> 손님은 여러 부스를 돌아다니며 담기 때문에, 담을 때 어느 부스 작품인지 같이 저장해둬야
 //    부스별로 묶어서 보여주고 부스별로 주문서를 보낼 수 있음
 export type CartItem = {
   productId: string;
@@ -19,7 +19,7 @@ export type CartItem = {
   purchaseLimit: number | null;
 };
 
-// 부스별로 묶은 장바구니 (화면 렌더링/주문서 전송 단위)
+// 부스별로 묶은 예상목록 (화면 렌더링/주문서 전송 단위)
 export type CartGroup = {
   boothId: string;
   boothNumber: string;

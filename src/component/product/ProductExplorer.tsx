@@ -60,7 +60,7 @@ export default function ProductExplorer({
             
             }`}
         >
-          {isFollowingOnly ? "전체 상품 보기" : "팔로우한 부스 상품만 보기"}
+          {isFollowingOnly ? "전체 작품 보기" : "팔로우한 부스 작품만 보기"}
         </button>
       )}
 
@@ -90,7 +90,7 @@ export default function ProductExplorer({
         </div>
       )}
 
-      {/* 상품 */}
+      {/* 작품 */}
       <ProductList
         products={filteredProducts}
         currentUserId={currentUserId}

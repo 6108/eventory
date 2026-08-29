@@ -51,7 +51,7 @@ export default function ProductManageExplorer({ eventId, boothId, products }: Pr
           ))}
         </div>
       )}
-      {/* 상품 */}
+      {/* 작품 */}
       <ProductManageList eventId={eventId} boothId={boothId} products={filteredProducts} />
     </div>
   );

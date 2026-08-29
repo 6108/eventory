@@ -27,8 +27,6 @@ export default function FollowButton({
   const openConfirmModal = useConfirmModalStore((s) => s.openConfirmModal);
 
   async function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
-    // Link나 부모의 클릭 핸들러(예: 페이지 이동, 라이트박스 열기)로
-    // 이벤트가 번지지 않도록 항상 막는다.
     e.preventDefault();
     e.stopPropagation();
 

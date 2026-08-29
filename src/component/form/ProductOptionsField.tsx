@@ -12,7 +12,7 @@ interface Props {
 
 export function ProductOptionsField({ options, onAdd, onUpdate, onRemove }: Props) {
   return (
-    <FormField label="상품 옵션">
+    <FormField label="옵션">
       <div className="flex flex-col gap-2">
         {options.map((option, index) => (
           <div key={index} className="flex gap-2">

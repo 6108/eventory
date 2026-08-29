@@ -1,4 +1,5 @@
 // src/app/api/booth/[boothId]/orders/route.ts
+
 import { NextResponse } from "next/server";
 import { requireBoothArtist } from "@/src/lib/auth/requireBoothArtist";
 import { getBoothOrders } from "@/src/lib/data/order";
@@ -14,18 +15,32 @@ export async function POST(
   { params }: { params: Promise<{ boothId: string }> }
 ) {
   const { boothId } = await params;
+
   const body = await request.json();
-  const { clientTransactionId, items } = body as {
+
+  const {
+    clientTransactionId,
+    items,
+    orderRequestIds,
+  } = body as {
     clientTransactionId: string;
     items: OrderPayload[];
+    orderRequestIds?: string[];
   };
 
   if (!clientTransactionId || !items || items.length === 0) {
-    return NextResponse.json({ error: "잘못된 요청입니다." }, { status: 400 });
+    return NextResponse.json(
+      { error: "잘못된 요청입니다." },
+      { status: 400 }
+    );
   }
 
   const authResult = await requireBoothArtist(boothId);
-  if (authResult instanceof NextResponse) return authResult;
+
+  if (authResult instanceof NextResponse) {
+    return authResult;
+  }
+
   const { supabase } = authResult;
 
   const { data: orderId, error } = await supabase.rpc("create_order", {
@@ -36,25 +51,43 @@ export async function POST(
       option_id: item.optionId ?? null,
       quantity: item.quantity,
     })),
+    p_order_request_ids: orderRequestIds ?? [],
   });
 
   if (error) {
     console.error(error);
 
     if (error.message?.startsWith("out of stock")) {
-      return NextResponse.json({ error: "재고가 부족합니다." }, { status: 409 });
+      return NextResponse.json(
+        { error: "재고가 부족합니다." },
+        { status: 409 }
+      );
     }
+
     if (error.message?.startsWith("invalid product")) {
       return NextResponse.json(
-        { error: "잘못된 상품이 포함되어 있습니다." },
+        { error: "잘못된 작품이 포함되어 있습니다." },
         { status: 400 }
       );
     }
 
-    return NextResponse.json({ error: "주문 생성에 실패했습니다." }, { status: 500 });
+    if (error.message?.startsWith("invalid option")) {
+      return NextResponse.json(
+        { error: "잘못된 옵션이 포함되어 있습니다." },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: "주문 생성에 실패했습니다." },
+      { status: 500 }
+    );
   }
 
-  return NextResponse.json({ success: true, orderId });
+  return NextResponse.json({
+    success: true,
+    orderId,
+  });
 }
 
 export async function GET(
@@ -64,7 +97,10 @@ export async function GET(
   const { boothId } = await params;
 
   const authResult = await requireBoothArtist(boothId);
-  if (authResult instanceof NextResponse) return authResult;
+
+  if (authResult instanceof NextResponse) {
+    return authResult;
+  }
 
   const orders = await getBoothOrders(boothId);
 

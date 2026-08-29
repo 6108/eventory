@@ -16,8 +16,8 @@ export default function PosTabs({ sellContent, requestsContent, prepaidContent, 
   const [tab, setTab] = useState<TabKey>("sell");
 
   const tabs: { key: TabKey; label: string }[] = [
-    { key: "sell", label: "상품 판매" },
-    { key: "requests", label: "고객 주문" },
+    { key: "sell", label: "작품 판매" },
+    { key: "requests", label: "손님 주문" },
     { key: "prepaid", label: "선입금 수령" },
     { key: "receipt", label: "영수증" },
   ];

@@ -112,7 +112,7 @@ export function ProductSampleImagesField({
       )}
 
       <p className="text-xs text-zinc-500">
-        상품 상세 컷, 옵션별 컬러 등 고객이 참고할 이미지를 추가로 올릴 수 있습니다.
+        작품 상세 컷, 옵션별 컬러 등 손님이 참고할 이미지를 추가로 올릴 수 있습니다.
       </p>
 
       {items.length > 0 && (

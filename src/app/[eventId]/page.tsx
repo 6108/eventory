@@ -180,22 +180,22 @@ export default function Page() {
             </Link>
 
             {/* 부스 등록 */}
-            {/* <Link
+            <Link
               href={`/${eventId}/booths/register`}
-              className="flex items-center justify-between border-t border-zinc-800 bg-zinc-900 px-4 py-5 transition hover:bg-zinc-800"
+              className="flex items-center justify-between border-t border-zinc-800 px-4 py-5 transition hover:bg-zinc-800"
             >
               <div>
                 <p className="text-sm font-medium text-white">
-                  부스 등록하기
+                  부스 연결하기
                 </p>
 
                 <p className="mt-1 text-xs text-zinc-500">
-                  나의 부스를 등록해보세요
+                  부스를 연결하고 회지와 굿즈 정보를 올려보세요
                 </p>
               </div>
 
               <span className="text-xl text-zinc-500">›</span>
-            </Link> */}
+            </Link>
           </div>
         </section>
 
@@ -225,7 +225,7 @@ export default function Page() {
             href={`/${eventId}/booths/register`}
             className="flex h-12 flex-1 items-center justify-center rounded-md bg-primary text-sm font-medium text-white transition hover:opacity-90"
           >
-            부스 등록하기
+            부스 연결하기
           </Link>
         </div>
       </div>

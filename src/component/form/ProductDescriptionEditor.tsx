@@ -186,7 +186,7 @@ export default function ProductDescriptionEditor({
         onChange={handleChange}
         modules={modules}
         formats={formats}
-        placeholder="상품 상세 설명을 입력해주세요. (이미지 복사/붙여넣기, 드래그앤드롭 가능)"
+        placeholder="작품 상세 설명을 입력해주세요. (이미지 복사/붙여넣기, 드래그앤드롭 가능)"
       />
     </div>
   );

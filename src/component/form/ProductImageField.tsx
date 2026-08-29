@@ -78,7 +78,7 @@ export function ProductImageField({
         <div className="relative mt-2 aspect-square w-48 overflow-hidden rounded border border-zinc-800">
           <Image
             src={previewUrl}
-            alt="상품 이미지 미리보기"
+            alt="작품 이미지 미리보기"
             fill
             sizes="192px"
             className="object-cover"

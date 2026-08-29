@@ -45,7 +45,7 @@ export default function RootLayout({
           <ConfirmModal />
           <Navbar />
 
-          <main className="flex-1 p-8 pt-20">{children}</main>
+          <main className="flex-1 p-4 pt-24 sm:p-8 sm:pt-20">{children}</main>
 
           {/* <Footer /> */}
         </Providers>

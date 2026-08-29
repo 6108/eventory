@@ -15,7 +15,7 @@ export function BoothMenu({ boothId, loading, onNavigate }: Props) {
   if (!boothId) {
     return (
       <UserMenuItem href={`/${eventId}/booths/register`} onClick={onNavigate}>
-        부스 등록
+        부스 연결
       </UserMenuItem>
     );
   }

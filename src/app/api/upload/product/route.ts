@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/src/lib/supabase/server";
 
-// 로그인한 사용자가 상품 이미지(대표/상세)를 Supabase Storage에 업로드하는 API
+// 로그인한 사용자가 작품 이미지(대표/상세)를 Supabase Storage에 업로드하는 API
 export async function POST(request: Request) {
   const supabase = await createClient();
 

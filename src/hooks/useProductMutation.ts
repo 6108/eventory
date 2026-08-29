@@ -103,16 +103,16 @@ export function useProductMutation({
       const result = await res.json();
 
       if (!res.ok) {
-        toast.error(result.error ?? (isEdit ? "상품 수정에 실패했습니다." : "상품 추가에 실패했습니다."));
+        toast.error(result.error ?? (isEdit ? "작품 수정에 실패했습니다." : "작품 추가에 실패했습니다."));
         return;
       }
 
-      toast.success(isEdit ? "상품이 수정되었습니다." : "상품이 추가되었습니다.");
+      toast.success(isEdit ? "작품이 수정되었습니다." : "작품이 추가되었습니다.");
       router.push(`/${eventId}/booths/${boothId}/manage/products`);
       router.refresh();
     } catch (error) {
       console.error(error);
-      toast.error(isEdit ? "상품 수정 중 오류가 발생했습니다." : "상품 추가 중 오류가 발생했습니다.");
+      toast.error(isEdit ? "작품 수정 중 오류가 발생했습니다." : "작품 추가 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }

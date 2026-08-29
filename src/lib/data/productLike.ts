@@ -30,7 +30,7 @@ type RawLikedProduct = {
   product_options: RawProductOption[] | null;
 };
 
-// 내가 좋아요한 상품 목록 조회 (좋아요 모아보기 페이지용)
+// 내가 좋아요한 작품 목록 조회 (좋아요 모아보기 페이지용)
 export async function getLikedProducts(userId: string): Promise<LikedProduct[]> {
   const supabase = await createClient();
 
@@ -51,7 +51,7 @@ export async function getLikedProducts(userId: string): Promise<LikedProduct[]> 
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("좋아요한 상품 조회 실패:", error);
+    console.error("좋아요한 작품 조회 실패:", error);
     return [];
   }
 

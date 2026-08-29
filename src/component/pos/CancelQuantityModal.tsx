@@ -68,7 +68,7 @@ export default function CancelQuantityModal({
 
   return (
     <Modal isOpen onClose={onClose} maxWidth="xs">
-      {/* 상품 정보 */}
+      {/* 작품 정보 */}
       <div className="mb-4">
         <p className="text-sm font-medium text-white">
           {item.productName ?? item.productId}

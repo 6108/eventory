@@ -18,12 +18,12 @@ export default async function Page({
   return (
     <div className="mx-auto w-full max-w-3xl">
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-white">상품 관리</h1>
+        <h1 className="text-xl font-semibold text-white">회지 & 굿즈 관리</h1>
         <Link
           href={`/${eventId}/booths/${boothId}/manage/products/new`}
           className="rounded bg-primary px-3 py-1.5 text-sm text-white"
         >
-          + 상품 추가
+          + 추가
         </Link>
       </div>
 
