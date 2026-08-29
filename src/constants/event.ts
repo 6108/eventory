@@ -7,7 +7,7 @@ export const EVENT_INFO = {
   name: "솔음사헌 배포전 : 𝐑𝐞𝐝𝐞𝐦𝐩𝐭𝐢𝐨𝐧",
 
   // 날짜/시간
-  dateLabel: "2026.06.19 (토)",
+  dateLabel: "2026.09.19 (토)",
   timeLabel: "00:00 ~ 00:00",
 
   // 장소

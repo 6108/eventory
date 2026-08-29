@@ -38,6 +38,9 @@ export default function Page() {
             <br />
             ²) 속박; 제한하여 자유롭지 못하게 하다
           </p>
+          <p className="mt-8 text-xs text-zinc-600">
+            이미지의 모든 저작권은 @QnD_SESH님에게 있습니다.
+          </p>
         </section>
 
         {/* 구분 */}
@@ -98,14 +101,15 @@ export default function Page() {
               <div className="w-20 shrink-0 text-sm text-zinc-500">
                 문의
               </div>
-
               <a
                 href={`mailto:${EVENT_INFO.contactEmail}`}
                 className="min-w-0 break-all text-sm text-zinc-300 hover:text-primary"
               >
                 {EVENT_INFO.contactEmail}
               </a>
+
             </div>
+
           </div>
         </section>
 
