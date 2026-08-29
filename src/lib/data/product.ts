@@ -1,6 +1,14 @@
 // src/lib/data/product.ts
 import { createClient } from "@/src/lib/supabase/server";
-import { PosProduct, Product, ProductCategory, ProductOption, ProductSubCategory, ProductSummary } from "@/src/types/product";
+import {
+  PosProduct,
+  Product,
+  ProductCategory,
+  ProductOption,
+  ProductSubCategory,
+  ProductSummary,
+  productCategories,
+} from "@/src/types/product";
 
 // 한 페이지에 가져올 상품 개수. 전체 상품 목록(/[eventId]/products)처럼
 // 부스 수 제한이 없는 화면에서 데이터가 무한정 늘어나는 걸 막기 위한 값.
@@ -13,6 +21,11 @@ export type ProductListFilter = {
   subCategory?: ProductSubCategory | "ALL";
 };
 
+export type ProductFilterOptions = {
+  categories: ProductCategory[];
+  subCategories: ProductSubCategory[];
+};
+
 export type ProductListPage = {
   products: ProductSummary[];
   hasMore: boolean;
@@ -20,6 +33,8 @@ export type ProductListPage = {
   nextPage: number | null;
   // 전체 개수. count 조회가 안 되는 예외 상황이면 null.
   total: number | null;
+  // 실제 상품이 존재하는 필터 목록
+  filters?: ProductFilterOptions;
 };
 
 // 작품(요약버전) 조회 - boothId 주면 그 부스만, 배열이면 해당 부스들, 안 주면 전체
@@ -80,6 +95,87 @@ export async function getProductSummaries(
   }));
 }
 
+// 실제 상품이 존재하는 카테고리 / 서브카테고리 조회
+//
+// category 필터가 선택되어 있어도 categories는 전체 범위에서 계산하고,
+// subCategories만 선택된 category 내부에서 계산한다.
+export async function getProductFilterOptions(
+  filter: ProductListFilter = {}
+): Promise<ProductFilterOptions> {
+  // 팔로우한 부스가 하나도 없는 경우
+  if (filter.boothIds && filter.boothIds.length === 0) {
+    return {
+      categories: [],
+      subCategories: [],
+    };
+  }
+
+  const supabase = await createClient();
+
+  let query = supabase
+    .from("products")
+    .select("category, sub_category");
+
+  // 현재 상품 목록과 동일한 범위만 사용
+  if (filter.boothIds) {
+    query = query.in("booth_id", filter.boothIds);
+  }
+
+  // 중요:
+  // 여기서는 category 필터를 걸지 않는다.
+  // 그래야 현재 category가 acrylic이어도
+  // 전체 카테고리 목록은 acrylic, sticker, book 등 실제 존재하는 것들이 전부 나온다.
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error("작품 필터 조회 실패:", error);
+
+    return {
+      categories: [],
+      subCategories: [],
+    };
+  }
+
+  const categorySet = new Set<ProductCategory>();
+  const subCategorySet = new Set<ProductSubCategory>();
+
+  for (const product of data ?? []) {
+    if (product.category) {
+      categorySet.add(product.category as ProductCategory);
+    }
+
+    // 선택된 category 내부의 서브카테고리만 수집
+    if (
+      filter.category &&
+      filter.category !== "ALL" &&
+      product.category === filter.category &&
+      product.sub_category
+    ) {
+      subCategorySet.add(
+        product.sub_category as ProductSubCategory
+      );
+    }
+  }
+
+  return {
+    categories: productCategories
+      .map((item) => item.value)
+      .filter((category) => categorySet.has(category)),
+
+    subCategories:
+      filter.category && filter.category !== "ALL"
+        ? productCategories
+          .find((item) => item.value === filter.category)
+          ?.types
+          .map((item) => item.value)
+          .filter((subCategory) =>
+            subCategorySet.has(subCategory)
+          ) ?? []
+        : [],
+  };
+}
+
 // 작품(요약버전) 페이지 단위 조회 - 전체 상품 목록처럼 데이터가 계속 늘어나는
 // 화면에서 사용. 부스/카테고리 필터는 클라이언트가 아니라 여기(DB 쿼리)에서 처리한다.
 export async function getProductSummariesPaged(
@@ -88,9 +184,18 @@ export async function getProductSummariesPaged(
   pageSize: number = PRODUCTS_PAGE_SIZE
 ): Promise<ProductListPage> {
   // 팔로우한 부스가 하나도 없는 경우처럼, boothIds가 빈 배열로 명시된 경우엔
-  // 쿼리를 아예 안 날리고 빈 결과로 처리 (in([])은 전체 조회로 오해될 수 있어 방어)
+  // 쿼리를 아예 안 날리고 빈 결과로 처리
   if (filter.boothIds && filter.boothIds.length === 0) {
-    return { products: [], hasMore: false, nextPage: null, total: 0 };
+    return {
+      products: [],
+      hasMore: false,
+      nextPage: null,
+      total: 0,
+      filters: {
+        categories: [],
+        subCategories: [],
+      },
+    };
   }
 
   const supabase = await createClient();
@@ -126,13 +231,16 @@ export async function getProductSummariesPaged(
 
   if (error) {
     console.error("작품 목록 조회 실패:", error);
-    return { products: [], hasMore: false, nextPage: null, total: null };
+
+    return {
+      products: [],
+      hasMore: false,
+      nextPage: null,
+      total: null,
+    };
   }
 
-  // getProductSummaries와 동일한 변환 로직을 여기서도 인라인으로 처리.
-  // 별도 함수로 뽑아서 타입을 손으로 적으면 Supabase가 select 문마다 추론하는
-  // 실제 타입과 어긋나기 쉬워서(널러블 여부 등), 각 쿼리 결과에서 TS가
-  // 자동으로 추론한 타입 그대로 바로 변환하는 방식을 유지한다.
+  // getProductSummaries와 동일한 변환 로직
   const products = (data ?? []).map((product) => ({
     id: product.id,
     boothId: product.booth_id,
@@ -159,15 +267,24 @@ export async function getProductSummariesPaged(
     ),
   }));
 
-  // count가 없으면(권한 등으로 불가한 경우) 이번 페이지가 꽉 찼는지로 대략 판단
+  // count가 없으면 이번 페이지가 꽉 찼는지로 대략 판단
   const hasMore =
-    count !== null ? to + 1 < count : products.length === pageSize;
+    count !== null
+      ? to + 1 < count
+      : products.length === pageSize;
+
+  // 첫 페이지만 필터 정보를 조회
+  const filters =
+    safePage === 0
+      ? await getProductFilterOptions(filter)
+      : undefined;
 
   return {
     products,
     hasMore,
     nextPage: hasMore ? safePage + 1 : null,
     total: count ?? null,
+    filters,
   };
 }
 
@@ -213,7 +330,12 @@ export async function getFollowedBoothProductsPaged(
 
   if (followError) {
     console.error("팔로우 부스 조회 실패:", followError);
-    return { products: [], hasMore: false, nextPage: null, total: null };
+    return {
+      products: [],
+      hasMore: false,
+      nextPage: null,
+      total: null,
+    };
   }
 
   const boothIds = (follows ?? []).map((f) => f.booth_id);
@@ -226,7 +348,10 @@ export async function getFollowedBoothProductsPaged(
 }
 
 // 단일 작품 상세 조회 (boothId 주면 해당 부스 소유 검증까지)
-export async function getProduct(productId: string, boothId?: string): Promise<Product | null> {
+export async function getProduct(
+  productId: string,
+  boothId?: string
+): Promise<Product | null> {
   const supabase = await createClient();
 
   let query = supabase
@@ -262,20 +387,24 @@ export async function getProduct(productId: string, boothId?: string): Promise<P
     remainingQuantity: productData.remaining_quantity,
     purchaseLimit: productData.purchase_limit,
     description: productData.description ?? "",
-    options: (productData.product_options ?? []).map((option): ProductOption => ({
-      id: option.id,
-      name: option.name,
-      price: option.price,
-      initialQuantity: option.initial_quantity,
-      remainingQuantity: option.remaining_quantity,
-    })),
+    options: (productData.product_options ?? []).map(
+      (option): ProductOption => ({
+        id: option.id,
+        name: option.name,
+        price: option.price,
+        initialQuantity: option.initial_quantity,
+        remainingQuantity: option.remaining_quantity,
+      })
+    ),
     category: productData.category as ProductCategory,
     subCategory: productData.sub_category as ProductSubCategory,
   };
 }
 
 // POS 작품 조회
-export async function getPosProducts(boothId: string): Promise<PosProduct[]> {
+export async function getPosProducts(
+  boothId: string
+): Promise<PosProduct[]> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -315,8 +444,7 @@ export async function getPosProducts(boothId: string): Promise<PosProduct[]> {
   }));
 }
 
-// src/lib/data/product.ts 에 추가
-
+// 장바구니 동기화용
 export type ProductLimitInfo = {
   productId: string;
   optionId: string | null;

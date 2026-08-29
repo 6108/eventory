@@ -8,11 +8,9 @@ import { useProductCategoryFilter } from "@/src/hooks/useProductCategoryFilter";
 import { useProductList, ProductListPage } from "@/src/hooks/useProductList";
 
 interface ProductExplorerProps {
-  // 서버 컴포넌트에서 미리 가져온 1페이지 (SSR 초기 렌더 + 재요청 방지용)
   initialPage: ProductListPage;
   currentUserId?: string;
   showFollowingFilter?: boolean;
-  // 특정 부스로 범위 제한 (부스 상세/상품 목록 페이지에서 사용). 없으면 전체 상품 대상.
   boothId?: string;
 }
 
@@ -26,22 +24,21 @@ export default function ProductExplorer({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const isFollowingOnly = searchParams.get("following") === "true";
+  const isFollowingOnly =
+    searchParams.get("following") === "true";
 
-  const {
-    category,
-    subCategory,
-    categories,
-    subCategories,
-    handleCategoryClick,
-    handleSubCategoryClick,
-  } = useProductCategoryFilter();
+  // URL에서 현재 카테고리 상태 가져오기
+  const category = searchParams.get("category") ?? "ALL";
+  const subCategory =
+    searchParams.get("subCategory") ?? "ALL";
 
   const {
     products,
     hasMore,
     isFetchingNextPage,
     fetchNextPage,
+    categories: availableCategories,
+    subCategories: availableSubCategories,
   } = useProductList({
     boothId,
     following: showFollowingFilter && isFollowingOnly,
@@ -50,8 +47,22 @@ export default function ProductExplorer({
     initialPage,
   });
 
+  const {
+    categories,
+    subCategories,
+    handleCategoryClick,
+    handleSubCategoryClick,
+  } = useProductCategoryFilter({
+    category,
+    subCategory,
+    availableCategories,
+    availableSubCategories,
+  });
+
   function toggleFollowingFilter() {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(
+      searchParams.toString()
+    );
 
     if (isFollowingOnly) {
       params.delete("following");
@@ -61,7 +72,9 @@ export default function ProductExplorer({
 
     const query = params.toString();
 
-    router.push(query ? `${pathname}?${query}` : pathname);
+    router.push(
+      query ? `${pathname}?${query}` : pathname
+    );
   }
 
   return (
@@ -73,10 +86,11 @@ export default function ProductExplorer({
           onClick={toggleFollowingFilter}
           className={`self-start rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors
             border-primary bg-primary text-white
-            
-            }`}
+          `}
         >
-          {isFollowingOnly ? "전체 작품 보기" : "팔로우한 부스 작품만 보기"}
+          {isFollowingOnly
+            ? "전체 작품 보기"
+            : "팔로우한 부스 작품만 보기"}
         </button>
       )}
 
@@ -87,7 +101,9 @@ export default function ProductExplorer({
             key={item.value}
             label={item.label}
             active={category === item.value}
-            onClick={() => handleCategoryClick(item.value)}
+            onClick={() =>
+              handleCategoryClick(item.value)
+            }
           />
         ))}
       </div>
@@ -100,7 +116,9 @@ export default function ProductExplorer({
               key={item.value}
               label={item.label}
               active={subCategory === item.value}
-              onClick={() => handleSubCategoryClick(item.value)}
+              onClick={() =>
+                handleSubCategoryClick(item.value)
+              }
             />
           ))}
         </div>
