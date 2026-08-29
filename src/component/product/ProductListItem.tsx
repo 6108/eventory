@@ -12,11 +12,13 @@ import { ImageIcon } from "lucide-react";
 interface ProductListItemProps {
   productInfo: ProductSummary;
   currentUserId?: string;
+  priority?: boolean;
 }
 
 export default function ProductListItem({
   productInfo,
   currentUserId,
+  priority = false,
 }: ProductListItemProps) {
   const isOwner =
     !!currentUserId && productInfo.artistIds?.includes(currentUserId);
@@ -67,6 +69,7 @@ export default function ProductListItem({
             src={productInfo.mainImage}
             alt={productInfo.name}
             fill
+            priority={priority}
             sizes="(max-width: 768px) 50vw, 33vw"
             className={`rounded-t-xl object-cover ${isSoldOut ? "opacity-20" : ""
               }`}

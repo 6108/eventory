@@ -5,18 +5,22 @@ import ProductList from "@/src/component/product/ProductList";
 import CategoryChip from "@/src/component/product/CategoryChip";
 import SubCategoryChip from "@/src/component/product/SubCategoryChip";
 import { useProductCategoryFilter } from "@/src/hooks/useProductCategoryFilter";
-import { ProductSummary } from "@/src/types/product";
+import { useProductList, ProductListPage } from "@/src/hooks/useProductList";
 
 interface ProductExplorerProps {
-  products: ProductSummary[];
+  // 서버 컴포넌트에서 미리 가져온 1페이지 (SSR 초기 렌더 + 재요청 방지용)
+  initialPage: ProductListPage;
   currentUserId?: string;
   showFollowingFilter?: boolean;
+  // 특정 부스로 범위 제한 (부스 상세/상품 목록 페이지에서 사용). 없으면 전체 상품 대상.
+  boothId?: string;
 }
 
 export default function ProductExplorer({
-  products,
+  initialPage,
   currentUserId,
   showFollowingFilter = false,
+  boothId,
 }: ProductExplorerProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -29,10 +33,22 @@ export default function ProductExplorer({
     subCategory,
     categories,
     subCategories,
-    filteredProducts,
     handleCategoryClick,
     handleSubCategoryClick,
-  } = useProductCategoryFilter(products);
+  } = useProductCategoryFilter();
+
+  const {
+    products,
+    hasMore,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useProductList({
+    boothId,
+    following: showFollowingFilter && isFollowingOnly,
+    category,
+    subCategory,
+    initialPage,
+  });
 
   function toggleFollowingFilter() {
     const params = new URLSearchParams(searchParams.toString());
@@ -92,8 +108,11 @@ export default function ProductExplorer({
 
       {/* 작품 */}
       <ProductList
-        products={filteredProducts}
+        products={products}
         currentUserId={currentUserId}
+        hasMore={hasMore}
+        isFetchingNextPage={isFetchingNextPage}
+        onLoadMore={fetchNextPage}
       />
     </div>
   );

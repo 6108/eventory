@@ -3,7 +3,7 @@ import FollowButton from "@/src/component/booth/FollowButton";
 
 import { createClient } from "@/src/lib/supabase/server";
 import { getBooth, isFollowingBooth } from "@/src/lib/data/booth";
-import { getProductSummaries } from "@/src/lib/data/product";
+import { getProductSummariesPaged } from "@/src/lib/data/product";
 
 export default async function Page({
   params,
@@ -30,8 +30,8 @@ export default async function Page({
     );
   }
 
-  const [products, initialFollowed] = await Promise.all([
-    getProductSummaries(boothId),
+  const [initialPage, initialFollowed] = await Promise.all([
+    getProductSummariesPaged(0, { boothIds: [boothId] }),
     user
       ? isFollowingBooth(user.id, boothId)
       : Promise.resolve(false),
@@ -106,13 +106,14 @@ export default async function Page({
       <section className="pt-10">
         <div className="mb-6 flex items-baseline ">
           <h2 className="text-xl sm:text-2xl font-semibold text-white">
-            판매 제품 {products.length}개
+            판매 제품 {initialPage.total ?? initialPage.products.length}개
           </h2>
         </div>
 
         <ProductExplorer
-          products={products}
+          initialPage={initialPage}
           currentUserId={user?.id}
+          boothId={boothId}
         />
       </section>
 

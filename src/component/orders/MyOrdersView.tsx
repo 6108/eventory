@@ -173,7 +173,7 @@ export default function MyOrdersView() {
                         <div className="flex justify-between text-[11px] text-zinc-600">
                           <span>주문번호</span>
 
-                          <span className="max-w-[220px] truncate">
+                          <span className="max-w-55 truncate">
                             {order.id}
                           </span>
                         </div>

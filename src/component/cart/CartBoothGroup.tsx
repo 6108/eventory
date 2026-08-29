@@ -29,7 +29,7 @@ export default function CartBoothGroup({ group }: CartBoothGroupProps) {
     if (!user) {
       openConfirmModal({
         title: "로그인 하시겠습니까?",
-        message: "주문 보내기는 로그인 후 이용 가능합니다.",
+        message: "주문 보내기는 로그인 후 이용할 수 있습니다.",
         confirmText: "로그인",
         cancelText: "취소",
         onConfirm: () => login(),

@@ -32,7 +32,7 @@ export default function FollowButton({
 
     if (!currentUserId) {
       openConfirmModal({
-        title: "로그인 필요",
+        title: "로그인 하시겠습니까?",
         message: "부스 팔로우는 로그인 후 이용할 수 있습니다.",
         confirmText: "로그인",
         cancelText: "취소",
