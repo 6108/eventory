@@ -1,23 +1,13 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import {
-  ProductSummary,
-  ProductCategory,
-  ProductSubCategory,
-} from "@/src/types/product";
-
-export interface ProductFilterOptions {
-  categories: ProductCategory[];
-  subCategories: ProductSubCategory[];
-}
+import { ProductSummary } from "@/src/types/product";
 
 export interface ProductListPage {
   products: ProductSummary[];
   hasMore: boolean;
   nextPage: number | null;
   total: number | null;
-  filters?: ProductFilterOptions;
 }
 
 interface UseProductListParams {
@@ -125,19 +115,10 @@ export function useProductList({
 
   const lastPage = query.data?.pages.at(-1);
 
-  // 필터 정보는 항상 첫 페이지 기준으로 유지한다.
-  // 페이지네이션으로 2, 3페이지를 불러와도 필터가 변하지 않는다.
-  const filters = query.data?.pages[0]?.filters ?? {
-    categories: [],
-    subCategories: [],
-  };
-
   return {
     products,
     hasMore: lastPage?.hasMore ?? false,
     total: lastPage?.total ?? null,
-    categories: filters.categories,
-    subCategories: filters.subCategories,
     isLoading: query.isLoading,
     isFetchingNextPage: query.isFetchingNextPage,
     fetchNextPage: query.fetchNextPage,

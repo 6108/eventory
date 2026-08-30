@@ -26,6 +26,14 @@ export type ProductFilterOptions = {
   subCategories: ProductSubCategory[];
 };
 
+export type ProductCategoryCounts = {
+  // 카테고리별 상품 개수. 실제 존재하는(개수 > 0) 카테고리만 포함한다.
+  categories: { value: ProductCategory; count: number }[];
+  // 선택된 category(filter.category) 내부의 서브카테고리별 개수.
+  // filter.category가 없거나 "ALL"이면 빈 배열.
+  subCategories: { value: ProductSubCategory; count: number }[];
+};
+
 export type ProductListPage = {
   products: ProductSummary[];
   hasMore: boolean;
@@ -33,8 +41,6 @@ export type ProductListPage = {
   nextPage: number | null;
   // 전체 개수. count 조회가 안 되는 예외 상황이면 null.
   total: number | null;
-  // 실제 상품이 존재하는 필터 목록
-  filters?: ProductFilterOptions;
 };
 
 // 작품(요약버전) 조회 - boothId 주면 그 부스만, 배열이면 해당 부스들, 안 주면 전체
@@ -95,13 +101,15 @@ export async function getProductSummaries(
   }));
 }
 
-// 실제 상품이 존재하는 카테고리 / 서브카테고리 조회
+// 카테고리 / 서브카테고리별 상품 "개수" 조회 (페이지네이션과 완전히 분리된 API에서 사용)
 //
-// category 필터가 선택되어 있어도 categories는 전체 범위에서 계산하고,
-// subCategories만 선택된 category 내부에서 계산한다.
-export async function getProductFilterOptions(
+// category 필터가 선택되어 있어도 categories 개수는 전체 범위에서 계산하고,
+// subCategories 개수만 선택된 category 내부에서 계산한다.
+// 개수가 0인 카테고리/서브카테고리는 결과에 아예 포함하지 않는다
+// (호출하는 쪽에서 "0이면 칩 숨기기"를 따로 구현할 필요 없게).
+export async function getProductCategoryCounts(
   filter: ProductListFilter = {}
-): Promise<ProductFilterOptions> {
+): Promise<ProductCategoryCounts> {
   // 팔로우한 부스가 하나도 없는 경우
   if (filter.boothIds && filter.boothIds.length === 0) {
     return {
@@ -129,7 +137,7 @@ export async function getProductFilterOptions(
   const { data, error } = await query;
 
   if (error) {
-    console.error("작품 필터 조회 실패:", error);
+    console.error("작품 카테고리 개수 조회 실패:", error);
 
     return {
       categories: [],
@@ -137,43 +145,46 @@ export async function getProductFilterOptions(
     };
   }
 
-  const categorySet = new Set<ProductCategory>();
-  const subCategorySet = new Set<ProductSubCategory>();
+  const categoryCountMap = new Map<ProductCategory, number>();
+  const subCategoryCountMap = new Map<ProductSubCategory, number>();
 
   for (const product of data ?? []) {
     if (product.category) {
-      categorySet.add(product.category as ProductCategory);
+      const category = product.category as ProductCategory;
+      categoryCountMap.set(category, (categoryCountMap.get(category) ?? 0) + 1);
     }
 
-    // 선택된 category 내부의 서브카테고리만 수집
+    // 선택된 category 내부의 서브카테고리만 집계
     if (
       filter.category &&
       filter.category !== "ALL" &&
       product.category === filter.category &&
       product.sub_category
     ) {
-      subCategorySet.add(
-        product.sub_category as ProductSubCategory
+      const subCategory = product.sub_category as ProductSubCategory;
+      subCategoryCountMap.set(
+        subCategory,
+        (subCategoryCountMap.get(subCategory) ?? 0) + 1
       );
     }
   }
 
-  return {
-    categories: productCategories
-      .map((item) => item.value)
-      .filter((category) => categorySet.has(category)),
+  const categories = productCategories
+    .map((item) => item.value)
+    .filter((category) => categoryCountMap.has(category))
+    .map((value) => ({ value, count: categoryCountMap.get(value)! }));
 
-    subCategories:
-      filter.category && filter.category !== "ALL"
-        ? productCategories
-          .find((item) => item.value === filter.category)
-          ?.types
-          .map((item) => item.value)
-          .filter((subCategory) =>
-            subCategorySet.has(subCategory)
-          ) ?? []
-        : [],
-  };
+  const subCategories =
+    filter.category && filter.category !== "ALL"
+      ? productCategories
+        .find((item) => item.value === filter.category)
+        ?.types
+        .map((item) => item.value)
+        .filter((subCategory) => subCategoryCountMap.has(subCategory))
+        .map((value) => ({ value, count: subCategoryCountMap.get(value)! })) ?? []
+      : [];
+
+  return { categories, subCategories };
 }
 
 // 작품(요약버전) 페이지 단위 조회 - 전체 상품 목록처럼 데이터가 계속 늘어나는
@@ -191,10 +202,6 @@ export async function getProductSummariesPaged(
       hasMore: false,
       nextPage: null,
       total: 0,
-      filters: {
-        categories: [],
-        subCategories: [],
-      },
     };
   }
 
@@ -273,25 +280,16 @@ export async function getProductSummariesPaged(
       ? to + 1 < count
       : products.length === pageSize;
 
-  // 첫 페이지만 필터 정보를 조회
-  const filters =
-    safePage === 0
-      ? await getProductFilterOptions(filter)
-      : undefined;
-
   return {
     products,
     hasMore,
     nextPage: hasMore ? safePage + 1 : null,
     total: count ?? null,
-    filters,
   };
 }
 
-// 내가 팔로우한 부스들의 작품만 조회
-export async function getFollowedBoothProducts(
-  userId: string
-): Promise<ProductSummary[]> {
+// 유저가 팔로우한 부스 id 목록
+async function getFollowedBoothIds(userId: string): Promise<string[]> {
   const supabase = await createClient();
 
   const { data: follows, error: followError } = await supabase
@@ -304,7 +302,14 @@ export async function getFollowedBoothProducts(
     return [];
   }
 
-  const boothIds = (follows ?? []).map((f) => f.booth_id);
+  return (follows ?? []).map((f) => f.booth_id);
+}
+
+// 내가 팔로우한 부스들의 작품만 조회
+export async function getFollowedBoothProducts(
+  userId: string
+): Promise<ProductSummary[]> {
+  const boothIds = await getFollowedBoothIds(userId);
 
   // 팔로우한 부스가 하나도 없으면 쿼리 자체를 안 날리고 빈 배열 반환
   if (boothIds.length === 0) {
@@ -321,30 +326,23 @@ export async function getFollowedBoothProductsPaged(
   filter: Omit<ProductListFilter, "boothIds"> = {},
   pageSize: number = PRODUCTS_PAGE_SIZE
 ): Promise<ProductListPage> {
-  const supabase = await createClient();
-
-  const { data: follows, error: followError } = await supabase
-    .from("booth_follows")
-    .select("booth_id")
-    .eq("user_id", userId);
-
-  if (followError) {
-    console.error("팔로우 부스 조회 실패:", followError);
-    return {
-      products: [],
-      hasMore: false,
-      nextPage: null,
-      total: null,
-    };
-  }
-
-  const boothIds = (follows ?? []).map((f) => f.booth_id);
+  const boothIds = await getFollowedBoothIds(userId);
 
   return getProductSummariesPaged(
     page,
     { ...filter, boothIds },
     pageSize
   );
+}
+
+// 내가 팔로우한 부스들 범위에서 카테고리별 개수 조회
+export async function getFollowedBoothCategoryCounts(
+  userId: string,
+  filter: Omit<ProductListFilter, "boothIds"> = {}
+): Promise<ProductCategoryCounts> {
+  const boothIds = await getFollowedBoothIds(userId);
+
+  return getProductCategoryCounts({ ...filter, boothIds });
 }
 
 // 단일 작품 상세 조회 (boothId 주면 해당 부스 소유 검증까지)

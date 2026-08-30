@@ -6,6 +6,7 @@ import CategoryChip from "@/src/component/product/CategoryChip";
 import SubCategoryChip from "@/src/component/product/SubCategoryChip";
 import { useProductCategoryFilter } from "@/src/hooks/useProductCategoryFilter";
 import { useProductList, ProductListPage } from "@/src/hooks/useProductList";
+import { useProductCategoryCounts } from "@/src/hooks/useProductCategoryCounts";
 
 interface ProductExplorerProps {
   initialPage: ProductListPage;
@@ -32,20 +33,33 @@ export default function ProductExplorer({
   const subCategory =
     searchParams.get("subCategory") ?? "ALL";
 
+  const following = showFollowingFilter && isFollowingOnly;
+
+  // 상품 목록(페이지네이션)과 카테고리 개수는 서로 완전히 분리된 요청이다.
+  // fetchNextPage로 다음 페이지를 더 불러와도 카테고리 개수는 재요청되지
+  // 않고, category/following이 바뀔 때만(쿼리 키 변경) 따로 조회된다.
   const {
     products,
     hasMore,
     isFetchingNextPage,
     fetchNextPage,
-    categories: availableCategories,
-    subCategories: availableSubCategories,
   } = useProductList({
     boothId,
-    following: showFollowingFilter && isFollowingOnly,
+    following,
     category,
     subCategory,
     initialPage,
   });
+
+  const {
+    categories: categoryCounts,
+    subCategories: subCategoryCounts,
+  } = useProductCategoryCounts({ boothId, following, category });
+
+  // 개수가 0인 카테고리/서브카테고리는 결과에 아예 안 담겨오므로,
+  // 존재하는 값만 그대로 넘기면 useProductCategoryFilter가 그 값들만 칩으로 만든다.
+  const availableCategories = categoryCounts.map((item) => item.value);
+  const availableSubCategories = subCategoryCounts.map((item) => item.value);
 
   const {
     categories,
