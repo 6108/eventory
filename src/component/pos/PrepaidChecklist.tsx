@@ -1,14 +1,15 @@
 "use client";
 
 import { usePrepaidRows } from "@/src/hooks/usePrepaidRows";
-
+import useIsActiveTab from "./PosTabContext";
 
 interface PrepaidChecklistProps {
   boothId: string;
 }
 
 export default function PrepaidChecklist({ boothId }: PrepaidChecklistProps) {
-  const { rows, headers, isLoading, pendingIds, toggleRow } = usePrepaidRows(boothId);
+  const isActive = useIsActiveTab("prepaid");
+  const { rows, headers, isLoading, pendingIds, toggleRow } = usePrepaidRows(boothId, isActive);
 
   if (isLoading) {
     return <div className="p-6 text-sm text-zinc-500">불러오는 중...</div>;

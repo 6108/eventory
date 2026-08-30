@@ -24,7 +24,7 @@ async function fetchOrders(boothId: string): Promise<Order[]> {
   return data.orders ?? [];
 }
 
-export function useOrders(boothId: string) {
+export function useOrders(boothId: string, enabled: boolean = true) {
   const queryClient = useQueryClient();
   const key = ordersKey(boothId);
 
@@ -35,6 +35,10 @@ export function useOrders(boothId: string) {
   } = useQuery({
     queryKey: key,
     queryFn: () => fetchOrders(boothId),
+    // 활성 탭(영수증)일 때만 조회. 한 번 조회된 뒤에는 react-query 캐시에
+    // 남아있으므로, 탭을 왔다갔다 해도 다시 부스러가 확인하러 오기 전까지는
+    // (invalidate 되기 전까지는) 재요청하지 않는다.
+    enabled,
   });
 
   const cancelMutation = useMutation({

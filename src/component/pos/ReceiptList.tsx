@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { useOrders, Order, OrderItem } from "@/src/hooks/useOrders";
+import useIsActiveTab from "./PosTabContext";
 
 interface ReceiptListProps {
   boothId: string;
 }
 
 export default function ReceiptList({ boothId }: ReceiptListProps) {
-  const { orders, isLoading, cancelItem } = useOrders(boothId);
+  const isActive = useIsActiveTab("receipt");
+  const { orders, isLoading, cancelItem } = useOrders(boothId, isActive);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   if (isLoading) {
