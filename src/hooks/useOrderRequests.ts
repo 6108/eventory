@@ -13,6 +13,14 @@ async function fetchOrderRequests(boothId: string): Promise<OrderRequest[]> {
   return data.requests ?? [];
 }
 
+// 다른 기기가 먼저 처리해서 서버가 409를 준 경우를 구분하기 위한 에러.
+export class StatusConflictError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "StatusConflictError";
+  }
+}
+
 export function useOrderRequests(boothId: string, enabled: boolean) {
   const queryClient = useQueryClient();
   const key = requestsKey(boothId);
@@ -37,7 +45,18 @@ export function useOrderRequests(boothId: string, enabled: boolean) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
-      if (!res.ok) throw new Error("상태 변경에 실패했습니다.");
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+
+        if (res.status === 409) {
+          throw new StatusConflictError(
+            data.error ?? "이미 다른 기기에서 처리된 요청입니다."
+          );
+        }
+
+        throw new Error(data.error ?? "상태 변경에 실패했습니다.");
+      }
     },
     onMutate: async ({ requestId, status }) => {
       await queryClient.cancelQueries({ queryKey: key });
@@ -52,7 +71,15 @@ export function useOrderRequests(boothId: string, enabled: boolean) {
 
       return { prev };
     },
-    onError: (_err, _vars, ctx) => {
+    // 409(다른 기기가 먼저 처리)일 때는 내가 갖고 있던 prev로 되돌려봐야
+    // 이미 낡은 값이라 다시 어긋날 수 있으므로, 서버에서 최신 상태를
+    // 새로 받아온다. 그 외 에러(네트워크 오류 등)는 낙관적 업데이트를
+    // 되돌리는 게 맞다.
+    onError: (err, _vars, ctx) => {
+      if (err instanceof StatusConflictError) {
+        queryClient.invalidateQueries({ queryKey: key });
+        return;
+      }
       if (ctx) queryClient.setQueryData(key, ctx.prev);
     },
   });

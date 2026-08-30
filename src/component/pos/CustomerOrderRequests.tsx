@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { useOrderStore } from "@/src/store/orderStore";
 import type { PosProduct } from "@/src/types/product";
 import type { OrderRequest } from "@/src/types/request";
-import { useOrderRequests } from "@/src/hooks/useOrderRequests";
+import { useOrderRequests, StatusConflictError } from "@/src/hooks/useOrderRequests";
 import useIsActiveTab, { usePosTabSwitch } from "./PosTabContext";
 
 interface OrderRequestsProps {
@@ -88,8 +88,21 @@ export default function OrderRequests({ boothId, products }: OrderRequestsProps)
 
     try {
       await setStatus(request.id, "checked");
-    } catch {
-      toast.error("상태 변경에 실패했습니다.");
+    } catch (err) {
+      // 다른 기기가 먼저 이 요청을 처리했다면, 방금 이 판매 화면에
+      // 담아둔 항목들도 되돌려야 한다. 그대로 두면 이미 다른 기기에서
+      // 결제된 손님 주문을 여기서도 또 팔게 될 수 있다.
+      const addedItems = unmarkRequestChecked(request.id);
+      for (const item of addedItems) {
+        decrementBy(item.productId, item.optionId, item.quantity);
+      }
+
+      if (err instanceof StatusConflictError) {
+        toast.error("다른 기기에서 이미 처리한 요청입니다. 목록을 새로고침했습니다.");
+      } else {
+        toast.error("상태 변경에 실패했습니다.");
+      }
+      return;
     }
 
     // 확인한 손님의 주문이 담긴 판매 화면으로 바로 이동시켜서
@@ -106,16 +119,24 @@ export default function OrderRequests({ boothId, products }: OrderRequestsProps)
 
     try {
       await setStatus(request.id, "requested");
-    } catch {
-      toast.error("되돌리기에 실패했습니다.");
+    } catch (err) {
+      toast.error(
+        err instanceof StatusConflictError
+          ? "다른 기기에서 이미 처리한 요청입니다. 목록을 새로고침했습니다."
+          : "되돌리기에 실패했습니다."
+      );
     }
   }
 
   async function handleCancel(request: OrderRequest) {
     try {
       await setStatus(request.id, "cancelled");
-    } catch {
-      toast.error("삭제에 실패했습니다.");
+    } catch (err) {
+      toast.error(
+        err instanceof StatusConflictError
+          ? "다른 기기에서 이미 처리한 요청입니다. 목록을 새로고침했습니다."
+          : "삭제에 실패했습니다."
+      );
     }
   }
 

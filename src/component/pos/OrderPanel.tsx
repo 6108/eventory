@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useOrderStore } from "@/src/store/orderStore";
+import { ordersKey } from "@/src/hooks/useOrders";
 
 interface OrderPanelProps {
   boothId: string;
@@ -97,6 +98,10 @@ export default function OrderPanel({ boothId }: OrderPanelProps) {
       } else {
         toast.success("판매가 등록되었습니다.");
       }
+
+      // 영수증 탭(ReceiptList)이 별도의 쿼리 캐시를 쓰고 있어서,
+      // 여기서 명시적으로 무효화해야 방금 등록한 판매가 영수증 탭에 바로 보인다.
+      queryClient.invalidateQueries({ queryKey: ordersKey(boothId) });
 
       clear();
       router.refresh();

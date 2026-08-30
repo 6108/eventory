@@ -8,6 +8,15 @@ const ALLOWED_STATUSES = ["requested", "checked", "cancelled"] as const;
 
 type AllowedStatus = (typeof ALLOWED_STATUSES)[number];
 
+// 각 목표 상태로 갈 수 있는 "현재 상태"의 화이트리스트.
+// 부스당 POS 기기가 2대 이상일 때, 두 기기가 같은 요청을 거의 동시에
+// 처리해도 한쪽만 성공하도록 조건부 UPDATE로 막기 위함.
+const ALLOWED_FROM_STATUSES: Record<AllowedStatus, AllowedStatus[]> = {
+  checked: ["requested"], // 확인: 아직 대기중인 요청만
+  requested: ["checked"], // 되돌리기: 확인된 요청만
+  cancelled: ["requested"], // 삭제: 아직 대기중인 요청만 (UI에서도 확인된 건 삭제 버튼 자체가 없음)
+};
+
 // 부스러가 주문 요청을 "확인함" 처리하거나(POS 담기와 함께 호출),
 // 잘못 눌렀을 때 다시 "requested"로 되돌리는 용도.
 
@@ -32,11 +41,16 @@ export async function PATCH(
 
   const { supabase } = authResult;
 
-  const { error } = await supabase
+  // .in("status", ...)를 조건에 함께 걸어서, 이 요청이 여전히 기대하는
+  // 상태일 때만 업데이트되게 한다. 다른 기기가 먼저 처리했다면 영향받은
+  // row가 0개가 되어 update() 자체는 성공하지만 data가 비어있게 된다.
+  const { data, error } = await supabase
     .from("order_requests")
     .update({ status })
     .eq("id", requestId)
-    .eq("booth_id", boothId);
+    .eq("booth_id", boothId)
+    .in("status", ALLOWED_FROM_STATUSES[status])
+    .select("id");
 
   if (error) {
     console.error("주문 요청 상태 변경 실패:", error);
@@ -44,6 +58,15 @@ export async function PATCH(
     return NextResponse.json(
       { error: "상태 변경에 실패했습니다." },
       { status: 500 }
+    );
+  }
+
+  if (!data || data.length === 0) {
+    // 이미 다른 기기(또는 이전 요청)가 상태를 바꿔놓은 경우.
+    // 클라이언트는 이 응답을 받으면 캐시를 무효화해서 최신 상태를 다시 받아야 한다.
+    return NextResponse.json(
+      { error: "이미 다른 기기에서 처리된 요청입니다." },
+      { status: 409 }
     );
   }
 

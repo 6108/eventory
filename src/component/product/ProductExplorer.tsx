@@ -72,8 +72,11 @@ export default function ProductExplorer({
 
     const query = params.toString();
 
-    router.push(
-      query ? `${pathname}?${query}` : pathname
+    router.replace(
+      query ? `${pathname}?${query}` : pathname,
+      {
+        scroll: false,
+      }
     );
   }
 
