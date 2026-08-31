@@ -1,43 +1,46 @@
 "use client";
 
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+
 import ProductList from "@/src/component/product/ProductList";
 import CategoryChip from "@/src/component/product/CategoryChip";
 import SubCategoryChip from "@/src/component/product/SubCategoryChip";
-import { useProductCategoryFilter } from "@/src/hooks/useProductCategoryFilter";
 import { useProductList, ProductListPage } from "@/src/hooks/useProductList";
-import { useProductCategoryCounts } from "@/src/hooks/useProductCategoryCounts";
+import { productCategories, ProductCategoryCounts } from "@/src/types/product";
 
 interface ProductExplorerProps {
   initialPage: ProductListPage;
   currentUserId?: string;
-  showFollowingFilter?: boolean;
   boothId?: string;
+  categoryCounts: ProductCategoryCounts;
+  followedCategoryCounts?: ProductCategoryCounts;
 }
 
 export default function ProductExplorer({
   initialPage,
   currentUserId,
-  showFollowingFilter = false,
   boothId,
+  categoryCounts,
+  followedCategoryCounts,
 }: ProductExplorerProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const [following, setFollowing] = useState(false);
+  const [category, setCategory] = useState("ALL");
+  const [subCategory, setSubCategory] = useState("ALL");
 
-  const isFollowingOnly =
-    searchParams.get("following") === "true";
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
 
-  // URL에서 현재 카테고리 상태 가져오기
-  const category = searchParams.get("category") ?? "ALL";
-  const subCategory =
-    searchParams.get("subCategory") ?? "ALL";
+    category === "ALL" ? params.delete("category") : params.set("category", category);
+    subCategory === "ALL" ? params.delete("subCategory") : params.set("subCategory", subCategory);
 
-  const following = showFollowingFilter && isFollowingOnly;
+    const query = params.toString();
+    const newUrl = query ? `${window.location.pathname}?${query}` : window.location.pathname;
 
-  // 상품 목록(페이지네이션)과 카테고리 개수는 서로 완전히 분리된 요청이다.
-  // fetchNextPage로 다음 페이지를 더 불러와도 카테고리 개수는 재요청되지
-  // 않고, category/following이 바뀔 때만(쿼리 키 변경) 따로 조회된다.
+    window.history.replaceState(null, "", newUrl);
+  }, [category, subCategory]);
+
+  const showFollowingFilter = !!currentUserId && !!followedCategoryCounts;
+
   const {
     products,
     hasMore,
@@ -45,103 +48,92 @@ export default function ProductExplorer({
     fetchNextPage,
   } = useProductList({
     boothId,
-    following,
+    following: showFollowingFilter && following,
     category,
     subCategory,
     initialPage,
   });
 
-  const {
-    categories: categoryCounts,
-    subCategories: subCategoryCounts,
-  } = useProductCategoryCounts({ boothId, following, category });
+  const activeCategoryCounts = following && followedCategoryCounts ? followedCategoryCounts : categoryCounts;
 
-  // 개수가 0인 카테고리/서브카테고리는 결과에 아예 안 담겨오므로,
-  // 존재하는 값만 그대로 넘기면 useProductCategoryFilter가 그 값들만 칩으로 만든다.
-  const availableCategories = categoryCounts.map((item) => item.value);
-  const availableSubCategories = subCategoryCounts.map((item) => item.value);
+  const existingCategories = useMemo(
+    () => new Set(activeCategoryCounts.categories.filter((c) => c.count > 0).map((c) => c.value)),
+    [activeCategoryCounts]
+  );
+  const existingSubCategories = useMemo(
+    () => new Set(activeCategoryCounts.subCategories.filter((c) => c.count > 0).map((c) => c.value)),
+    [activeCategoryCounts]
+  );
 
-  const {
-    categories,
-    subCategories,
-    handleCategoryClick,
-    handleSubCategoryClick,
-  } = useProductCategoryFilter({
-    category,
-    subCategory,
-    availableCategories,
-    availableSubCategories,
-  });
+  const visibleCategories = useMemo(
+    () => [
+      { value: "ALL", label: "전체" },
+      ...productCategories
+        .filter((c) => existingCategories.has(c.value))
+        .map((c) => ({ value: c.value, label: c.label })),
+    ],
+    [existingCategories]
+  );
 
-  function toggleFollowingFilter() {
-    const params = new URLSearchParams(
-      searchParams.toString()
-    );
+  const currentCategoryDef = productCategories.find((c) => c.value === category);
 
-    if (isFollowingOnly) {
-      params.delete("following");
-    } else {
-      params.set("following", "true");
-    }
+  const visibleSubCategories = useMemo(() => {
+    if (category === "ALL" || !currentCategoryDef) return [];
+    return [
+      { value: "ALL", label: "전체" },
+      ...currentCategoryDef.types
+        .filter((t) => existingSubCategories.has(t.value))
+        .map((t) => ({ value: t.value, label: t.label })),
+    ];
+  }, [category, currentCategoryDef, existingSubCategories]);
 
-    const query = params.toString();
+  const handleFollowingToggle = () => {
+    setFollowing((prev) => !prev);
+    setCategory("ALL");
+    setSubCategory("ALL");
+  };
 
-    router.replace(
-      query ? `${pathname}?${query}` : pathname,
-      {
-        scroll: false,
-      }
-    );
-  }
+  const handleCategoryChange = (value: string) => {
+    setCategory(value);
+    setSubCategory("ALL");
+  };
 
   return (
     <div className="flex flex-col gap-6">
-      {/* 팔로우한 부스만 보기 */}
-      {showFollowingFilter && currentUserId && (
+      {showFollowingFilter && (
         <button
           type="button"
-          onClick={toggleFollowingFilter}
-          className={`self-start rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors
-            border-primary bg-primary text-white
-          `}
+          onClick={handleFollowingToggle}
+          className="self-start rounded-sm border border-primary bg-primary px-3 py-1.5 text-xs font-medium text-white transition-colors"
         >
-          {isFollowingOnly
-            ? "전체 작품 보기"
-            : "팔로우한 부스 작품만 보기"}
+          {following ? "전체 작품 보기" : "팔로우한 부스 작품만 보기"}
         </button>
       )}
 
-      {/* 카테고리 */}
       <div className="flex gap-2 overflow-x-auto">
-        {categories.map((item) => (
+        {visibleCategories.map((item) => (
           <CategoryChip
             key={item.value}
             label={item.label}
             active={category === item.value}
-            onClick={() =>
-              handleCategoryClick(item.value)
-            }
+            onClick={() => handleCategoryChange(item.value)}
           />
         ))}
       </div>
 
-      {/* 타입 */}
-      {subCategories.length > 0 && (
+      {visibleSubCategories.length > 0 && (
         <div className="flex gap-2 overflow-x-auto font-bold">
-          {subCategories.map((item) => (
+          {visibleSubCategories.map((item) => (
             <SubCategoryChip
               key={item.value}
               label={item.label}
               active={subCategory === item.value}
-              onClick={() =>
-                handleSubCategoryClick(item.value)
-              }
+              onClick={() => setSubCategory(item.value)}
             />
           ))}
         </div>
       )}
 
-      {/* 작품 */}
       <ProductList
         products={products}
         currentUserId={currentUserId}

@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { EVENT_ID as eventId } from "@/src/constants/event";
 import { useCartStore } from "@/src/store/cartStore";
 import { useAuth } from "@/src/hooks/useAuth";
-import { useConfirmModalStore } from "@/src/store/confirmModalStore";
+import { useRequireLogin } from "@/src/hooks/useRequireLogin";
 import type { CartGroup } from "@/src/types/cart";
 import CartItemRow from "./CartItemRow";
 
@@ -19,34 +19,17 @@ export default function CartBoothGroup({ group }: CartBoothGroupProps) {
   const clearBooth = useCartStore((s) => s.clearBooth);
   const markBoothSent = useCartStore((s) => s.markBoothSent);
   const sentAt = useCartStore((s) => s.sentBoothIds[group.boothId]);
-  const { user, login } = useAuth();
-  const openConfirmModal = useConfirmModalStore((s) => s.openConfirmModal);
+  const { user } = useAuth();
+  const requireLogin = useRequireLogin();
   const [sending, setSending] = useState(false);
-  // setSending(true)은 다음 렌더에서야 버튼을 잠그므로, 그 틈에 들어오는
-  // 초고속 연타(더블탭 등)까지 막으려면 렌더와 무관하게 즉시 확인 가능한
-  // ref가 필요하다.
   const sendingRef = useRef(false);
 
-  // 구매할 목록에 담는 건 로그인 없이도 가능하지만, 주문 요청을 보내려면
-  // "누가 보냈는지" 부스러가 알아야 하니 이 시점에만 로그인을 요구함 (찜과 같은 패턴)
   async function handleSendRequest() {
     if (!user) {
-      openConfirmModal({
-        title: "로그인 하시겠습니까?",
-        message: "주문 보내기는 로그인 후 이용할 수 있습니다.",
-        confirmText: "로그인",
-        cancelText: "취소",
-        onConfirm: () => login(),
-      });
+      requireLogin("주문 보내기는 로그인 후 이용할 수 있습니다.");
       return;
     }
 
-    // sentAt은 장바구니 내용이 바뀌면 스토어에서 자동으로 지워진다
-    // (increment/decrement/addItem/syncLimits 전부 해당 boothId의
-    // sentBoothIds를 지움). 즉 sentAt이 아직 남아있다는 건 마지막 전송
-    // 이후로 내용이 하나도 안 바뀌었다는 뜻 -> 서버에 보낼 새 정보가
-    // 없으므로 굳이 같은 요청을 다시 보내지 않는다. (연타/재클릭으로
-    // 인한 불필요한 API 호출 방지)
     if (sentAt) {
       toast("이미 전송한 내용과 동일합니다.", { icon: "ℹ️" });
       return;

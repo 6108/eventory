@@ -5,6 +5,7 @@ import type { ProductFormState } from "@/src/types/form";
 
 function createInitialForm(product?: Product): ProductFormState {
   return {
+
     name: product?.name ?? "",
     price: product ? String(product.price) : "",
     category: product?.category ?? "",
@@ -14,6 +15,7 @@ function createInitialForm(product?: Product): ProductFormState {
     description: product?.description ?? "",
     options:
       product?.options.map((option) => ({
+        id: option.id,
         name: option.name,
         initialQuantity: option.initialQuantity?.toString() ?? "",
       })) ?? [],

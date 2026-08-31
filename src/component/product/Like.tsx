@@ -1,9 +1,10 @@
+// src/component/product/Like.tsx
 "use client";
 
 import { Heart } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "@/src/hooks/useAuth";
-import { useConfirmModalStore } from "@/src/store/confirmModalStore";
+import { useRequireLogin } from "@/src/hooks/useRequireLogin";
 import {
   useMyLikedProductIds,
   useProductLikeCount,
@@ -13,14 +14,13 @@ import {
 interface LikeProps {
   productId: string;
   isOwner?: boolean;
-  /** 좋아요 상태가 바뀐 직후(낙관적 업데이트 시점) 호출됨. 목록에서 제거하는 등의 용도 */
   onToggle?: (liked: boolean) => void;
 }
 
 export default function Like({ productId, isOwner = false, onToggle }: LikeProps) {
-  const { user, login } = useAuth();
+  const { user } = useAuth();
   const userId = user?.id ?? null;
-  const openConfirmModal = useConfirmModalStore((s) => s.openConfirmModal);
+  const requireLogin = useRequireLogin();
 
   const { data: likedIds } = useMyLikedProductIds(userId);
   const { data: count } = useProductLikeCount(productId, isOwner);
@@ -30,13 +30,7 @@ export default function Like({ productId, isOwner = false, onToggle }: LikeProps
 
   const handleClick = () => {
     if (!userId) {
-      openConfirmModal({
-        title: "로그인 하시겠습니까?",
-        message: "좋아요는 로그인 후 이용할 수 있습니다.",
-        confirmText: "로그인",
-        cancelText: "취소",
-        onConfirm: () => login(),
-      });
+      requireLogin("좋아요는 로그인 후 이용할 수 있습니다.");
       return;
     }
 
@@ -46,7 +40,7 @@ export default function Like({ productId, isOwner = false, onToggle }: LikeProps
       { productId, liked },
       {
         onError: () => {
-          onToggle?.(liked); // 실패 시 되돌리기
+          onToggle?.(liked);
           toast.error(
             next ? "좋아요에 실패했습니다." : "좋아요 취소에 실패했습니다."
           );

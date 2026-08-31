@@ -1,3 +1,4 @@
+// src/component/cart/QuickAddButton.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -5,8 +6,10 @@ import { ShoppingCart } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { useCartStore } from "@/src/store/cartStore";
+import { useProductOptionSelector } from "@/src/hooks/useProductOptionSelector";
 import Modal from "@/src/component/common/Modal";
 import IconActionButton from "@/src/component/common/IconActionButton";
+import ProductOptionSelect from "./ProductOptionSelect";
 import type { ProductSummary } from "@/src/types/product";
 
 interface QuickAddButtonProps {
@@ -18,33 +21,17 @@ export default function QuickAddButton({
 }: QuickAddButtonProps) {
   const addItem = useCartStore((s) => s.addItem);
 
-  const hasOptions = (product.options ?? []).length > 0;
+  const {
+    hasOptions,
+    selectedOptionId,
+    setSelectedOptionId,
+    selectedOption,
+    remainingQuantity,
+    isSoldOut,
+  } = useProductOptionSelector(product);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(
-    hasOptions ? product.options[0].id : null
-  );
-
   const [quantity, setQuantity] = useState(1);
-
-  const selectedOption = hasOptions
-    ? product.options.find(
-      (option) => option.id === selectedOptionId
-    ) ?? null
-    : null;
-
-  /**
-   * 옵션이 있는 경우 옵션 재고,
-   * 옵션이 없는 경우 작품 재고를 사용한다.
-   */
-  const remainingQuantity = hasOptions
-    ? selectedOption?.remainingQuantity ?? null
-    : product.remainingQuantity;
-
-  const isSoldOut =
-    remainingQuantity !== null &&
-    remainingQuantity <= 0;
 
   useEffect(() => {
     if (
@@ -168,7 +155,6 @@ export default function QuickAddButton({
         >
           <div className="flex flex-col gap-5"
             onClick={(e) => e.stopPropagation()}>
-            {/* 작품 정보 */}
             <div>
               <p className="text-xs text-zinc-500">
                 {product.boothName} ({product.boothNumber})
@@ -183,49 +169,28 @@ export default function QuickAddButton({
               </p>
             </div>
 
-            {/* 옵션 */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm text-zinc-400">
                 옵션
               </label>
 
-              <select
-                value={selectedOptionId ?? ""}
-                onChange={(e) => {
-                  setSelectedOptionId(e.target.value);
+              <ProductOptionSelect
+                options={product.options}
+                value={selectedOptionId}
+                onChange={(optionId) => {
+                  setSelectedOptionId(optionId);
                   setQuantity(1);
                 }}
                 className="rounded border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white outline-none focus:border-primary"
-              >
-                {product.options.map((option) => {
-                  const optionSoldOut =
-                    option.remainingQuantity !== null &&
-                    option.remainingQuantity <= 0;
-
-                  return (
-                    <option
-                      key={option.id}
-                      value={option.id}
-                      disabled={optionSoldOut}
-                    >
-                      {option.name}
-                      {optionSoldOut
-                        ? " (품절)"
-                        : ""}
-                    </option>
-                  );
-                })}
-              </select>
+              />
             </div>
 
-            {/* 재고 */}
             {!isSoldOut && remainingQuantity !== null && (
               <p className="text-xs text-zinc-500">
                 남은 수량 {remainingQuantity}개
               </p>
             )}
 
-            {/* 수량 */}
             <div className="flex items-center justify-between">
               <span className="text-sm text-zinc-400">
                 수량
@@ -263,14 +228,12 @@ export default function QuickAddButton({
               </div>
             </div>
 
-            {/* 구매 제한 안내 */}
             {product.purchaseLimit !== null && (
               <p className="text-xs text-zinc-500">
                 1인당 최대 {product.purchaseLimit}개
               </p>
             )}
 
-            {/* 담기 */}
             <button
               type="button"
               onClick={handleModalConfirm}

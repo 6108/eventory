@@ -1,9 +1,9 @@
-// src/app/api/products/limits/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { getProductLimits } from "@/src/lib/data/product";
 
-// 장바구니 화면 진입 시 호출해서, 담긴 상품들의 최신 구매제한/재고를 가져온다.
-// GET /api/products/limits?ids=productId1,productId2,...
+import { createClient } from "@/src/lib/supabase/server";
+
+// 장바구니에 담긴 상품들의 최신 구매제한/재고 조회
+
 export async function GET(req: NextRequest) {
   const idsParam = req.nextUrl.searchParams.get("ids");
 
@@ -20,7 +20,50 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ limits: [] });
   }
 
-  const limits = await getProductLimits(productIds);
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("products")
+    .select(
+      `id, remaining_quantity, purchase_limit,
+      product_options ( id, remaining_quantity )`
+    )
+    .in("id", productIds);
+
+  if (error) {
+    console.error("구매제한/재고 조회 실패:", error);
+
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    );
+  }
+
+  const limits = [];
+
+  for (const product of data ?? []) {
+    const options = product.product_options ?? [];
+
+    if (options.length === 0) {
+      limits.push({
+        productId: product.id,
+        optionId: null,
+        purchaseLimit: product.purchase_limit,
+        remainingQuantity: product.remaining_quantity,
+      });
+
+      continue;
+    }
+
+    for (const option of options) {
+      limits.push({
+        productId: product.id,
+        optionId: option.id,
+        purchaseLimit: product.purchase_limit,
+        remainingQuantity: option.remaining_quantity,
+      });
+    }
+  }
 
   return NextResponse.json({ limits });
 }

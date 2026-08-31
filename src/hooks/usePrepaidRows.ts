@@ -34,8 +34,14 @@ export function usePrepaidRows(boothId: string, enabled: boolean = true) {
     setIsLoading(true);
 
     fetch(`/api/booth/${boothId}/prepaid`)
-      .then((res) => res.json())
-      .then((data: { rows?: PrepaidRowResponse[] }) => {
+      .then(async (res) => {
+        if (!res.ok) {
+          // 서버가 에러 상태를 줬을 때도 JSON을 정상 파싱하되, 실패로 처리
+          throw new Error(`선입금 리스트 조회 실패 (status ${res.status})`);
+        }
+        return res.json() as Promise<{ rows?: PrepaidRowResponse[] }>;
+      })
+      .then((data) => {
         if (cancelled) return;
 
         if (!data.rows?.length) {
@@ -51,6 +57,16 @@ export function usePrepaidRows(boothId: string, enabled: boolean = true) {
         setRows(loaded);
         setHeaders(Object.keys(loaded[0].cells));
         setIsLoading(false);
+      })
+      .catch((error) => {
+        if (cancelled) return;
+
+        // QA: 조회 실패 시에도 isLoading을 반드시 해제해야
+        // "불러오는 중..."에서 영원히 멈추지 않는다.
+        console.error("선입금 리스트 조회 실패:", error);
+        setIsLoading(false);
+        // 재시도 가능하도록 플래그를 되돌려, 다음 마운트/탭 전환 시 다시 조회를 시도한다.
+        hasFetchedRef.current = false;
       });
 
     return () => {

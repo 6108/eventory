@@ -3,7 +3,25 @@ import FollowButton from "@/src/component/booth/FollowButton";
 
 import { createClient } from "@/src/lib/supabase/server";
 import { getBooth, isFollowingBooth } from "@/src/lib/data/booth";
-import { getProductSummariesPaged } from "@/src/lib/data/product";
+import { getProductSummaries } from "@/src/lib/data/product";
+import { ProductCategory, ProductCategoryCounts, ProductSubCategory } from "@/src/types/product";
+
+function buildCategoryCounts(
+  products: { category: ProductCategory; subCategory: ProductSubCategory }[]
+): ProductCategoryCounts {
+  const categoryMap = new Map<ProductCategory, number>();
+  const subCategoryMap = new Map<ProductSubCategory, number>();
+
+  for (const product of products) {
+    if (product.category) categoryMap.set(product.category, (categoryMap.get(product.category) ?? 0) + 1);
+    if (product.subCategory) subCategoryMap.set(product.subCategory, (subCategoryMap.get(product.subCategory) ?? 0) + 1);
+  }
+
+  return {
+    categories: Array.from(categoryMap.entries()).map(([value, count]) => ({ value, count })),
+    subCategories: Array.from(subCategoryMap.entries()).map(([value, count]) => ({ value, count })),
+  };
+}
 
 export default async function Page({
   params,
@@ -23,21 +41,26 @@ export default async function Page({
   if (!booth) {
     return (
       <main className="mx-auto max-w-5xl px-4 py-16">
-        <p className="text-center text-zinc-500">
-          부스를 찾을 수 없습니다.
-        </p>
+        <p className="text-center text-zinc-500">부스를 찾을 수 없습니다.</p>
       </main>
     );
   }
 
-  const [initialPage, initialFollowed] = await Promise.all([
-    getProductSummariesPaged(0, { boothIds: [boothId] }),
-    user
-      ? isFollowingBooth(user.id, boothId)
-      : Promise.resolve(false),
+  const [products, initialFollowed] = await Promise.all([
+    getProductSummaries(boothId),
+    user ? isFollowingBooth(user.id, boothId) : Promise.resolve(false),
   ]);
 
   const isAdult = booth.category === "ADULT";
+
+  const initialPage = {
+    products,
+    hasMore: false,
+    nextPage: null,
+    total: products.length,
+  };
+
+  const categoryCounts = buildCategoryCounts(products);
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
@@ -48,17 +71,13 @@ export default async function Page({
           <div className="min-w-0 flex-1">
             {/* Meta */}
             <div className="min-w-0 flex-1">
-              {/* Meta */}
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 text-md font-medium text-zinc-400">
                     <span>[{booth.boothNumber}]</span>
-                    <span>
-                      {booth.category === "ADULT" ? "성인 부스" : "일반 부스"}
-                    </span>
+                    <span>{booth.category === "ADULT" ? "성인 부스" : "일반 부스"}</span>
                   </div>
 
-                  {/* Name */}
                   <h1 className="pt-1 text-2xl font-bold tracking-tight text-white sm:text-4xl">
                     {booth.boothName}
                   </h1>
@@ -74,7 +93,6 @@ export default async function Page({
                 </div>
               </div>
             </div>
-
 
             {/* Description */}
             {booth.description && (
@@ -97,8 +115,6 @@ export default async function Page({
               </div>
             )}
           </div>
-
-
         </div>
       </header>
 
@@ -106,7 +122,7 @@ export default async function Page({
       <section className="pt-10">
         <div className="mb-6 flex items-baseline ">
           <h2 className="text-xl sm:text-2xl font-semibold text-white">
-            판매 제품 {initialPage.total ?? initialPage.products.length}개
+            판매 제품 {products.length}개
           </h2>
         </div>
 
@@ -114,9 +130,9 @@ export default async function Page({
           initialPage={initialPage}
           currentUserId={user?.id}
           boothId={boothId}
+          categoryCounts={categoryCounts}
         />
       </section>
-
     </main>
   );
 }

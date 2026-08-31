@@ -1,30 +1,28 @@
 // src/app/api/products/route.ts
+
 import { NextResponse } from "next/server";
 import { createClient } from "@/src/lib/supabase/server";
 import {
   getFollowedBoothProductsPaged,
   getProductSummariesPaged,
-  ProductListFilter,
 } from "@/src/lib/data/product";
-import { ProductCategory, ProductSubCategory } from "@/src/types/product";
+import {
+  ProductCategory,
+  ProductSubCategory,
+} from "@/src/types/product";
 
-// 전체 상품 목록 / 팔로우한 부스 상품 목록을 무한스크롤용으로 페이지 단위 조회.
+// 전체 상품 / 팔로우한 부스 상품을 무한스크롤용으로 페이지 단위 조회.
 // GET /api/products?boothId=&following=true&category=&subCategory=&page=0
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
   const boothId = searchParams.get("boothId");
   const following = searchParams.get("following") === "true";
-
-  const category =
-    (searchParams.get("category") as ProductCategory | null) ?? "ALL";
-  const subCategory =
-    (searchParams.get("subCategory") as ProductSubCategory | null) ?? "ALL";
+  const category = searchParams.get("category") as ProductCategory | null;
+  const subCategory = searchParams.get("subCategory") as ProductSubCategory | null;
 
   const pageParam = Number(searchParams.get("page") ?? "0");
   const page = Number.isFinite(pageParam) && pageParam >= 0 ? pageParam : 0;
-
-  const filter: ProductListFilter = { category, subCategory };
 
   if (following) {
     const supabase = await createClient();
@@ -43,7 +41,8 @@ export async function GET(request: Request) {
     const result = await getFollowedBoothProductsPaged(
       user.id,
       page,
-      filter
+      category ?? undefined,
+      subCategory ?? undefined
     );
 
     return NextResponse.json(result);
@@ -51,7 +50,8 @@ export async function GET(request: Request) {
 
   const result = await getProductSummariesPaged(
     page,
-    boothId ? { ...filter, boothIds: [boothId] } : filter
+    category ?? undefined,
+    subCategory ?? undefined,
   );
 
   return NextResponse.json(result);

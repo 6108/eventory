@@ -1,7 +1,9 @@
 "use client";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { ProductSummary } from "@/src/types/product";
+import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
+import {
+  ProductSummary,
+} from "@/src/types/product";
 
 export interface ProductListPage {
   products: ProductSummary[];
@@ -71,8 +73,6 @@ export function useProductList({
   subCategory = "ALL",
   initialPage,
 }: UseProductListParams) {
-  // 필터 조합이 바뀌면(카테고리 클릭, 팔로우 토글 등)
-  // 쿼리 키가 바뀌면서 자동으로 1페이지부터 새로 불러온다.
   const queryKey = [
     "products",
     {
@@ -82,6 +82,9 @@ export function useProductList({
       subCategory,
     },
   ] as const;
+
+  // 최초 필터(전체, following=false)일 때만 SSR 데이터 재사용
+  const isInitialFilter = !following && category === "ALL" && subCategory === "ALL";
 
   const query = useInfiniteQuery({
     queryKey,
@@ -99,20 +102,21 @@ export function useProductList({
 
     getNextPageParam: (lastPage) => lastPage.nextPage,
 
-    initialData: initialPage
-      ? {
-        pages: [initialPage],
-        pageParams: [0],
-      }
-      : undefined,
+    initialData:
+      initialPage && isInitialFilter
+        ? {
+          pages: [initialPage],
+          pageParams: [0],
+        }
+        : undefined,
+
+    placeholderData: keepPreviousData,
 
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
   });
 
-  const products =
-    query.data?.pages.flatMap((page) => page.products) ?? [];
-
+  const products = query.data?.pages.flatMap((page) => page.products) ?? [];
   const lastPage = query.data?.pages.at(-1);
 
   return {

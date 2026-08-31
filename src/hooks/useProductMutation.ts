@@ -1,3 +1,4 @@
+// src/hooks/useProductMutation.ts
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -60,7 +61,6 @@ export function useProductMutation({
         mainImageUrl = uploadedUrl;
       }
 
-      // 새로 추가한 샘플 이미지들 업로드
       const uploadedSampleUrls: string[] = [];
       for (const file of sampleImageFiles) {
         const uploadedUrl = await uploadImage(file, "detail");
@@ -94,6 +94,7 @@ export function useProductMutation({
                 : null,
           purchaseLimit: form.purchaseLimit ? Number(form.purchaseLimit) : null,
           options: form.options.map((option) => ({
+            id: option.id,
             name: option.name,
             initialQuantity: Number(option.initialQuantity),
           })),
@@ -119,7 +120,33 @@ export function useProductMutation({
   }
 
   async function remove() {
-    // 기존 그대로
+    if (!productId) return;
+
+    if (!confirm("이 상품을 삭제하시겠습니까? 되돌릴 수 없습니다.")) {
+      return;
+    }
+
+    setDeleting(true);
+
+    try {
+      const res = await fetch(`/api/booth/${boothId}/products/${productId}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        const result = await res.json();
+        toast.error(result.error ?? "삭제에 실패했습니다.");
+        return;
+      }
+
+      toast.success("상품이 삭제되었습니다.");
+      router.push(`/${eventId}/booths/${boothId}/manage/products`);
+      router.refresh();
+    } catch {
+      toast.error("삭제 중 오류가 발생했습니다.");
+    } finally {
+      setDeleting(false);
+    }
   }
 
   return { loading, deleting, submit, remove };

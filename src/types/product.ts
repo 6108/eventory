@@ -130,3 +130,23 @@ export type LikedProduct = {
   likedAt: string;
   product: ProductSummary;
 };
+
+// 상품 카테고리 개수
+export type ProductCategoryCounts = {
+  categories: {
+    value: ProductCategory;
+    count: number;
+  }[];
+  subCategories: {
+    value: ProductSubCategory;
+    count: number;
+  }[];
+};
+
+//페이지네이션
+export type ProductListPage = {
+  products: ProductSummary[];
+  hasMore: boolean;
+  nextPage: number | null;
+  total: number | null;
+};

@@ -2,6 +2,7 @@
 
 // 작품 옵션 폼
 export type ProductOptionFormState = {
+  id?: string;
   name: string;
   initialQuantity: string;
 };
