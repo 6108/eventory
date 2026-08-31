@@ -1,10 +1,15 @@
 "use client";
 
+import { useMemo, useState } from "react";
+
 import CategoryChip from "@/src/component/product/CategoryChip";
 import SubCategoryChip from "@/src/component/product/SubCategoryChip";
-import { useProductCategoryFilter } from "@/src/hooks/useProductCategoryFilter";
-import { ProductSummary } from "@/src/types/product";
 import ProductManageList from "./ProductManageList";
+
+import {
+  productCategories,
+  ProductSummary,
+} from "@/src/types/product";
 
 interface ProductManageExplorerProps {
   eventId: string;
@@ -17,38 +22,124 @@ export default function ProductManageExplorer({
   boothId,
   products,
 }: ProductManageExplorerProps) {
-  const {
+  const [category, setCategory] = useState("ALL");
+  const [subCategory, setSubCategory] = useState("ALL");
+
+  // 현재 부스에 실제로 존재하는 카테고리
+  const existingCategories = useMemo(() => {
+    return new Set(
+      products
+        .map((product) => product.category)
+        .filter(Boolean)
+    );
+  }, [products]);
+
+  // 현재 부스에 실제로 존재하는 서브카테고리
+  const existingSubCategories = useMemo(() => {
+    return new Set(
+      products
+        .filter(
+          (product) =>
+            category === "ALL" || product.category === category
+        )
+        .map((product) => product.subCategory)
+        .filter(Boolean)
+    );
+  }, [products, category]);
+
+  // 카테고리 목록
+  const visibleCategories = useMemo(() => {
+    return [
+      { value: "ALL", label: "전체" },
+      ...productCategories
+        .filter((category) =>
+          existingCategories.has(category.value)
+        )
+        .map((category) => ({
+          value: category.value,
+          label: category.label,
+        })),
+    ];
+  }, [existingCategories]);
+
+  // 현재 선택된 카테고리 정의
+  const currentCategoryDef = productCategories.find(
+    (item) => item.value === category
+  );
+
+  // 서브카테고리 목록
+  const visibleSubCategories = useMemo(() => {
+    if (category === "ALL" || !currentCategoryDef) {
+      return [];
+    }
+
+    return [
+      { value: "ALL", label: "전체" },
+      ...currentCategoryDef.types
+        .filter((type) =>
+          existingSubCategories.has(type.value)
+        )
+        .map((type) => ({
+          value: type.value,
+          label: type.label,
+        })),
+    ];
+  }, [
     category,
-    subCategory,
-    categories,
-    subCategories,
-    handleCategoryClick,
-    handleSubCategoryClick,
-  } = useProductCategoryFilter();
+    currentCategoryDef,
+    existingSubCategories,
+  ]);
+
+  // 카테고리 변경
+  const handleCategoryChange = (value: string) => {
+    setCategory(value);
+    setSubCategory("ALL");
+  };
+
+  // 서브카테고리 변경
+  const handleSubCategoryChange = (value: string) => {
+    setSubCategory(value);
+  };
+
+  // 선택된 조건으로 상품 필터링
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => {
+      const categoryMatch =
+        category === "ALL" || product.category === category;
+
+      const subCategoryMatch =
+        subCategory === "ALL" ||
+        product.subCategory === subCategory;
+
+      return categoryMatch && subCategoryMatch;
+    });
+  }, [products, category, subCategory]);
 
   return (
     <div className="flex flex-col gap-6">
       {/* 카테고리 */}
       <div className="flex gap-2 overflow-x-auto">
-        {categories.map((item) => (
+        {visibleCategories.map((item) => (
           <CategoryChip
             key={item.value}
             label={item.label}
             active={category === item.value}
-            onClick={() => handleCategoryClick(item.value)}
+            onClick={() => handleCategoryChange(item.value)}
           />
         ))}
       </div>
 
-      {/* 타입 */}
-      {subCategories.length > 0 && (
+      {/* 서브카테고리 */}
+      {visibleSubCategories.length > 0 && (
         <div className="flex gap-2 overflow-x-auto font-bold">
-          {subCategories.map((item) => (
+          {visibleSubCategories.map((item) => (
             <SubCategoryChip
               key={item.value}
               label={item.label}
               active={subCategory === item.value}
-              onClick={() => handleSubCategoryClick(item.value)}
+              onClick={() =>
+                handleSubCategoryChange(item.value)
+              }
             />
           ))}
         </div>
@@ -58,7 +149,7 @@ export default function ProductManageExplorer({
       <ProductManageList
         eventId={eventId}
         boothId={boothId}
-        products={products}
+        products={filteredProducts}
       />
     </div>
   );

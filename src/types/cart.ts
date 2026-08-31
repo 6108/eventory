@@ -24,3 +24,10 @@ export type CartGroup = {
   totalAmount: number;
   totalQuantity: number;
 };
+
+export type ServerCartItem = {
+  id: string;
+  productId: string;
+  optionId: string | null;
+  quantity: number;
+};

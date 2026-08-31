@@ -337,56 +337,26 @@ export async function PATCH(
   // ============================================================
   // 3. 삭제된 기존 옵션 처리
   // ============================================================
+  // QA: 예전에는 주문(order_items)에서 한 번이라도 쓰인 옵션은 삭제를
+  // 건너뛰었음(FK가 ON DELETE NO ACTION이라 삭제 시 에러가 났기 때문).
+  // 하지만 order_items가 product_name/option_name/unit_price/subtotal을
+  // 자체 컬럼으로 이미 저장해두는 스냅샷 구조라, 옵션을 지워도 과거 주문
+  // 표시에는 전혀 영향이 없음. order_items_option_id_fkey를
+  // ON DELETE SET NULL로 마이그레이션한 뒤에는 이 체크가 필요 없어져서
+  // 제거함 — 이제 아티스트가 옵션을 자유롭게 삭제할 수 있음.
 
   const deletedOptions = currentOptions.filter(
     (option) => !incomingOptionIds.has(option.id)
   );
 
-  for (const option of deletedOptions) {
-    // ----------------------------------------------------------
-    // 이 옵션을 주문에서 사용했는지 확인
-    // ----------------------------------------------------------
-
-    const {
-      count,
-      error: orderItemCheckError,
-    } = await supabase
-      .from("order_items")
-      .select("id", {
-        count: "exact",
-        head: true,
-      })
-      .eq("option_id", option.id);
-
-    if (orderItemCheckError) {
-      console.error(orderItemCheckError);
-
-      return NextResponse.json(
-        { error: "옵션 사용 여부를 확인하지 못했습니다." },
-        { status: 500 }
-      );
-    }
-
-    // ----------------------------------------------------------
-    // 주문에서 사용된 옵션이면 삭제하지 않음
-    // ----------------------------------------------------------
-
-    if ((count ?? 0) > 0) {
-      console.log(
-        `옵션 ${option.id}는 주문에서 사용되어 삭제하지 않습니다.`
-      );
-
-      continue;
-    }
-
-    // ----------------------------------------------------------
-    // 주문에서 한 번도 사용되지 않았다면 실제 삭제
-    // ----------------------------------------------------------
-
+  if (deletedOptions.length > 0) {
     const { error: deleteOptionError } = await supabase
       .from("product_options")
       .delete()
-      .eq("id", option.id)
+      .in(
+        "id",
+        deletedOptions.map((option) => option.id)
+      )
       .eq("product_id", productId);
 
     if (deleteOptionError) {

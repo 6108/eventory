@@ -1,22 +1,24 @@
-// src/component/cart/CartItemRow.tsx
 "use client";
 
 import Image from "next/image";
 import { useCartStore } from "@/src/store/cartStore";
+import { useCartActions } from "@/src/hooks/useCartAction";
+
 import type { CartItem } from "@/src/types/cart";
 
 interface CartItemRowProps {
   item: CartItem;
 }
 
-export default function CartItemRow({ item }: CartItemRowProps) {
-  const increment = useCartStore((s) => s.increment);
-  const decrement = useCartStore((s) => s.decrement);
-  const removeItem = useCartStore((s) => s.removeItem);
+export default function CartItemRow({
+  item,
+}: CartItemRowProps) {
+  const lastBlocked = useCartStore((s) => s.lastBlocked);
+  const { increment, decrement, removeItem } = useCartActions();
 
-  // 구매 제한만 하드 캡으로 버튼 비활성화. 재고는 담기 단계에서 체크하지 않음
   const isMaxedByLimit =
-    item.purchaseLimit != null && item.quantity >= item.purchaseLimit;
+    item.purchaseLimit != null &&
+    item.quantity >= item.purchaseLimit;
 
   return (
     <li className="flex items-center gap-3 rounded border border-zinc-800 p-3">
@@ -33,30 +35,52 @@ export default function CartItemRow({ item }: CartItemRowProps) {
       )}
 
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm text-white">{item.productName}</p>
+        <p className="truncate text-sm text-white">
+          {item.productName}
+        </p>
+
         {item.optionName && (
-          <p className="truncate text-xs text-zinc-400">{item.optionName}</p>
+          <p className="truncate text-xs text-zinc-400">
+            {item.optionName}
+          </p>
         )}
+
         {item.purchaseLimit != null && (
           <p className="whitespace-nowrap text-[11px] font-medium text-zinc-400">
             (1인 {item.purchaseLimit}개 한정)
           </p>
         )}
-        <p className="text-sm text-primary">{item.price.toLocaleString()}원</p>
+
+        <p className="text-sm text-primary">
+          {item.price.toLocaleString()}원
+        </p>
+
+        {lastBlocked?.productId === item.productId &&
+          lastBlocked?.optionId === item.optionId && (
+            <p className="mt-1 text-[11px] text-red-400">
+              구매 제한 수량을 초과할 수 없습니다.
+            </p>
+          )}
       </div>
 
       <div className="flex items-center gap-2">
         <button
-          onClick={() => decrement(item.productId, item.optionId)}
+          onClick={() =>
+            decrement(item.productId, item.optionId)
+          }
           className="h-7 w-7 rounded bg-zinc-800 text-white"
         >
           −
         </button>
+
         <span className="w-5 text-center text-sm text-white">
           {item.quantity}
         </span>
+
         <button
-          onClick={() => increment(item.productId, item.optionId)}
+          onClick={() =>
+            increment(item.productId, item.optionId)
+          }
           disabled={isMaxedByLimit}
           aria-disabled={isMaxedByLimit}
           className="h-7 w-7 rounded bg-zinc-800 text-white disabled:cursor-not-allowed disabled:opacity-40"
@@ -66,7 +90,9 @@ export default function CartItemRow({ item }: CartItemRowProps) {
       </div>
 
       <button
-        onClick={() => removeItem(item.productId, item.optionId)}
+        onClick={() =>
+          removeItem(item.productId, item.optionId)
+        }
         className="shrink-0 text-xs text-red-400"
       >
         삭제

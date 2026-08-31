@@ -21,18 +21,13 @@ export function useAuth() {
   const { data: user, isLoading: loading } = useQuery({
     queryKey: AUTH_QUERY_KEY,
     queryFn: fetchUser,
-    staleTime: Infinity, // 로그인 상태는 onAuthStateChange가 갱신해줄 거라 자체 재요청 불필요
+    staleTime: Infinity,
   });
 
-  // 세션 변화(로그인/로그아웃/토큰 갱신) 감지 → 캐시에 직접 반영
   useEffect(() => {
     const { data: listener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      (_event, session) => {
         queryClient.setQueryData(AUTH_QUERY_KEY, session?.user ?? null);
-
-        if (event === "SIGNED_OUT") {
-          queryClient.clear(); // 로그아웃 시 이전 유저의 모든 캐시(주문, 좋아요 등) 제거
-        }
       }
     );
 
@@ -57,5 +52,10 @@ export function useAuth() {
     await supabase.auth.signOut();
   };
 
-  return { user: user ?? null, loading, login, logout };
+  return {
+    user: user ?? null,
+    loading,
+    login,
+    logout,
+  };
 }
