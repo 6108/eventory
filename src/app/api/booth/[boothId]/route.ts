@@ -30,7 +30,7 @@ export async function PUT(
   const { data: booth, error } = await supabase
     .from("booths")
     .update({
-      name: boothName.trim(),
+      booth_name: boothName.trim(),
       description: description?.trim() ?? "",
       category,
     })
