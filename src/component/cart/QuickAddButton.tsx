@@ -4,8 +4,7 @@
 import { useEffect, useState } from "react";
 import { ShoppingCart } from "lucide-react";
 import toast from "react-hot-toast";
-
-import { useCartStore } from "@/src/store/cartStore";
+import { useCartActions } from "@/src/hooks/useCartAction";
 import { useProductOptionSelector } from "@/src/hooks/useProductOptionSelector";
 import Modal from "@/src/component/common/Modal";
 import IconActionButton from "@/src/component/common/IconActionButton";
@@ -19,7 +18,7 @@ interface QuickAddButtonProps {
 export default function QuickAddButton({
   product,
 }: QuickAddButtonProps) {
-  const addItem = useCartStore((s) => s.addItem);
+  const { addItem } = useCartActions();
 
   const {
     hasOptions,

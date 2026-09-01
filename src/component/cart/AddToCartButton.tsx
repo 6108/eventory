@@ -3,10 +3,10 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useCartStore } from "@/src/store/cartStore";
 import { useProductOptionSelector } from "@/src/hooks/useProductOptionSelector";
 import ProductOptionSelect from "./ProductOptionSelect";
 import type { Product } from "@/src/types/product";
+import { useCartActions } from "@/src/hooks/useCartAction";
 
 interface AddToCartButtonProps {
   product: Product;
@@ -19,7 +19,7 @@ export default function AddToCartButton({
   boothName,
   boothNumber,
 }: AddToCartButtonProps) {
-  const addItem = useCartStore((s) => s.addItem);
+  const { addItem } = useCartActions();
 
   const {
     hasOptions,
