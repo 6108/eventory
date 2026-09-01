@@ -58,19 +58,19 @@ export default function UserMenu() {
 
       {open && (
         <div className="absolute right-0 top-full z-50 mt-2 w-44 rounded-md border border-zinc-800 bg-zinc-900 py-1 shadow-lg">
-          <UserMenuSection label="쇼핑">
-            <UserMenuItem
+          <UserMenuSection label="구매">
+            {/* <UserMenuItem
               href={`/${eventId}/likes`}
               onClick={() => setOpen(false)}
             >
               보관함
-            </UserMenuItem>
+            </UserMenuItem> */}
 
             <UserMenuItem
               href={`/${eventId}/my-orders`}
               onClick={() => setOpen(false)}
             >
-              내 주문내역
+              영수증
             </UserMenuItem>
           </UserMenuSection>
 

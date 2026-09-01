@@ -26,7 +26,7 @@ export default function MobileOrder({ boothId }: MobileOrderProps) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-0 left-0 z-40 flex w-full items-center justify-between border-t border-zinc-800 bg-zinc-950 px-4 py-3 lg:hidden"
+        className="fixed bottom-0 left-0 z-40 flex w-full items-center justify-between border-t border-zinc-800 bg-zinc-950 px-4 py-3 md:hidden"
       >
         <span className="text-sm text-white">
           주문 {totalQuantity}개

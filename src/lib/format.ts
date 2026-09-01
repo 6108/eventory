@@ -1,4 +1,8 @@
 // src/lib/format.ts
+export function formatOrderNumber(orderId: string) {
+  return `#${orderId.slice(0, 8).toUpperCase()}`;
+}
+
 export function formatTime(dateString: string) {
   return new Date(dateString).toLocaleTimeString("ko-KR", {
     hour: "2-digit",

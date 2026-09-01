@@ -31,7 +31,9 @@ export default function BoothListItem({
         </span>
 
         <span className="min-w-0 line-clamp-3 px-2 text-sm text-zinc-400 sm:text-base sm:text-inherit">
-          {boothInfo.artistNames.join(", ")}
+          {boothInfo.artistNames.length > 0
+            ? boothInfo.artistNames.join(", ")
+            : "-"}
         </span>
 
         <span

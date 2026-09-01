@@ -20,7 +20,7 @@ export default async function Page({
 
   const sellContent = (
     <div className="h-full">
-      <div className="h-full overflow-y-auto pb-20 md:pb-0 md:pr-80">
+      <div className="h-full pb-20 md:pb-0 md:pr-80">
         <PosProductExplorer products={products} />
       </div>
 
@@ -34,17 +34,18 @@ export default async function Page({
     </div>
   );
 
-  const prepaidContent = <PrepaidChecklist boothId={boothId} />;
   const requestsContent = <CustomerOrderRequests boothId={boothId} products={products} />;
-
+  const prepaidContent = <PrepaidChecklist boothId={boothId} />;
+  const receiptContent = <ReceiptList boothId={boothId} />;
   return (
     <div className="h-[calc(100vh-4rem)]">
       <PosTabs
         sellContent={sellContent}
         requestsContent={requestsContent}
         prepaidContent={prepaidContent}
-        receiptContent={<ReceiptList boothId={boothId} />}
+        receiptContent={receiptContent}
       />
+
     </div>
   );
 }

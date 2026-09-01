@@ -33,3 +33,24 @@ export async function getBoothArtists(
       profileImage: artist.profile_image ?? "",
     }));
 }
+
+export async function isBoothArtist(
+  userId: string,
+  boothId: string
+): Promise<boolean> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("booth_artists")
+    .select("artist_id")
+    .eq("booth_id", boothId)
+    .eq("artist_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("부스 아티스트 여부 조회 실패:", error);
+    return false;
+  }
+
+  return !!data;
+}

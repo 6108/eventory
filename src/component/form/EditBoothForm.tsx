@@ -67,7 +67,7 @@ export default function EditBoothForm({
     }
 
     toast.success("부스 정보가 수정되었습니다.");
-    router.push(`/${eventId}/booths/${boothId}/manage`);
+    router.back();
     router.refresh();
   }
 
@@ -122,7 +122,7 @@ export default function EditBoothForm({
       </FormField>
 
       <FormActions
-        onCancel={() => router.push(`/${eventId}/booths/${boothId}/manage`)}
+        onCancel={() => router.back()}
         loading={loading}
         submitLabel="저장"
         loadingLabel="저장 중..."

@@ -107,7 +107,7 @@ export default function CartView() {
           <p className="text-center text-xs leading-5 text-zinc-500">
             구매할 작품을 미리 담아서 전송하면, 부스에서 닉네임으로 목록을 확인할 수 있습니다.
             <br />
-            실제 구매와 재고 확인은 부스에서 진행됩니다.
+            실제 구매와 재고 확인은 부스 도착 후에 진행됩니다.
           </p>
 
           <div className="flex items-center justify-between rounded border border-zinc-800 bg-zinc-900 px-4 py-3">

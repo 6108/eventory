@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useOrders, Order, OrderItem } from "@/src/hooks/useOrders";
+import { formatOrderNumber } from "@/src/lib/format";
 import useIsActiveTab from "./PosTabContext";
 
 interface ReceiptListProps {
@@ -22,7 +23,7 @@ export default function ReceiptList({ boothId }: ReceiptListProps) {
   }
 
   return (
-    <div className="h-full overflow-y-auto p-4">
+    <div className="h-full p-4">
       <ul className="divide-y divide-zinc-800">
         {orders.map((order, index) => {
           const isCancelled = order.status === "cancelled";
@@ -109,7 +110,7 @@ function ReceiptDetailModal({
               {isCancelled && <span className="text-xs text-red-500">취소됨</span>}
             </div>
             <p className="mt-1 text-xs text-zinc-500">{formatDateTime(order.createdAt)}</p>
-            <p className="mt-1 text-xs text-zinc-600">주문번호 #{order.id.slice(0, 8)}</p>
+            <p className="mt-1 text-xs text-zinc-600">주문번호 {formatOrderNumber(order.id)}</p>
           </div>
 
           <button onClick={onClose} className="text-sm text-zinc-500 hover:text-white">

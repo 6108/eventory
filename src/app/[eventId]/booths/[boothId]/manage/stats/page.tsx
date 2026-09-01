@@ -175,8 +175,8 @@ export default async function Page({
               <thead>
                 <tr className="border-b border-zinc-800 text-left text-xs text-zinc-500">
                   <th className="px-3 py-2 font-normal">작품</th>
-                  <th className="px-3 py-2 font-normal text-right">수량</th>
-                  <th className="px-3 py-2 font-normal text-right">매출</th>
+                  <th className="w-20 px-2 py-2 font-normal text-right">수량</th>
+                  <th className="w-30 px-3 py-2 font-normal text-right">매출</th>
                 </tr>
               </thead>
               <tbody>

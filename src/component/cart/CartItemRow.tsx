@@ -35,7 +35,7 @@ export default function CartItemRow({
       )}
 
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm text-white">
+        <p className="text-sm text-white">
           {item.productName}
         </p>
 
@@ -61,42 +61,44 @@ export default function CartItemRow({
               구매 제한 수량을 초과할 수 없습니다.
             </p>
           )}
+
+        <div className="mt-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() =>
+                decrement(item.productId, item.optionId)
+              }
+              className="h-7 w-7 rounded bg-zinc-800 text-white"
+            >
+              −
+            </button>
+
+            <span className="w-5 text-center text-sm text-white">
+              {item.quantity}
+            </span>
+
+            <button
+              onClick={() =>
+                increment(item.productId, item.optionId)
+              }
+              disabled={isMaxedByLimit}
+              aria-disabled={isMaxedByLimit}
+              className="h-7 w-7 rounded bg-zinc-800 text-white disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              +
+            </button>
+          </div>
+
+          <button
+            onClick={() =>
+              removeItem(item.productId, item.optionId)
+            }
+            className="text-xs text-red-400"
+          >
+            삭제
+          </button>
+        </div>
       </div>
-
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() =>
-            decrement(item.productId, item.optionId)
-          }
-          className="h-7 w-7 rounded bg-zinc-800 text-white"
-        >
-          −
-        </button>
-
-        <span className="w-5 text-center text-sm text-white">
-          {item.quantity}
-        </span>
-
-        <button
-          onClick={() =>
-            increment(item.productId, item.optionId)
-          }
-          disabled={isMaxedByLimit}
-          aria-disabled={isMaxedByLimit}
-          className="h-7 w-7 rounded bg-zinc-800 text-white disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          +
-        </button>
-      </div>
-
-      <button
-        onClick={() =>
-          removeItem(item.productId, item.optionId)
-        }
-        className="shrink-0 text-xs text-red-400"
-      >
-        삭제
-      </button>
     </li>
   );
 }

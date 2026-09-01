@@ -183,6 +183,7 @@ export type Database = {
           created_at: string | null
           id: string
           option_id: string | null
+          option_key: string | null
           product_id: string
           quantity: number
           updated_at: string | null
@@ -192,6 +193,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           option_id?: string | null
+          option_key?: string | null
           product_id: string
           quantity?: number
           updated_at?: string | null
@@ -201,6 +203,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           option_id?: string | null
+          option_key?: string | null
           product_id?: string
           quantity?: number
           updated_at?: string | null
@@ -642,24 +645,15 @@ export type Database = {
         Args: { p_booth_number: string; p_code: string }
         Returns: string
       }
-      create_order:
-        | {
-            Args: {
-              p_booth_id: string
-              p_client_transaction_id: string
-              p_items: Json
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              p_booth_id: string
-              p_client_transaction_id: string
-              p_items: Json
-              p_order_request_ids?: string[]
-            }
-            Returns: string
-          }
+      create_order: {
+        Args: {
+          p_booth_id: string
+          p_client_transaction_id: string
+          p_items: Json
+          p_order_request_ids?: string[]
+        }
+        Returns: string
+      }
       create_order_request: {
         Args: { p_booth_id: string; p_customer_nickname: string; p_items: Json }
         Returns: string

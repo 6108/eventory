@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight, Store } from "lucide-react";
-import FollowButton from "../booth/FollowButton"; // 실제 경로에 맞게 수정
+import FollowButton from "../booth/FollowButton";
 import QuickAddButton from "../cart/QuickAddButton";
 import type { ProductSummary } from "@/src/types/product";
 
@@ -66,6 +66,24 @@ export default function ImageLightbox({
       className="fixed inset-0 z-200 flex flex-col items-center justify-center bg-black/90 p-4"
       onClick={handleClose}
     >
+      {/* 작품 정보 */}
+      {product && (
+        <div
+          className="absolute left-4 top-4 z-50 max-w-[75%] "
+          onClick={(e) => e.stopPropagation()}
+        >
+          <p className="truncate text-base font-semibold text-white bg-black/50 p-2 rounded-lg backdrop-blur-sm">
+            {product.name}
+          </p>
+
+          {product.artistNames.length > 0 && (
+            <p className="mt-1 truncate  text-zinc-400 p-2">
+              {product.artistNames.join(", ")}
+            </p>
+          )}
+        </div>
+      )}
+
       <button
         type="button"
         onClick={(e) => {

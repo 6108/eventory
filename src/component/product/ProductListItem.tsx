@@ -78,12 +78,12 @@ export default function ProductListItem({
           {/* 이미지 개수 + 좋아요 */}
           <div className="absolute inset-0">
             {/* 좋아요 */}
-            <div className="absolute right-2 top-2">
+            {/* <div className="absolute right-2 top-2">
               <Like
                 productId={productInfo.id}
                 isOwner={isOwner}
               />
-            </div>
+            </div> */}
 
             {/* 상세 이미지 */}
             {productInfo.sampleImages.length > 0 && (

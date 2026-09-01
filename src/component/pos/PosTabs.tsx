@@ -27,8 +27,8 @@ export default function PosTabs({
 
   return (
     <PosTabProvider value={{ tab, setTab }}>
-      <div className="h-full">
-        <div className="flex whitespace-nowrap border-b border-zinc-800 px-2 sm:px-4">
+      <div className="h-full mt-8">
+        <div className="w-full fixed top-14 left-0 z-10 flex whitespace-nowrap border-b border-zinc-800 bg-black px-2 sm:px-4">
           {tabs.map((t) => (
             <button
               key={t.key}

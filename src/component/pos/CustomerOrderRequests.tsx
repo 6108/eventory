@@ -151,7 +151,7 @@ export default function OrderRequests({ boothId, products }: OrderRequestsProps)
   );
 
   return (
-    <div className="h-full overflow-y-auto p-4">
+    <div className="h-full p-4">
       <p className="mb-4 rounded border border-zinc-800 bg-zinc-900 p-3 text-xs text-zinc-400">
         손님이 담아둔 작품 목록입니다.
         손님이 다시 담으면 이전 내용은 최신 내용으로 바뀝니다.
@@ -242,7 +242,7 @@ function RequestCard({
           </p>
         </button>
 
-        {!checked && (
+        {/* {!checked && (
           <button
             type="button"
             disabled={pending}
@@ -251,7 +251,7 @@ function RequestCard({
           >
             지우기
           </button>
-        )}
+        )} */}
       </div>
     </li>
   );

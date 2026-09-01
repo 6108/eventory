@@ -43,9 +43,15 @@ export function useToggleLike(userId: string | null) {
           .eq("user_id", userId!);
         if (error) throw error;
       } else {
-        const { error } = await supabase
-          .from("product_likes")
-          .insert({ product_id: productId, user_id: userId! });
+        // product_likes에 (product_id, user_id) 유니크 제약이 있으므로,
+        // 연타/멀티탭으로 같은 좋아요가 거의 동시에 두 번 눌려도
+        // upsert + ignoreDuplicates로 조용히 무시된다(이미 좋아요 상태 유지).
+        // 일반 insert였다면 두 번째 호출이 23505로 실패해 사용자에게
+        // 불필요한 에러 토스트가 뜰 수 있었다.
+        const { error } = await supabase.from("product_likes").upsert(
+          { product_id: productId, user_id: userId! },
+          { onConflict: "product_id,user_id", ignoreDuplicates: true }
+        );
         if (error) throw error;
       }
     },

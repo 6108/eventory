@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { requireBoothArtist } from "@/src/lib/auth/requireBoothArtist";
 
+// GET 라우트가 정적으로 캐시되면(브라우저/CDN/Next 라우트 캐시) 새로고침 시
+// 체크 전 상태의 옛 응답이 재사용돼 "체크박스가 새로고침하면 풀리는" 것처럼
+// 보일 수 있다. 매 요청마다 항상 새로 조회하도록 강제한다.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 // 부스 아티스트가 엑셀 파싱된 선입금 리스트를 저장 (기존 것 지우고 새로 덮어쓰기)
 export async function POST(
   request: Request,
