@@ -1,5 +1,6 @@
 // src/store/orderStore.ts
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 import { OrderItem } from "../types/order";
 
 // 어떤 손님 주문 요청을 "확인"해서 담았을 때, 정확히 뭘 얼마나 담았는지 기록.
@@ -14,6 +15,13 @@ type CheckedRequestEntry = {
 interface OrderState {
   items: OrderItem[];
   checkedRequests: Record<string, CheckedRequestEntry>; // key: orderRequestId
+
+  // 결제 시도 중인 거래의 idempotency key.
+  // 체크아웃을 시작할 때 한 번만 생성해서 재시도(와이파이 끊김 등) 내내
+  // 재사용해야, 서버가 같은 거래인지 구분해서 중복 주문 생성을 막을 수 있다.
+  // items가 살아있는 동안(=아직 결제 확정 전) 새로고침해도 이어서 쓸 수 있게
+  // persist 대상에 포함시킨다.
+  pendingClientTransactionId: string | null;
 
   addItem: (item: OrderItem) => void;
   increment: (productId: string, optionId: string | null) => void;
@@ -35,108 +43,138 @@ interface OrderState {
     items: CheckedRequestEntry["items"]
   ) => void;
   unmarkRequestChecked: (requestId: string) => CheckedRequestEntry["items"];
+
+  // 체크아웃 시작 시 한 번 호출해서 이번 거래의 clientTransactionId를 고정한다.
+  // 이미 값이 있으면(=이전 시도가 재시도 대기 중이면) 그 값을 그대로 반환해서
+  // 같은 거래로 재시도되게 한다.
+  getOrCreatePendingClientTransactionId: () => string;
 }
 
-export const useOrderStore = create<OrderState>((set, get) => ({
-  items: [],
-  checkedRequests: {},
+export const useOrderStore = create<OrderState>()(
+  persist(
+    (set, get) => ({
+      items: [],
+      checkedRequests: {},
+      pendingClientTransactionId: null,
 
-  addItem: (item) =>
-    set((state) => {
-      const existing = state.items.find(
-        (i) =>
-          i.productId === item.productId && i.optionId === item.optionId
-      );
+      addItem: (item) =>
+        set((state) => {
+          const existing = state.items.find(
+            (i) =>
+              i.productId === item.productId && i.optionId === item.optionId
+          );
 
-      if (existing) {
-        const nextQuantity = existing.quantity + item.quantity;
+          if (existing) {
+            const nextQuantity = existing.quantity + item.quantity;
 
-        return {
-          items: state.items.map((i) =>
-            i.productId === item.productId && i.optionId === item.optionId
-              ? { ...i, quantity: nextQuantity }
-              : i
+            return {
+              items: state.items.map((i) =>
+                i.productId === item.productId && i.optionId === item.optionId
+                  ? { ...i, quantity: nextQuantity }
+                  : i
+              ),
+            };
+          }
+
+          return {
+            items: [...state.items, item],
+          };
+        }),
+
+      increment: (productId, optionId) =>
+        set((state) => ({
+          items: state.items.map((item) => {
+            if (item.productId !== productId || item.optionId !== optionId) {
+              return item;
+            }
+
+            return {
+              ...item,
+              quantity: item.quantity + 1,
+            };
+          }),
+        })),
+
+      decrement: (productId, optionId) =>
+        set((state) => ({
+          items: state.items
+            .map((item) =>
+              item.productId === productId && item.optionId === optionId
+                ? { ...item, quantity: item.quantity - 1 }
+                : item
+            )
+            .filter((item) => item.quantity > 0),
+        })),
+
+      decrementBy: (productId, optionId, quantity) =>
+        set((state) => ({
+          items: state.items
+            .map((item) =>
+              item.productId === productId && item.optionId === optionId
+                ? { ...item, quantity: item.quantity - quantity }
+                : item
+            )
+            .filter((item) => item.quantity > 0),
+        })),
+
+      removeItem: (productId, optionId) =>
+        set((state) => ({
+          items: state.items.filter(
+            (item) =>
+              !(item.productId === productId && item.optionId === optionId)
           ),
-        };
-      }
+        })),
 
-      return {
-        items: [...state.items, item],
-      };
-    }),
+      clear: () =>
+        set({ items: [], checkedRequests: {}, pendingClientTransactionId: null }),
 
-  increment: (productId, optionId) =>
-    set((state) => ({
-      items: state.items.map((item) => {
-        if (item.productId !== productId || item.optionId !== optionId) {
-          return item;
-        }
+      totalAmount: () =>
+        get().items.reduce(
+          (sum, item) => sum + item.unitPrice * item.quantity,
+          0
+        ),
 
-        return {
-          ...item,
-          quantity: item.quantity + 1,
-        };
-      }),
-    })),
+      totalQuantity: () =>
+        get().items.reduce((sum, item) => sum + item.quantity, 0),
 
-  decrement: (productId, optionId) =>
-    set((state) => ({
-      items: state.items
-        .map((item) =>
-          item.productId === productId && item.optionId === optionId
-            ? { ...item, quantity: item.quantity - 1 }
-            : item
-        )
-        .filter((item) => item.quantity > 0),
-    })),
+      markRequestChecked: (requestId, items) =>
+        set((state) => ({
+          checkedRequests: {
+            ...state.checkedRequests,
+            [requestId]: { items },
+          },
+        })),
 
-  decrementBy: (productId, optionId, quantity) =>
-    set((state) => ({
-      items: state.items
-        .map((item) =>
-          item.productId === productId && item.optionId === optionId
-            ? { ...item, quantity: item.quantity - quantity }
-            : item
-        )
-        .filter((item) => item.quantity > 0),
-    })),
+      unmarkRequestChecked: (requestId) => {
+        const entry = get().checkedRequests[requestId];
 
-  removeItem: (productId, optionId) =>
-    set((state) => ({
-      items: state.items.filter(
-        (item) =>
-          !(item.productId === productId && item.optionId === optionId)
-      ),
-    })),
+        set((state) => {
+          const next = { ...state.checkedRequests };
+          delete next[requestId];
+          return { checkedRequests: next };
+        });
 
-  clear: () => set({ items: [], checkedRequests: {} }),
-
-  totalAmount: () =>
-    get().items.reduce(
-      (sum, item) => sum + item.unitPrice * item.quantity,
-      0
-    ),
-
-  totalQuantity: () =>
-    get().items.reduce((sum, item) => sum + item.quantity, 0),
-
-  markRequestChecked: (requestId, items) =>
-    set((state) => ({
-      checkedRequests: {
-        ...state.checkedRequests,
-        [requestId]: { items },
+        return entry?.items ?? [];
       },
-    })),
 
-  unmarkRequestChecked: (requestId) => {
-    const entry = get().checkedRequests[requestId];
+      getOrCreatePendingClientTransactionId: () => {
+        const existing = get().pendingClientTransactionId;
+        if (existing) return existing;
 
-    set((state) => {
-      const next = { ...state.checkedRequests };
-      delete next[requestId];
-      return { checkedRequests: next };
-    });
-
-    return entry?.items ?? [];
-  },
-}));
+        const id = crypto.randomUUID();
+        set({ pendingClientTransactionId: id });
+        return id;
+      },
+    }),
+    {
+      name: "booth-order-store",
+      storage: createJSONStorage(() => localStorage),
+      // 판매(POS) 목적의 임시 상태만 남긴다. 손님 주문 요청 확인 여부는
+      // 서버가 진실의 원천이므로 굳이 persist하지 않는다.
+      partialize: (state) => ({
+        items: state.items,
+        pendingClientTransactionId: state.pendingClientTransactionId,
+      }),
+    }
+  )
+);

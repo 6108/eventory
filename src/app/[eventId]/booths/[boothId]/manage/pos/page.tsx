@@ -20,12 +20,12 @@ export default async function Page({
 
   const sellContent = (
     <div className="h-full">
-      <div className="h-full overflow-y-auto pb-20 lg:pb-0">
+      <div className="h-full overflow-y-auto pb-20 md:pb-0 md:pr-80">
         <PosProductExplorer products={products} />
       </div>
 
       {/* PC */}
-      <div className="fixed right-0 top-16 hidden h-[calc(100vh-4rem)] w-80 border-l border-zinc-800 bg-black p-6 lg:block">
+      <div className="fixed right-0 top-16 hidden h-[calc(100vh-4rem)] w-80 border-l border-zinc-800 bg-black p-6 md:block">
         <CartPanel boothId={boothId} />
       </div>
 

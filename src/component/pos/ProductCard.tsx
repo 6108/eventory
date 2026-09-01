@@ -179,7 +179,7 @@ export default function ProductCard({
         )}
 
         {hasOptions && (
-          <div className="space-y-1.5">
+          <div className="max-h-20 space-y-1.5 overflow-y-auto pr-1">
             {product.options.map((option) => {
               const soldOut =
                 option.remainingQuantity !== null &&
@@ -211,21 +211,18 @@ export default function ProductCard({
                       {option.name}
                     </p>
 
-                    <p className="mt-0.5 text-xs text-zinc-500">
+                    <p className="text-xs text-zinc-500">
                       {option.initialQuantity === null
                         ? "제한없음"
                         : `${option.initialQuantity}/${optionDisplayRemaining === null
                           ? "∞"
-                          : optionDisplayRemaining
-                        }`}
+                          : optionDisplayRemaining}`}
                     </p>
                   </div>
 
                   <div className="ml-3 shrink-0 text-right">
                     <p
-                      className={`text-sm font-medium ${soldOut
-                        ? "text-red-500"
-                        : "text-white"
+                      className={`text-sm font-medium ${soldOut ? "text-red-500" : "text-white"
                         }`}
                     >
                       {soldOut
