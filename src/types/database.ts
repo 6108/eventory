@@ -659,6 +659,15 @@ export type Database = {
         Returns: string
       }
       get_booth_code: { Args: { p_booth_id: string }; Returns: string }
+      my_booth_ids: { Args: never; Returns: string[] }
+      remove_booth_artist: {
+        Args: { p_artist_id: string; p_booth_id: string }
+        Returns: undefined
+      }
+      sync_artist_name: {
+        Args: { p_new_name: string; p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       booth_category: "ADULT" | "GENERAL"

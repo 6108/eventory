@@ -8,30 +8,21 @@ export async function getBoothArtists(
 
   const { data, error } = await supabase
     .from("booth_artists")
-    .select(`
-      artist:users (
-        id,
-        email,
-        name,
-        profile_image
-      )
-    `)
-    .eq("booth_id", boothId);
+    .select("artist_id, artist_name")
+    .eq("booth_id", boothId)
+    .order("created_at", { ascending: true });
 
   if (error) {
     console.error("부스 아티스트 조회 실패:", error);
     return [];
   }
 
-  return (data ?? [])
-    .map((item) => item.artist)
-    .filter((artist) => artist !== null)
-    .map((artist) => ({
-      id: artist.id,
-      email: artist.email,
-      name: artist.name,
-      profileImage: artist.profile_image ?? "",
-    }));
+  return (data ?? []).map((row) => ({
+    id: row.artist_id,
+    email: null,
+    name: row.artist_name,
+    profileImage: "",
+  }));
 }
 
 export async function isBoothArtist(

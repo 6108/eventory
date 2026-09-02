@@ -21,8 +21,8 @@ export default function BoothListItem({
       href={`/${eventId}/booths/${boothInfo.id}`}
       className="text-inherit no-underline"
     >
-      <div className="grid grid-cols-[4rem_minmax(0,1fr)_5rem_3.5rem] items-center gap-0 border-t border-zinc-800 p-2 hover:bg-zinc-800 sm:grid-cols-[4rem_minmax(0,1fr)_6rem_5rem] sm:p-1">
-        <span className="truncate text-center text-primary sm:px-2">
+      <div className="grid grid-cols-[4rem_minmax(0,1fr)_5rem_3.5rem] items-center gap-0 border-t border-zinc-800 py-2 sm:grid-cols-[4rem_minmax(0,1fr)_6rem_5rem] sm:py-1">
+        <span className="truncate text-center text-primary">
           {boothInfo.boothNumber}
         </span>
 
@@ -30,7 +30,7 @@ export default function BoothListItem({
           {boothInfo.boothName}
         </span>
 
-        <span className="min-w-0 line-clamp-3 px-2 text-sm text-zinc-400 sm:text-base sm:text-inherit">
+        <span className="min-w-0 line-clamp-3 px-1 text-center text-sm text-zinc-400 sm:text-base sm:text-inherit">
           {boothInfo.artistNames.length > 0
             ? boothInfo.artistNames.join(", ")
             : "-"}

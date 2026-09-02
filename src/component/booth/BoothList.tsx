@@ -54,8 +54,8 @@ export default function BoothList({
 
         <div className="grid grid-cols-[4rem_minmax(0,1fr)_5rem_3.5rem] items-center py-2 font-medium sm:grid-cols-[4rem_minmax(0,1fr)_6rem_5rem]">
           <span className="text-center">부스번호</span>
-          <span className="text-left px-2">부스명</span>
-          <span className="text-left px-2">작가</span>
+          <span className="px-2 text-left">부스명</span>
+          <span className="px-1 text-center">작가</span>
           <span className="text-center">구분</span>
         </div>
       </div>

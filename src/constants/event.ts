@@ -11,8 +11,8 @@ export const EVENT_INFO = {
   timeLabel: "00:00 ~ 00:00",
 
   // 장소
-  venueName: "장소명",
-  address: "상세 주소",
+  venueName: "추후 공개",
+  address: "상세 주소 ",
   mapUrl: "https://map.naver.com/", // 실제 링크로 교체
 
   // 문의

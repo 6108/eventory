@@ -24,10 +24,12 @@ export async function PATCH(request: Request) {
     );
   }
 
+  const trimmedName = name.trim();
+
   const { error } = await supabase
     .from("users")
     .update({
-      name: name.trim(),
+      name: trimmedName,
     })
     .eq("id", user.id);
 
@@ -38,6 +40,19 @@ export async function PATCH(request: Request) {
       { error: "이름 수정에 실패했습니다." },
       { status: 500 }
     );
+  }
+
+  // users.name 변경을 booth_artists.artist_name / booths.artist_names /
+  // products.artist_names 스냅샷에도 반영. DB 함수(RPC) 하나로 원자적 처리.
+  // 여기서 실패해도 이름 변경 자체는 이미 성공했으므로 500으로 막지 않고
+  // 로그만 남긴다.
+  const { error: syncError } = await supabase.rpc("sync_artist_name", {
+    p_user_id: user.id,
+    p_new_name: trimmedName,
+  });
+
+  if (syncError) {
+    console.error("작가 이름 동기화 실패:", syncError);
   }
 
   return NextResponse.json({
