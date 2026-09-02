@@ -9,7 +9,7 @@ import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "redemption",
-  description: "솔음사헌 배포전",
+  description: "---- 배포전",
 };
 
 export default function RootLayout({

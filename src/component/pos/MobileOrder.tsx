@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { useOrderStore } from "@/src/store/orderStore";
+import { useHasMounted } from "@/src/hooks/useHasMounted";
 import OrderPanel from "./OrderPanel";
 
 interface MobileOrderProps {
@@ -11,14 +12,18 @@ interface MobileOrderProps {
 
 export default function MobileOrder({ boothId }: MobileOrderProps) {
   const [open, setOpen] = useState(false);
+  const hasMounted = useHasMounted();
 
   const items = useOrderStore((s) => s.items);
   const totalAmount = useOrderStore((s) => s.totalAmount());
 
-  const totalQuantity = items.reduce(
-    (sum, item) => sum + item.quantity,
-    0
-  );
+  // orderStore는 localStorage에서 복원되므로, 마운트 전(SSR/최초 렌더)에는
+  // 항상 0으로 보여줘서 서버 렌더링 결과와 어긋나 hydration mismatch가
+  // 나는 것을 막는다.
+  const totalQuantity = hasMounted
+    ? items.reduce((sum, item) => sum + item.quantity, 0)
+    : 0;
+  const displayAmount = hasMounted ? totalAmount : 0;
 
   return (
     <>
@@ -33,7 +38,7 @@ export default function MobileOrder({ boothId }: MobileOrderProps) {
         </span>
 
         <span className="font-medium text-white">
-          {totalAmount.toLocaleString()}원
+          {displayAmount.toLocaleString()}원
         </span>
       </button>
 

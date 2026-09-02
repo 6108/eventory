@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useOrderStore } from "@/src/store/orderStore";
+import { useHasMounted } from "@/src/hooks/useHasMounted";
 import { ordersKey } from "@/src/hooks/useOrders";
 
 interface OrderPanelProps {
@@ -14,18 +15,25 @@ interface OrderPanelProps {
 export default function OrderPanel({ boothId }: OrderPanelProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const hasMounted = useHasMounted();
 
-  const items = useOrderStore((s) => s.items);
+  const storeItems = useOrderStore((s) => s.items);
   const checkedRequests = useOrderStore((s) => s.checkedRequests);
 
   const increment = useOrderStore((s) => s.increment);
   const decrement = useOrderStore((s) => s.decrement);
   const removeItem = useOrderStore((s) => s.removeItem);
   const clear = useOrderStore((s) => s.clear);
-  const totalAmount = useOrderStore((s) => s.totalAmount());
+  const storeTotalAmount = useOrderStore((s) => s.totalAmount());
   const getOrCreatePendingClientTransactionId = useOrderStore(
     (s) => s.getOrCreatePendingClientTransactionId
   );
+
+  // orderStore는 localStorage에서 복원되므로, 마운트 전(SSR/최초 렌더)에는
+  // 항상 빈 상태로 보여줘서 서버 렌더링 결과와 어긋나 하이드레이션 에러가
+  // 나는 것을 막는다.
+  const items = hasMounted ? storeItems : [];
+  const totalAmount = hasMounted ? storeTotalAmount : 0;
 
   const [loading, setLoading] = useState(false);
   // 네트워크 자체가 끊겨서 요청이 서버에 도달했는지조차 알 수 없는 상태.

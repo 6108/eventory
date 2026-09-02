@@ -100,7 +100,13 @@ export async function POST(
     }
 
     return NextResponse.json(
-      { error: "주문 요청 전송에 실패했습니다." },
+      {
+        error: "주문 요청 전송에 실패했습니다.",
+        detail: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      },
       { status: 500 }
     );
   }
