@@ -129,18 +129,40 @@ export default function ProductForm({
         onAdd={addOption}
         onUpdate={updateOption}
         onRemove={removeOption}
+        isEdit={isEdit}
       />
 
       {form.options.length === 0 && (
-        <FormField label="초기 수량">
-          <Input
-            type="number"
-            min="0"
-            value={form.initialQuantity}
-            onChange={(e) => updateField("initialQuantity", e.target.value)}
-            placeholder="비워두면 제한 없음"
-          />
-        </FormField>
+        <>
+          <FormField label="초기 수량">
+            <Input
+              type="number"
+              min="0"
+              value={form.initialQuantity}
+              onChange={(e) =>
+                updateField("initialQuantity", e.target.value)
+              }
+              placeholder="비워두면 제한 없음"
+            />
+          </FormField>
+
+          {isEdit && (
+            <FormField label="현재 남은 수량">
+              <Input
+                type="number"
+                min="0"
+                value={form.remainingQuantity}
+                onChange={(e) =>
+                  updateField(
+                    "remainingQuantity",
+                    e.target.value
+                  )
+                }
+                placeholder="현재 남은 수량"
+              />
+            </FormField>
+          )}
+        </>
       )}
 
       <FormField label="1인 구매 제한">

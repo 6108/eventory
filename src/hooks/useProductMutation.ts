@@ -92,11 +92,23 @@ export function useProductMutation({
               : form.initialQuantity
                 ? Number(form.initialQuantity)
                 : null,
+          remainingQuantity:
+            isEdit && form.options.length === 0
+              ? form.remainingQuantity === ""
+                ? null
+                : Number(form.remainingQuantity)
+              : undefined,
           purchaseLimit: form.purchaseLimit ? Number(form.purchaseLimit) : null,
           options: form.options.map((option) => ({
             id: option.id,
             name: option.name,
             initialQuantity: Number(option.initialQuantity),
+            remainingQuantity:
+              isEdit && option.id
+                ? option.remainingQuantity === ""
+                  ? null
+                  : Number(option.remainingQuantity)
+                : undefined,
           })),
         }),
       });
@@ -122,7 +134,7 @@ export function useProductMutation({
   async function remove() {
     if (!productId) return;
 
-    if (!confirm("이 상품을 삭제하시겠습니까? 되돌릴 수 없습니다.")) {
+    if (!confirm("이 작품을 삭제하시겠습니까? 되돌릴 수 없습니다.")) {
       return;
     }
 
@@ -139,7 +151,7 @@ export function useProductMutation({
         return;
       }
 
-      toast.success("상품이 삭제되었습니다.");
+      toast.success("작품이 삭제되었습니다.");
       router.push(`/${eventId}/booths/${boothId}/manage/products`);
       router.refresh();
     } catch {

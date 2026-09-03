@@ -98,28 +98,15 @@ export default function Page() {
 
             {/* 문의 */}
             <div className="flex px-4 py-4">
-              <div className="w-20 shrink-0 text-sm text-zinc-500">
-                행사 관련 문의
+              <div className="w-20 shrink-0 whitespace-nowrap text-sm text-zinc-500">
+                문의
               </div>
               <a
                 href={`mailto:${EVENT_INFO.contactEmail}`}
-                className="min-w-0 break-all text-sm text-zinc-300 hover:text-primary"
+                className="min-w-0 wrap-break-word text-sm text-zinc-300 hover:text-primary"
               >
                 {EVENT_INFO.contactEmail}
               </a>
-
-            </div>
-            <div className="flex px-4 py-4">
-              <div className="w-20 shrink-0 text-sm text-zinc-500">
-                사이트 관련 문의
-              </div>
-              <a
-                href={`mailto:div33dom@gmail.com`}
-                className="min-w-0 break-all text-sm text-zinc-300 hover:text-primary"
-              >
-                div33dom@gmail.com
-              </a>
-
             </div>
           </div>
         </section>

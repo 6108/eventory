@@ -5,6 +5,7 @@ export type ProductOptionFormState = {
   id?: string;
   name: string;
   initialQuantity: string;
+  remainingQuantity: string;
 };
 
 // 작품 폼
@@ -14,6 +15,7 @@ export type ProductFormState = {
   category: string;
   subCategory: string;
   initialQuantity: string;
+  remainingQuantity: string;
   purchaseLimit: string;
   description: string;
   options: ProductOptionFormState[];

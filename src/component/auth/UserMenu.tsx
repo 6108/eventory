@@ -58,7 +58,7 @@ export default function UserMenu() {
 
       {open && (
         <div className="absolute right-0 top-full z-50 mt-2 w-44 rounded-md border border-zinc-800 bg-zinc-900 py-1 shadow-lg">
-          <UserMenuSection label="구매">
+          <UserMenuSection>
             {/* <UserMenuItem
               href={`/${eventId}/likes`}
               onClick={() => setOpen(false)}

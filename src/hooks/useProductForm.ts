@@ -11,6 +11,7 @@ function createInitialForm(product?: Product): ProductFormState {
     category: product?.category ?? "",
     subCategory: product?.subCategory ?? "",
     initialQuantity: product?.initialQuantity?.toString() ?? "",
+    remainingQuantity: product?.remainingQuantity?.toString() ?? "",
     purchaseLimit: product?.purchaseLimit?.toString() ?? "",
     description: product?.description ?? "",
     options:
@@ -18,6 +19,7 @@ function createInitialForm(product?: Product): ProductFormState {
         id: option.id,
         name: option.name,
         initialQuantity: option.initialQuantity?.toString() ?? "",
+        remainingQuantity: option.remainingQuantity?.toString() ?? "",
       })) ?? [],
   };
 }
@@ -37,13 +39,13 @@ export function useProductForm(product?: Product) {
   function addOption() {
     setForm((prev) => ({
       ...prev,
-      options: [...prev.options, { name: "", initialQuantity: "" }],
+      options: [...prev.options, { name: "", initialQuantity: "", remainingQuantity: "", }],
     }));
   }
 
   function updateOption(
     index: number,
-    key: "name" | "initialQuantity",
+    key: "name" | "initialQuantity" | "remainingQuantity",
     value: string
   ) {
     setForm((prev) => ({

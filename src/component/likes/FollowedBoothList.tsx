@@ -70,7 +70,7 @@ export default function FollowedBoothList({
                     </p>
                   )}
                   {booth.description && (
-                    <p className="text-xs text-zinc-200 whitespace-pre-wrap mt-0.5">
+                    <p className="text-sm text-zinc-200 whitespace-pre-wrap mt-0.5">
                       {booth.description}
                     </p>
                   )}

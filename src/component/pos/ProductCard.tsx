@@ -214,9 +214,7 @@ export default function ProductCard({
                     <p className="text-xs text-zinc-500">
                       {option.initialQuantity === null
                         ? "제한없음"
-                        : `${option.initialQuantity}/${optionDisplayRemaining === null
-                          ? "∞"
-                          : optionDisplayRemaining}`}
+                        : `${optionDisplayRemaining === null ? "∞" : optionDisplayRemaining}/${option.initialQuantity}`}
                     </p>
                   </div>
 

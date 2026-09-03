@@ -164,11 +164,7 @@ export default function ImageLightbox({
           </button>
 
           <div className="flex shrink-0 items-center gap-2">
-            {product &&
-              (product.remainingQuantity === null ||
-                product.remainingQuantity > 0) && (
-                <QuickAddButton product={product} />
-              )}
+            {product && <QuickAddButton product={product} />}
 
             <FollowButton
               boothId={boothId}
