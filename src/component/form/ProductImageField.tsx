@@ -62,7 +62,10 @@ export default function ProductImageField({
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-sm text-zinc-400">대표 이미지</label>
+      <label className="flex items-center gap-1 text-sm text-zinc-400">
+        대표 이미지
+        {required && <span className="text-red-500">*</span>}
+      </label>
 
       <input
         type="file"

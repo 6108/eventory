@@ -24,7 +24,10 @@ export default function CategorySelect({
   return (
     <>
       <div className="flex flex-col gap-2">
-        <label className="text-sm text-zinc-400">카테고리</label>
+        <label className="flex items-center gap-1 text-sm text-zinc-400">
+          카테고리
+          <span className="text-red-500">*</span>
+        </label>
         <Select
           value={category}
           onChange={(e) => {
@@ -43,7 +46,10 @@ export default function CategorySelect({
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="text-sm text-zinc-400">세부 카테고리</label>
+        <label className="flex items-center gap-1 text-sm text-zinc-400">
+          세부 카테고리
+          <span className="text-red-500">*</span>
+        </label>
         <Select
           value={subCategory}
           onChange={(e) => onSubCategoryChange(e.target.value)}

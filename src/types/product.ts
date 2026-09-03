@@ -9,6 +9,8 @@ export const productCategories = [
       { value: "shaker", label: "쉐이커" },
       { value: "clip", label: "집게" },
       { value: "corotto", label: "코롯토" },
+      { value: "etc", label: "기타" },
+
     ],
   },
   {
@@ -17,8 +19,11 @@ export const productCategories = [
     types: [
       { value: "sheet", label: "인스" },
       { value: "cut", label: "반칼" },
-      { value: "die_cut", label: "완칼" },
+      { value: "die_cut", label: "완칼/조각" },
       { value: "roll", label: "롤" },
+      { value: "kiss", label: "키스컷" },
+      { value: "etc", label: "기타" },
+
     ],
   },
   {
@@ -28,6 +33,8 @@ export const productCategories = [
       { value: "postcard", label: "엽서" },
       { value: "photocard", label: "포토카드" },
       { value: "poster", label: "포스터" },
+      { value: "etc", label: "기타" },
+
     ],
   },
   {
@@ -37,6 +44,8 @@ export const productCategories = [
       { value: "comic", label: "만화책" },
       { value: "novel", label: "소설" },
       { value: "artbook", label: "아트북" },
+      { value: "etc", label: "기타" },
+
     ],
   },
   {
@@ -44,7 +53,9 @@ export const productCategories = [
     label: "기타",
     types: [
       { value: "cloth", label: "천 굿즈" },
-      { value: "badge", label: "뱃지" },
+      { value: "button", label: "핀 버튼" },
+      { value: "etc", label: "기타" },
+
     ],
   },
   {
@@ -54,6 +65,8 @@ export const productCategories = [
       { value: "event", label: "이벤트 증정" },
       { value: "gift", label: "구매 증정" },
       { value: "free", label: "무료 배포" },
+      { value: "etc", label: "기타" },
+
     ],
   },
 ] as const;

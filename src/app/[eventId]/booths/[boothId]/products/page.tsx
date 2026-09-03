@@ -1,6 +1,6 @@
-import ProductExplorer from "@/src/component/product/ProductExplorer";
-import { getProductSummariesPaged } from "@/src/lib/data/product";
-import { Suspense } from "react";
+// import ProductExplorer from "@/src/component/product/ProductExplorer";
+// import { getProductSummariesPaged } from "@/src/lib/data/product";
+// import { Suspense } from "react";
 
 export default async function Page({
   params,

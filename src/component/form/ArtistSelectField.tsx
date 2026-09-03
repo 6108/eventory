@@ -9,7 +9,7 @@ interface ArtistSelectFieldProps {
 
 export default function ArtistSelectField({ artists, selectedArtistIds, onToggle }: ArtistSelectFieldProps) {
   return (
-    <FormField label="작가">
+    <FormField label="작가" required>
       {artists.length === 0 ? (
         <div className="rounded border border-zinc-800 bg-zinc-900 px-3 py-3 text-sm text-zinc-500">
           등록된 작가가 없습니다.

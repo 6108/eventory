@@ -78,7 +78,7 @@ export default function ProductForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-      <FormField label="작품명">
+      <FormField label="작품명" required>
         <Input
           value={form.name}
           onChange={(e) => updateField("name", e.target.value)}
@@ -101,7 +101,7 @@ export default function ProductForm({
         }}
       />
 
-      <FormField label="가격">
+      <FormField label="가격" required>
         <Input
           type="number"
           min="0"
@@ -189,7 +189,7 @@ export default function ProductForm({
           disabled={deleting}
           className="mt-2 text-sm text-red-400 hover:text-red-300 disabled:opacity-50"
         >
-          {deleting ? "삭제 중..." : "정보 삭제"}
+          {deleting ? "삭제 중..." : "삭제"}
         </button>
       )}
     </form>

@@ -112,13 +112,13 @@ export default function ProductExplorer({
 
   return (
     <div className="flex flex-col gap-6">
-      <button
+      {!boothId && (<button
         type="button"
         onClick={handleFollowingToggle}
         className="self-start rounded-sm border border-primary bg-primary px-3 py-1.5 text-xs font-medium text-white transition-colors"
       >
         {following ? "전체 작품 보기" : "팔로우한 부스 작품만 보기"}
-      </button>
+      </button>)}
 
       <div className="flex gap-2 overflow-x-auto">
         {visibleCategories.map((item) => (
