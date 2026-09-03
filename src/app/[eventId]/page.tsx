@@ -145,7 +145,7 @@ export default function Page() {
 
           {/* 가로 2열 이미지 */}
 
-          {/* <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3">
             {EVENT_INFO.luckyDraw.images.map((image) => (
               <div
                 key={image.src}
@@ -161,7 +161,7 @@ export default function Page() {
                 />
               </div>
             ))}
-          </div> */}
+          </div>
         </section>
 
         {/* 구분 */}

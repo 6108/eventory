@@ -7,7 +7,7 @@ export async function getMyCartItems(userId: string): Promise<CartItem[]> {
   const { data, error } = await supabase
     .from("cart_items")
     .select(`
-      id, quantity, option_id,
+      id, quantity, option_id, purchased,
       products (
         id, name, price, main_image, purchase_limit, remaining_quantity,
         booths ( id, booth_name, booth_number )
@@ -53,6 +53,7 @@ export async function getMyCartItems(userId: string): Promise<CartItem[]> {
           ? option.remaining_quantity
           : product.remaining_quantity,
         purchaseLimit: product.purchase_limit,
+        purchased: row.purchased ?? false,
       } satisfies CartItem;
     })
     .filter((item): item is CartItem => item !== null);

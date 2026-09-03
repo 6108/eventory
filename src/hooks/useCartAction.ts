@@ -7,6 +7,7 @@ import {
   clearServerCart,
   deleteCartItem,
   saveCartItem,
+  savePurchased,
 } from "@/src/lib/action/cart";
 
 export function useCartActions() {
@@ -16,6 +17,9 @@ export function useCartActions() {
   const storeIncrement = useCartStore((s) => s.increment);
   const storeDecrement = useCartStore((s) => s.decrement);
   const storeRemoveItem = useCartStore((s) => s.removeItem);
+  const storeToggleBoothPurchased = useCartStore(
+    (s) => s.toggleBoothPurchased
+  );
   const storeClearAll = useCartStore((s) => s.clearAll);
 
   function getItem(productId: string, optionId: string | null) {
@@ -39,6 +43,7 @@ export function useCartActions() {
         productId: updated.productId,
         optionId: updated.optionId,
         quantity: updated.quantity,
+        purchased: updated.purchased,
       });
     }
   }
@@ -85,6 +90,25 @@ export function useCartActions() {
     }
   }
 
+  function togglePurchased(boothId: string) {
+    storeToggleBoothPurchased(boothId);
+
+    if (!user) return;
+
+    // 방금 갱신된(store 반영 후) 부스 항목들을 서버에도 반영
+    const boothItems = useCartStore
+      .getState()
+      .items.filter((item) => item.boothId === boothId);
+
+    for (const item of boothItems) {
+      void savePurchased(user.id, {
+        productId: item.productId,
+        optionId: item.optionId,
+        purchased: item.purchased,
+      });
+    }
+  }
+
   function clearAll() {
     storeClearAll();
 
@@ -98,6 +122,7 @@ export function useCartActions() {
     increment,
     decrement,
     removeItem,
+    togglePurchased,
     clearAll,
   };
 }

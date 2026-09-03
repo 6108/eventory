@@ -9,6 +9,31 @@ type ProductOptionInput = {
   initialQuantity: number;
 };
 
+// 재고 수정 시 remaining_quantity를 무조건 initial_quantity로 리셋하면
+// 이미 판매된(차감된) 수량까지 되살아나 오버셀이 발생한다.
+// 대신 "이미 팔린 수량(sold) = old initial - old remaining"을 구해서
+// 새 initial_quantity에서 그만큼만 뺀 값을 remaining으로 사용한다.
+// null은 "무제한 재고"를 의미하므로 null <-> 숫자 전환도 함께 처리한다.
+function computeRemainingOnQuantityUpdate(
+  oldInitial: number | null,
+  oldRemaining: number | null,
+  newInitial: number | null
+): number | null {
+  if (newInitial === null) {
+    // 무제한으로 전환
+    return null;
+  }
+
+  if (oldInitial === null || oldRemaining === null) {
+    // 이전에 무제한이었거나(기존 재고 개념이 없었음) 값이 비어있었던 경우,
+    // 팔린 수량을 알 수 없으므로 새 초기 수량을 그대로 남은 수량으로 사용
+    return newInitial;
+  }
+
+  const sold = Math.max(oldInitial - oldRemaining, 0);
+  return Math.max(newInitial - sold, 0);
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ boothId: string; productId: string }> }
@@ -94,7 +119,7 @@ export async function PATCH(
 
   const { data: existing, error: existingError } = await supabase
     .from("products")
-    .select("id")
+    .select("id, initial_quantity, remaining_quantity")
     .eq("id", productId)
     .eq("booth_id", boothId)
     .single();
@@ -146,6 +171,12 @@ export async function PATCH(
       ? null
       : Number(initialQuantity);
 
+  const productRemainingQuantity = computeRemainingOnQuantityUpdate(
+    existing.initial_quantity,
+    existing.remaining_quantity,
+    productInitialQuantity
+  );
+
   // =========================
   // 상품 수정
   // =========================
@@ -163,7 +194,7 @@ export async function PATCH(
       sub_category: subCategory,
 
       initial_quantity: productInitialQuantity,
-      remaining_quantity: productInitialQuantity,
+      remaining_quantity: productRemainingQuantity,
 
       purchase_limit:
         purchaseLimit === null || purchaseLimit === ""
@@ -287,11 +318,20 @@ export async function PATCH(
       );
     }
 
+    const newOptionInitialQuantity = Number(option.initialQuantity);
+
+    const newOptionRemainingQuantity = computeRemainingOnQuantityUpdate(
+      existingOption.initial_quantity,
+      existingOption.remaining_quantity,
+      newOptionInitialQuantity
+    );
+
     const { error: updateOptionError } = await supabase
       .from("product_options")
       .update({
         name: option.name.trim(),
-        initial_quantity: Number(option.initialQuantity),
+        initial_quantity: newOptionInitialQuantity,
+        remaining_quantity: newOptionRemainingQuantity,
       })
       .eq("id", option.id)
       .eq("product_id", productId);

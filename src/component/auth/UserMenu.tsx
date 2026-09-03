@@ -66,11 +66,18 @@ export default function UserMenu() {
               보관함
             </UserMenuItem> */}
 
-            <UserMenuItem
+            {/* <UserMenuItem
               href={`/${eventId}/my-orders`}
               onClick={() => setOpen(false)}
             >
               영수증
+            </UserMenuItem> */}
+
+            <UserMenuItem
+              href={`/${eventId}/follow`}
+              onClick={() => setOpen(false)}
+            >
+              팔로우한 부스
             </UserMenuItem>
           </UserMenuSection>
 

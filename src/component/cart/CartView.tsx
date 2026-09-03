@@ -67,6 +67,18 @@ export default function CartView() {
     0
   );
 
+  const purchasedItems = items.filter((item) => item.purchased);
+
+  const purchasedQuantity = purchasedItems.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
+
+  const purchasedAmount = purchasedItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
   function handleClearAll() {
     openConfirmModal({
       title: "전체 비우기",
@@ -104,10 +116,16 @@ export default function CartView() {
         </div>
       ) : (
         <>
-          <p className="text-center text-xs leading-5 text-zinc-500">
+          {/* "부스로 전송" 기능 비활성화로 문구 변경 (기존 문구는 보존, CartBoothGroup.tsx 상단 주석 참고) */}
+          {/* <p className="text-center text-xs leading-5 text-zinc-500">
             구매할 작품을 미리 담아서 전송하면, 부스에서 닉네임으로 목록을 확인할 수 있습니다.
             <br />
             실제 구매와 재고 확인은 부스 도착 후에 진행됩니다.
+          </p> */}
+          <p className="text-center text-xs leading-5 text-zinc-500">
+            여기 담은 목록은 부스로 전송되지 않는 나만의 기록입니다.
+            <br />
+            부스에서 다 사셨다면 "구매 완료"를 눌러 정리해두세요.
           </p>
 
           <div className="flex items-center justify-between rounded border border-zinc-800 bg-zinc-900 px-4 py-3">
@@ -118,6 +136,17 @@ export default function CartView() {
               {totalAmount.toLocaleString()}원
             </span>
           </div>
+
+          {purchasedItems.length > 0 && (
+            <div className="flex items-center justify-between rounded border border-zinc-800 bg-zinc-900/50 px-4 py-3">
+              <span className="text-sm text-zinc-500">
+                구매 완료 ({purchasedQuantity}개)
+              </span>
+              <span className="text-sm font-medium text-zinc-400">
+                {purchasedAmount.toLocaleString()}원
+              </span>
+            </div>
+          )}
 
           <div className="flex flex-col gap-4">
             {groups.map((group) => (

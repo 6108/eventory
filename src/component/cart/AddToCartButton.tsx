@@ -48,6 +48,7 @@ export default function AddToCartButton({
       quantity,
       remainingQuantity,
       purchaseLimit: product.purchaseLimit,
+      purchased: false,
     });
 
     toast.success("구매할 목록에 담았습니다.");

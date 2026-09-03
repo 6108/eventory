@@ -36,51 +36,53 @@ export default function PrepaidChecklist({
 
   return (
     <div className="p-4">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-zinc-800 text-left text-zinc-500">
-            <th className="w-12 py-2">수령</th>
-
-            {headers.map((h) => (
-              <th
-                key={h}
-                className="py-2 pr-4"
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-
-        <tbody>
-          {rows.map((row) => (
-            <tr
-              key={row.id}
-              className={`border-b border-zinc-900 ${row.checked ? "opacity-40" : ""
-                }`}
-            >
-              <td className="py-2">
-                <input
-                  type="checkbox"
-                  checked={row.checked}
-                  disabled={pendingIds.has(row.id)}
-                  onChange={() => toggleRow(row.id)}
-                  className="h-5 w-5 disabled:opacity-50"
-                />
-              </td>
+      <div className="overflow-x-auto overflow-y-visible">
+        <table className="w-full min-w-max text-sm">
+          <thead>
+            <tr className="border-b border-zinc-800 text-left text-zinc-500">
+              <th className="w-12 py-2 sticky left-0 bg-black">수령</th>
 
               {headers.map((h) => (
-                <td
+                <th
                   key={h}
-                  className="py-2 pr-4"
+                  className="py-2 pr-4 whitespace-nowrap"
                 >
-                  {row.cells[h]}
-                </td>
+                  {h}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {rows.map((row) => (
+              <tr
+                key={row.id}
+                className={`border-b border-zinc-900 ${row.checked ? "opacity-40" : ""
+                  }`}
+              >
+                <td className="py-2 sticky left-0 bg-black">
+                  <input
+                    type="checkbox"
+                    checked={row.checked}
+                    disabled={pendingIds.has(row.id)}
+                    onChange={() => toggleRow(row.id)}
+                    className="h-5 w-5 disabled:opacity-50"
+                  />
+                </td>
+
+                {headers.map((h) => (
+                  <td
+                    key={h}
+                    className="py-2 pr-4 whitespace-nowrap"
+                  >
+                    {row.cells[h]}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

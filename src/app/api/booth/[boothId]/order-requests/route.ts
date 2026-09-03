@@ -26,8 +26,13 @@ export async function GET(
 }
 
 // 손님이 주문 요청을 보냄 (로그인 필요).
-// 대기열이 아니라 편의 도구이므로, 손님 한 명당 한 부스에 요청은 항상 1개만 유지 —
-// 재전송 시 새로 만들지 않고 기존 요청을 갱신해서 "최신 내용으로 갱신"되게 함.
+// 대기열이 아니라 편의 도구이므로, 손님 한 명당 한 부스에 "아직 결제 안 된"
+// 요청은 항상 1개만 유지 — 재전송 시 새로 만들지 않고 기존 요청을 갱신해서
+// "최신 내용으로 갱신"되게 함.
+// 단, 부스러가 이미 확인(checked)해서 처리 중인 요청은 조용히 덮어쓰지 않고
+// 막는다 (already_checked) — 결제 완료된 요청은 결제 시점의 내용 그대로
+// 남아야 하고, 처리 중인 요청은 부스러 모르게 바뀌면 안 되기 때문.
+// (자세한 재사용 조건은 create_order_request RPC 참고)
 
 export async function POST(
   request: Request,
@@ -99,14 +104,18 @@ export async function POST(
       );
     }
 
+    if (error.message?.startsWith("already_checked")) {
+      return NextResponse.json(
+        {
+          error:
+            "이미 부스에서 확인 중인 주문입니다. 부스 앞에서 직접 말씀해주세요.",
+        },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json(
-      {
-        error: "주문 요청 전송에 실패했습니다.",
-        detail: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint,
-      },
+      { error: "주문 요청 전송에 실패했습니다." },
       { status: 500 }
     );
   }

@@ -44,12 +44,19 @@ export async function PATCH(
   // .in("status", ...)를 조건에 함께 걸어서, 이 요청이 여전히 기대하는
   // 상태일 때만 업데이트되게 한다. 다른 기기가 먼저 처리했다면 영향받은
   // row가 0개가 되어 update() 자체는 성공하지만 data가 비어있게 된다.
+  //
+  // .is("order_id", null)도 함께 건다 — status는 결제 완료 후에도 계속
+  // 'checked'로 남아있고 order_id만 채워지는 구조라, status 조건만으로는
+  // "이미 결제된 요청"을 걸러내지 못한다. 이게 없으면 기기 A에서 결제까지
+  // 끝낸 요청을, 아직 화면이 안 새로고침된 기기 B에서 "되돌리기"를 눌러
+  // 다시 대기 목록에 올려버릴 수 있다 (이미 판 걸 또 팔게 되는 위험).
   const { data, error } = await supabase
     .from("order_requests")
     .update({ status })
     .eq("id", requestId)
     .eq("booth_id", boothId)
     .in("status", ALLOWED_FROM_STATUSES[status])
+    .is("order_id", null)
     .select("id");
 
   if (error) {

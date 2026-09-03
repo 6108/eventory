@@ -60,6 +60,7 @@ export default function QuickAddButton({
       quantity: qty,
       remainingQuantity: remaining,
       purchaseLimit: product.purchaseLimit,
+      purchased: false,
     });
 
     toast.success("구매할 것에 담았습니다.");
@@ -140,7 +141,6 @@ export default function QuickAddButton({
     <div onClick={(e) => e.stopPropagation()}>
       <IconActionButton
         onClick={handleButtonClick}
-        disabled={!hasOptions && isSoldOut}
         icon={<ShoppingCart size={14} />}
         label="담기"
       />

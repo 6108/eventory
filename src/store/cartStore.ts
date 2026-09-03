@@ -18,6 +18,7 @@ interface CartState {
   increment: (productId: string, optionId: string | null) => void;
   decrement: (productId: string, optionId: string | null) => void;
   removeItem: (productId: string, optionId: string | null) => void;
+  toggleBoothPurchased: (boothId: string) => void;
   clearBooth: (boothId: string) => void;
   clearAll: () => void;
   markBoothSent: (boothId: string) => void;
@@ -114,9 +115,32 @@ export const useCartStore = create<CartState>()(
           }
 
           return {
-            items: [...state.items, cartItem],
+            items: [
+              ...state.items,
+              { ...cartItem, purchased: cartItem.purchased ?? false },
+            ],
             sentBoothIds: nextSentBoothIds,
             lastBlocked: null,
+          };
+        }),
+
+      toggleBoothPurchased: (boothId) =>
+        set((state) => {
+          const boothItems = state.items.filter(
+            (item) => item.boothId === boothId
+          );
+
+          if (boothItems.length === 0) return state;
+
+          // 부스 항목이 전부 체크돼있으면 해제, 하나라도 안 돼있으면 전부 체크
+          const nextPurchased = !boothItems.every((item) => item.purchased);
+
+          return {
+            items: state.items.map((item) =>
+              item.boothId === boothId
+                ? { ...item, purchased: nextPurchased }
+                : item
+            ),
           };
         }),
 
@@ -338,11 +362,19 @@ export const useCartStore = create<CartState>()(
               totalAmount:
                 cartItem.price * cartItem.quantity,
               totalQuantity: cartItem.quantity,
+              purchased: false, // 아래서 그룹 전체 기준으로 다시 계산
             });
           }
         }
 
-        return Array.from(map.values());
+        // 부스 안 모든 항목이 구매완료로 체크됐을 때만 그 부스를 "구매완료"로
+        // 취급 — 구매완료 부스는 카드 자체를 목록 맨 아래로 내려서 정리한다.
+        return Array.from(map.values())
+          .map((group) => ({
+            ...group,
+            purchased: group.items.every((item) => item.purchased),
+          }))
+          .sort((a, b) => Number(a.purchased) - Number(b.purchased));
       },
     }),
     {

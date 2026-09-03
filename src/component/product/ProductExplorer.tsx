@@ -7,6 +7,7 @@ import CategoryChip from "@/src/component/product/CategoryChip";
 import SubCategoryChip from "@/src/component/product/SubCategoryChip";
 import { useProductList, ProductListPage } from "@/src/hooks/useProductList";
 import { productCategories, ProductCategoryCounts } from "@/src/types/product";
+import { useRequireLogin } from "@/src/hooks/useRequireLogin";
 
 interface ProductExplorerProps {
   initialPage: ProductListPage;
@@ -23,6 +24,8 @@ export default function ProductExplorer({
   categoryCounts,
   followedCategoryCounts,
 }: ProductExplorerProps) {
+  const requireLogin = useRequireLogin();
+
   const [following, setFollowing] = useState(false);
   const [category, setCategory] = useState("ALL");
   const [subCategory, setSubCategory] = useState("ALL");
@@ -39,7 +42,8 @@ export default function ProductExplorer({
     window.history.replaceState(null, "", newUrl);
   }, [category, subCategory]);
 
-  const showFollowingFilter = !!currentUserId && !!followedCategoryCounts;
+  // 로그인 여부와 무관하게 버튼은 항상 노출. 실제 팔로우 필터링은 로그인 + 카운트가 있을 때만 동작
+  const canUseFollowingFilter = !!currentUserId && !!followedCategoryCounts;
 
   const {
     products,
@@ -48,13 +52,16 @@ export default function ProductExplorer({
     fetchNextPage,
   } = useProductList({
     boothId,
-    following: showFollowingFilter && following,
+    following: canUseFollowingFilter && following,
     category,
     subCategory,
     initialPage,
   });
 
-  const activeCategoryCounts = following && followedCategoryCounts ? followedCategoryCounts : categoryCounts;
+  const activeCategoryCounts =
+    following && canUseFollowingFilter && followedCategoryCounts
+      ? followedCategoryCounts
+      : categoryCounts;
 
   const existingCategories = useMemo(
     () => new Set(activeCategoryCounts.categories.filter((c) => c.count > 0).map((c) => c.value)),
@@ -88,6 +95,11 @@ export default function ProductExplorer({
   }, [category, currentCategoryDef, existingSubCategories]);
 
   const handleFollowingToggle = () => {
+    if (!currentUserId) {
+      requireLogin("팔로우한 부스 작품 보기는 로그인 후 이용할 수 있습니다.");
+      return;
+    }
+
     setFollowing((prev) => !prev);
     setCategory("ALL");
     setSubCategory("ALL");
@@ -100,15 +112,13 @@ export default function ProductExplorer({
 
   return (
     <div className="flex flex-col gap-6">
-      {showFollowingFilter && (
-        <button
-          type="button"
-          onClick={handleFollowingToggle}
-          className="self-start rounded-sm border border-primary bg-primary px-3 py-1.5 text-xs font-medium text-white transition-colors"
-        >
-          {following ? "전체 작품 보기" : "팔로우한 부스 작품만 보기"}
-        </button>
-      )}
+      <button
+        type="button"
+        onClick={handleFollowingToggle}
+        className="self-start rounded-sm border border-primary bg-primary px-3 py-1.5 text-xs font-medium text-white transition-colors"
+      >
+        {following ? "전체 작품 보기" : "팔로우한 부스 작품만 보기"}
+      </button>
 
       <div className="flex gap-2 overflow-x-auto">
         {visibleCategories.map((item) => (

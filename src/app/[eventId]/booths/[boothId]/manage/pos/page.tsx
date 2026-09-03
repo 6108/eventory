@@ -5,7 +5,7 @@ import PosProductExplorer from "@/src/component/pos/PosProductExplorer";
 import CartPanel from "@/src/component/pos/OrderPanel";
 import MobileCart from "@/src/component/pos/MobileOrder";
 import PrepaidChecklist from "@/src/component/pos/PrepaidChecklist";
-import CustomerOrderRequests from "@/src/component/pos/CustomerOrderRequests";
+// import CustomerOrderRequests from "@/src/component/pos/CustomerOrderRequests";
 import { getPosProducts } from "@/src/lib/data/product";
 import ReceiptList from "@/src/component/pos/ReceiptList";
 
@@ -34,14 +34,15 @@ export default async function Page({
     </div>
   );
 
-  const requestsContent = <CustomerOrderRequests boothId={boothId} products={products} />;
+  // const requestsContent = <CustomerOrderRequests boothId={boothId} products={products} />;
   const prepaidContent = <PrepaidChecklist boothId={boothId} />;
   const receiptContent = <ReceiptList boothId={boothId} />;
   return (
     <div className="h-[calc(100vh-4rem)]">
       <PosTabs
+        boothId={boothId}
         sellContent={sellContent}
-        requestsContent={requestsContent}
+        requestsContent={null} // QA: "담아둔 목록" 탭 비활성화 — CartBoothGroup.tsx 상단 주석 참고
         prepaidContent={prepaidContent}
         receiptContent={receiptContent}
       />

@@ -5,7 +5,7 @@ import { useOrderStore } from "@/src/store/orderStore";
 import type { PosProduct } from "@/src/types/product";
 import type { OrderRequest } from "@/src/types/request";
 import { useOrderRequests, StatusConflictError } from "@/src/hooks/useOrderRequests";
-import useIsActiveTab, { usePosTabSwitch } from "./PosTabContext";
+import { usePosTabSwitch } from "./PosTabContext";
 
 interface OrderRequestsProps {
   boothId: string;
@@ -13,8 +13,11 @@ interface OrderRequestsProps {
 }
 
 export default function OrderRequests({ boothId, products }: OrderRequestsProps) {
-  const isActive = useIsActiveTab("requests");
-  const { requests, isLoading, pendingRequestId, setStatus } = useOrderRequests(boothId, isActive);
+  // 예전엔 이 탭이 활성 상태일 때만 폴링했는데, 그러면 부스러가 "작품 판매" 탭에
+  // 계속 있는 동안 새 주문 요청이 왔는지조차 알 수 없었다. 항상 폴링하도록 변경
+  // (탭 버튼의 배지 카운트도 같은 이유로 항상 폴링하는 useOrderRequests를 쓰고,
+  //  react-query가 같은 쿼리 키를 캐시 공유해서 중복 요청은 발생하지 않는다).
+  const { requests, isLoading, pendingRequestId, setStatus } = useOrderRequests(boothId, true);
   const addItem = useOrderStore((s) => s.addItem);
   const clear = useOrderStore((s) => s.clear);
   const decrementBy = useOrderStore((s) => s.decrementBy);
