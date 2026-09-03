@@ -8,13 +8,13 @@ import ConfirmModal from "../component/common/ConfirmModal";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://boothspot.net/redemption0919"),
+  metadataBase: new URL("https://boothspot.net/"),
   title: "redemption",
   description: "솔음사헌 배포전",
   openGraph: {
     title: "redemption",
     description: "솔음사헌 배포전",
-    url: "https://boothspot.net/redemption0919",
+    url: "https://boothspot.net/",
     siteName: "redemption",
     images: [
       {
