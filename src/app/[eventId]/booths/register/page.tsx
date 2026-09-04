@@ -13,7 +13,7 @@ export default function Page() {
         </p>
 
         <p className="text-sm text-zinc-400 mb-8">
-          연결 코드는 트위터 DM(@div33dom)으로 요청해주세요! <br /> 확인 후 개별적으로 전달해드립니다
+          연결 코드는 트위터 DM(@pm5_0216)으로 요청해주세요!
         </p>
         <RegisterForm />
       </div>
