@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "@/src/styles/globals.css";
 import Navbar from "../component/layout/Navbar";
 import Footer from "../component/layout/Footer";
@@ -6,6 +7,8 @@ import DisableContextMenu from "../component/common/DisableContextMenu";
 import { Toaster } from "react-hot-toast";
 import ConfirmModal from "../component/common/ConfirmModal";
 import { Providers } from "./providers";
+
+const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://boothspot.net"),
@@ -48,9 +51,9 @@ export default function RootLayout({
             toastOptions={{
               duration: 3000,
               style: {
-                background: "#18181b",   // zinc-900
+                background: "#18181b",
                 color: "#fafafa",
-                border: "1px solid #27272a", // zinc-800
+                border: "1px solid #27272a",
                 fontSize: "14px",
                 borderRadius: "8px",
                 padding: "12px 16px",
@@ -71,6 +74,23 @@ export default function RootLayout({
 
           {/* <Footer /> */}
         </Providers>
+
+        {GA_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_ID}');
+              `}
+            </Script>
+          </>
+        )}
       </body>
     </html>
   );
