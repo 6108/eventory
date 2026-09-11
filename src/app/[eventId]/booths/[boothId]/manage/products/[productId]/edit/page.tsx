@@ -14,7 +14,7 @@ export default async function Page({
 }) {
   const { eventId, boothId, productId } = await params;
 
-  const product = await getProduct(productId, boothId);
+  const product = await getProduct(productId, boothId, true);
 
   if (!product) {
     return <div>작품이 없습니다</div>;

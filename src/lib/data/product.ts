@@ -274,7 +274,7 @@ export async function getFollowedBoothProductsPaged(
 
 
 // 특정 상품 조회
-export async function getProduct(productId: string, boothId?: string): Promise<Product | null> {
+export async function getProduct(productId: string, boothId?: string, includeHidden = false): Promise<Product | null> {
   const supabase = await createClient();
 
   let query = supabase
@@ -285,7 +285,10 @@ export async function getProduct(productId: string, boothId?: string): Promise<P
       product_options ( id, name, price, initial_quantity, remaining_quantity )`
     )
     .eq("id", productId)
-    .eq("visible", true);
+
+  if (!includeHidden) {
+    query = query.eq("visible", true);
+  }
 
   if (boothId) {
     query = query.eq("booth_id", boothId);

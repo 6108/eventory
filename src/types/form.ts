@@ -19,6 +19,7 @@ export type ProductFormState = {
   purchaseLimit: string;
   description: string;
   options: ProductOptionFormState[];
+  visible: boolean;
 };
 
 // 부스 폼

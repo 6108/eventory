@@ -85,6 +85,29 @@ export default function ProductForm({
           required
         />
       </FormField>
+      <FormField label="작품 공개">
+        <button
+          type="button"
+          role="switch"
+          aria-checked={form.visible}
+          onClick={() => updateField("visible", !form.visible)}
+          className="flex items-center gap-3"
+        >
+          <span
+            className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${form.visible ? "bg-primary" : "bg-zinc-700"
+              }`}
+          >
+            <span
+              className={`absolute left-0 top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${form.visible ? "translate-x-6" : "translate-x-1"
+                }`}
+            />
+          </span>
+
+          <span className="text-sm text-zinc-300">
+            {form.visible ? "공개" : "비공개"}
+          </span>
+        </button>
+      </FormField>
 
       <ProductImageField
         required={!isEdit}

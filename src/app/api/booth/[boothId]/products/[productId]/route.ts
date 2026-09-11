@@ -53,6 +53,7 @@ export async function PATCH(
     description,
     artistIds,
     options,
+    visible,
   } = body;
 
   // =========================
@@ -204,6 +205,7 @@ export async function PATCH(
       description: description?.trim() ?? "",
       artist_ids: artistIds,
       artist_names: artistNames,
+      visible: visible ?? true,
     })
     .eq("id", productId)
     .eq("booth_id", boothId)
@@ -222,7 +224,8 @@ export async function PATCH(
         description,
         remaining_quantity,
         artist_ids,
-        artist_names
+        artist_names,
+        visible
       `
     )
     .single();

@@ -21,6 +21,7 @@ export async function POST(
     description,
     artistIds,
     options,
+    visible,
   } = body;
 
   if (!name?.trim()) {
@@ -117,9 +118,10 @@ export async function POST(
       description: description?.trim() ?? "",
       artist_ids: artistIds,
       artist_names: artistNames,
+      visible: visible ?? true,
     })
     .select(
-      "id, booth_id, main_image, sample_images, name, price, category, sub_category, initial_quantity, purchase_limit, description, remaining_quantity, artist_ids, artist_names"
+      "id, booth_id, main_image, sample_images, name, price, category, sub_category, initial_quantity, purchase_limit, description, remaining_quantity, artist_ids, artist_names, visible"
     )
     .single();
 

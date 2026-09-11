@@ -14,6 +14,7 @@ function createInitialForm(product?: Product): ProductFormState {
     remainingQuantity: product?.remainingQuantity?.toString() ?? "",
     purchaseLimit: product?.purchaseLimit?.toString() ?? "",
     description: product?.description ?? "",
+    visible: product?.visible ?? true,
     options:
       product?.options.map((option) => ({
         id: option.id,
@@ -21,6 +22,7 @@ function createInitialForm(product?: Product): ProductFormState {
         initialQuantity: option.initialQuantity?.toString() ?? "",
         remainingQuantity: option.remainingQuantity?.toString() ?? "",
       })) ?? [],
+
   };
 }
 
