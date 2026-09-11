@@ -1,6 +1,6 @@
 export type OrderItem = {
   id: string;
-  productId: string;
+  productId: string | null;
   optionId: string | null;
   productName: string;
   optionName: string | null;

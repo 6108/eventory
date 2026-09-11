@@ -218,9 +218,10 @@ export default function OrderPanel({ boothId }: OrderPanelProps) {
 
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() =>
-                    decrement(item.productId, item.optionId)
-                  }
+                  onClick={() => {
+                    if (!item.productId) return;
+                    decrement(item.productId, item.optionId);
+                  }}
                   className="h-6 w-6 rounded bg-zinc-800 text-white"
                 >
                   −
@@ -231,9 +232,10 @@ export default function OrderPanel({ boothId }: OrderPanelProps) {
                 </span>
 
                 <button
-                  onClick={() =>
-                    increment(item.productId, item.optionId)
-                  }
+                  onClick={() => {
+                    if (!item.productId) return;
+                    increment(item.productId, item.optionId);
+                  }}
                   className="h-6 w-6 rounded bg-zinc-800 text-white"
                 >
                   +
@@ -241,9 +243,10 @@ export default function OrderPanel({ boothId }: OrderPanelProps) {
               </div>
 
               <button
-                onClick={() =>
+                onClick={() => {
+                  if (!item.productId) return;
                   removeItem(item.productId, item.optionId)
-                }
+                }}
                 className="text-xs text-red-400"
               >
                 삭제
