@@ -99,6 +99,7 @@ export type Product = {
   purchaseLimit: number | null; // null이면 구매 제한 없음
   description: string;
   options: ProductOption[];
+  visible: boolean;
 
   category: ProductCategory;
   subCategory: ProductSubCategory;
@@ -134,6 +135,7 @@ export type ProductSummary = {
   subCategory: ProductSubCategory;
   remainingQuantity: number | null;
   purchaseLimit: number | null;
+  visible: boolean;
   options: ProductOption[];
 };
 

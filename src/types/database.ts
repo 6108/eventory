@@ -1,3 +1,6 @@
+Need to install the following packages:
+supabase@2.117.0
+Ok to proceed? (y) 
 export type Json =
   | string
   | number
@@ -258,7 +261,7 @@ export type Database = {
           option_id: string | null
           option_name: string | null
           order_id: string | null
-          product_id: string
+          product_id: string | null
           product_name: string
           quantity: number
           subtotal: number
@@ -270,7 +273,7 @@ export type Database = {
           option_id?: string | null
           option_name?: string | null
           order_id?: string | null
-          product_id: string
+          product_id?: string | null
           product_name: string
           quantity: number
           subtotal: number
@@ -282,7 +285,7 @@ export type Database = {
           option_id?: string | null
           option_name?: string | null
           order_id?: string | null
-          product_id?: string
+          product_id?: string | null
           product_name?: string
           quantity?: number
           subtotal?: number
@@ -562,6 +565,7 @@ export type Database = {
           remaining_quantity: number | null
           sample_images: string[] | null
           sub_category: string | null
+          visible: boolean
         }
         Insert: {
           artist_ids?: string[] | null
@@ -579,6 +583,7 @@ export type Database = {
           remaining_quantity?: number | null
           sample_images?: string[] | null
           sub_category?: string | null
+          visible?: boolean
         }
         Update: {
           artist_ids?: string[] | null
@@ -596,6 +601,7 @@ export type Database = {
           remaining_quantity?: number | null
           sample_images?: string[] | null
           sub_category?: string | null
+          visible?: boolean
         }
         Relationships: [
           {

@@ -13,7 +13,8 @@ export const PRODUCTS_PAGE_SIZE = 24;
 
 
 export async function getProductSummaries(
-  boothId?: string | string[]
+  boothId?: string | string[],
+  includeHidden = false
 ): Promise<ProductSummary[]> {
   const supabase = await createClient();
 
@@ -21,11 +22,16 @@ export async function getProductSummaries(
     .from("products")
     .select(
       `id, booth_id, artist_ids, artist_names, main_image, sample_images, name, price,
-      category, sub_category, initial_quantity, remaining_quantity, purchase_limit,
-      booths ( booth_name, booth_number ),
-      product_options ( id, name, price, initial_quantity, remaining_quantity )`
-    )
-    .order("created_at", { ascending: false });
+    category, sub_category, initial_quantity, remaining_quantity, purchase_limit, visible,
+    booths ( booth_name, booth_number ),
+    product_options ( id, name, price, initial_quantity, remaining_quantity )`
+    );
+
+  if (!includeHidden) {
+    query = query.eq("visible", true);
+  }
+
+  query = query.order("created_at", { ascending: false });
 
   if (Array.isArray(boothId)) {
     query = query.in("booth_id", boothId);
@@ -56,6 +62,7 @@ export async function getProductSummaries(
     subCategory: product.sub_category as ProductSubCategory,
     remainingQuantity: product.remaining_quantity,
     purchaseLimit: product.purchase_limit,
+    visible: product.visible ?? true,
     options: (product.product_options ?? []).map(
       (option): ProductOption => ({
         id: option.id,
@@ -81,11 +88,12 @@ export async function getProductSummariesPaged(
     .from("products")
     .select(
       `id, booth_id, artist_ids, artist_names, main_image, sample_images, name, price,
-      category, sub_category, initial_quantity, remaining_quantity, purchase_limit,
+      category, sub_category, initial_quantity, remaining_quantity, purchase_limit, visible,
       booths ( booth_name, booth_number ),
       product_options ( id, name, price, initial_quantity, remaining_quantity )`,
       { count: "exact" }
     )
+    .eq("visible", true)
     .order("created_at", { ascending: false });
 
   if (category) {
@@ -128,6 +136,7 @@ export async function getProductSummariesPaged(
     subCategory: product.sub_category as ProductSubCategory,
     remainingQuantity: product.remaining_quantity,
     purchaseLimit: product.purchase_limit,
+    visible: product.visible ?? true,
     options: (product.product_options ?? []).map(
       (option): ProductOption => ({
         id: option.id,
@@ -190,12 +199,13 @@ export async function getFollowedBoothProductsPaged(
     .from("products")
     .select(
       `id, booth_id, artist_ids, artist_names, main_image, sample_images, name, price,
-      category, sub_category, initial_quantity, remaining_quantity, purchase_limit,
+      category, sub_category, initial_quantity, remaining_quantity, purchase_limit,visible,
       booths ( booth_name, booth_number ),
       product_options ( id, name, price, initial_quantity, remaining_quantity )`,
       { count: "exact" }
     )
     .in("booth_id", boothIds)
+    .eq("visible", true)
     .order("created_at", { ascending: false });
 
   if (category) {
@@ -238,6 +248,7 @@ export async function getFollowedBoothProductsPaged(
     subCategory: product.sub_category as ProductSubCategory,
     remainingQuantity: product.remaining_quantity,
     purchaseLimit: product.purchase_limit,
+    visible: product.visible ?? true,
     options: (product.product_options ?? []).map(
       (option): ProductOption => ({
         id: option.id,
@@ -270,10 +281,11 @@ export async function getProduct(productId: string, boothId?: string): Promise<P
     .from("products")
     .select(
       `id, booth_id, main_image, sample_images, name, price, category, sub_category,
-      initial_quantity, remaining_quantity, purchase_limit, description, artist_ids, artist_names,
+      initial_quantity, remaining_quantity, purchase_limit, description, artist_ids, artist_names, visible,
       product_options ( id, name, price, initial_quantity, remaining_quantity )`
     )
-    .eq("id", productId);
+    .eq("id", productId)
+    .eq("visible", true);
 
   if (boothId) {
     query = query.eq("booth_id", boothId);
@@ -299,6 +311,7 @@ export async function getProduct(productId: string, boothId?: string): Promise<P
     remainingQuantity: productData.remaining_quantity,
     purchaseLimit: productData.purchase_limit,
     description: productData.description ?? "",
+    visible: productData.visible ?? true,
     options: (productData.product_options ?? []).map(
       (option): ProductOption => ({
         id: option.id,

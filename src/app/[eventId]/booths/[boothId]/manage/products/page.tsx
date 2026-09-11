@@ -13,7 +13,7 @@ export default async function Page({
 }) {
   const { eventId, boothId } = await params;
 
-  const products = await getProductSummaries(boothId);
+  const products = await getProductSummaries(boothId, true);
 
   return (
     <div className="mx-auto w-full max-w-3xl">
