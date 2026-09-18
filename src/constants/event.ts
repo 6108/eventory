@@ -8,7 +8,7 @@ export const EVENT_INFO = {
 
   // 날짜/시간
   dateLabel: "2026.09.19 (토)",
-  timeLabel: "00:00 ~ 00:00",
+  timeLabel: "9:30 ~ 17:00",
 
   // 장소
   venueName: "추후 공개",
@@ -18,16 +18,21 @@ export const EVENT_INFO = {
   // 문의
   contactEmail: "butchershop.sesh@gmail.com",
 
+  timeTable: {
+    src: "/images/event/time_table.webp",
+    alt: "일정표",
+  },
+
   luckyDraw: {
     title: "럭키드로우 안내",
     images: [
       {
         src: "/images/event/lucky_draw_01.webp",
-        alt: "럭키드로우 안내 이미지 1 (임시 이미지)",
+        alt: "럭키드로우 안내 이미지 1",
       },
       {
         src: "/images/event/lucky_draw_02.webp",
-        alt: "럭키드로우 안내 이미지 2 (임시 이미지)",
+        alt: "럭키드로우 안내 이미지 2",
       },
     ],
   },

@@ -115,6 +115,40 @@ export default function Page() {
         <div className="h-px bg-primary" />
 
         {/* ========================================
+          타임테이블
+        ======================================== */}
+        <section className="px-5 py-8 sm:px-8">
+          <div className="mb-5">
+            <p className="text-xs font-medium tracking-[0.18em] text-zinc-500">
+              TIME TABLE
+            </p>
+
+            <h2 className="mt-2 text-xl font-semibold text-white">
+              일정표
+            </h2>
+
+
+          </div>
+
+          <div
+            key={EVENT_INFO.timeTable.src}
+            className="mx-auto w-full max-w-160"
+          >
+            <Image
+              src={EVENT_INFO.timeTable.src}
+              alt={EVENT_INFO.timeTable.alt}
+              width={1200}
+              height={1500}
+              sizes="(max-width: 640px) 100vw, 640px"
+              className="h-auto w-full"
+            />
+          </div>
+        </section>
+
+        {/* 구분 */}
+        <div className="h-px bg-primary" />
+
+        {/* ========================================
             럭키드로우
         ======================================== */}
         <section className="px-5 py-8 sm:px-8">
