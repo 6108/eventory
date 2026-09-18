@@ -23,6 +23,27 @@ export const EVENT_INFO = {
     alt: "일정표",
   },
 
+  notice: {
+    title: "입장안내",
+    images: [
+      {
+        src: "/images/event/notice_01.webp",
+        alt: "입장안내 및 공지",
+      },
+      {
+        src: "/images/event/notice_02.webp",
+        alt: "입장안내 및 공지2",
+      }, {
+        src: "/images/event/notice_03.webp",
+        alt: "입장안내 및 공지3",
+      }, {
+        src: "/images/event/notice_04.webp",
+        alt: "입장안내 및 공지4",
+      },
+    ],
+
+  },
+
   luckyDraw: {
     title: "럭키드로우 안내",
     images: [

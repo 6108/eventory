@@ -149,6 +149,46 @@ export default function Page() {
         <div className="h-px bg-primary" />
 
         {/* ========================================
+          입장 안내 및 공지
+        ======================================== */}
+        <section className="px-5 py-8 sm:px-8">
+          <div className="mb-5">
+            <p className="text-xs font-medium tracking-[0.18em] text-zinc-500">
+              NOTICE
+            </p>
+
+            <h2 className="mt-2 text-xl font-semibold text-white">
+              {EVENT_INFO.notice.title}
+            </h2>
+
+
+          </div>
+
+          {/* 가로 2열 이미지 */}
+
+          <div className="flex flex-col gap-3">
+            {EVENT_INFO.notice.images.map((image) => (
+              <div
+                key={image.src}
+                className="mx-auto w-full max-w-160"
+              >
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  width={1200}
+                  height={1500}
+                  sizes="(max-width: 640px) 100vw, 640px"
+                  className="h-auto w-full"
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 구분 */}
+        <div className="h-px bg-primary" />
+
+        {/* ========================================
             럭키드로우
         ======================================== */}
         <section className="px-5 py-8 sm:px-8">
