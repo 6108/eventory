@@ -11,9 +11,9 @@ export const EVENT_INFO = {
   timeLabel: "9:30 ~ 17:00",
 
   // 장소
-  venueName: "추후 공개",
-  address: "상세 주소 ",
-  mapUrl: "https://map.naver.com/", // 실제 링크로 교체
+  venueName: "스페이스 쉐어 서울중부센터 스카이홀",
+  address: "서울 중구 장충단로 247 굿모닝시티몰 9층",
+  mapUrl: "https://naver.me/GUwS16uF",
 
   // 문의
   contactEmail: "butchershop.sesh@gmail.com",
