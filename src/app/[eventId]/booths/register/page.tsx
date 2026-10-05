@@ -11,10 +11,6 @@ export default function Page() {
         <p className="text-sm text-zinc-400 mb-8">
           부스번호와 연결 코드를 입력해 부스에 연결하세요
         </p>
-
-        <p className="text-sm text-zinc-400 mb-8">
-          연결 코드는 트위터 DM(@pm5_0216)으로 요청해주세요!
-        </p>
         <RegisterForm />
       </div>
     </div>

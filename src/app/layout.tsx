@@ -11,17 +11,17 @@ import { Providers } from "./providers";
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://boothspot.net"),
-  title: "redemption",
-  description: "솔음사헌 배포전",
+  metadataBase: new URL("https://example.com"),
+  title: "Moonhalo Market",
+  description: "달무리 창작 페스타 (포트폴리오용 목업)",
   openGraph: {
-    title: "redemption",
-    description: "솔음사헌 배포전",
-    url: "https://boothspot.net/redemption0919",
-    siteName: "redemption",
+    title: "Moonhalo Market",
+    description: "달무리 창작 페스타 (포트폴리오용 목업)",
+    url: "https://example.com/moonhalo-fest",
+    siteName: "Moonhalo Market",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image.svg",
         width: 1200,
         height: 630,
       },
@@ -31,9 +31,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "redemption",
-    description: "솔음사헌 배포전",
-    images: ["/og-image.png"],
+    title: "Moonhalo Market",
+    description: "달무리 창작 페스타 (포트폴리오용 목업)",
+    images: ["/og-image.svg"],
   },
 };
 

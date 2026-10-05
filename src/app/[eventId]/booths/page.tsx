@@ -11,7 +11,7 @@ export default async function Page() {
       <div className="w-full md:w-1/2 md:sticky md:top-14 md:self-start md:h-[calc(100vh-3.5rem)] overflow-y-auto">
         <div className="w-full max-w-150 mx-auto">
           <Image
-            src="/images/booths/booth_map.jpeg"
+            src="/images/booth_map.svg"
             alt="부스 배치도"
             width={1200}
             height={800}

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/src/lib/supabase/client";
-import type { User } from "@supabase/supabase-js";
+import type { MockUser as User } from "@/src/lib/mock/builder";
 import { EVENT_ID as eventId } from "@/src/constants/event";
 
 const AUTH_QUERY_KEY = ["auth-user"] as const;

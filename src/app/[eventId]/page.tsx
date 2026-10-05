@@ -15,7 +15,7 @@ export default function Page() {
         <section className=" border-zinc-800 bg-zinc-950">
           <div className="relative mx-auto aspect-square w-50 overflow-hidden sm:w-50">
             <Image
-              src="/images/logo.png"
+              src="/images/logo.svg"
               alt={EVENT_INFO.name}
               fill
               priority
@@ -34,12 +34,12 @@ export default function Page() {
           </h1>
 
           <p className="mt-3 text-sm leading-6 text-zinc-400">
-            ¹) 구원; 구출되어 해방되다
+            달무리: 달 주위에 생기는 희미한 빛의 고리
             <br />
-            ²) 속박; 제한하여 자유롭지 못하게 하다
+            작은 창작자들의 빛이 한자리에 모이는 하루
           </p>
           <p className="mt-8 text-xs text-zinc-600">
-            이미지의 모든 저작권은 @QnD_SESH님에게 있습니다.
+            ※ 이 페이지의 모든 이미지는 포트폴리오용 가상 목업입니다.
           </p>
         </section>
 

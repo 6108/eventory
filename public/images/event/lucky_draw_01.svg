@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500" viewBox="0 0 1200 1500">
+<rect width="1200" height="1500" fill="#18181b"/>
+<circle cx="1030" cy="190" r="110" fill="#f4c687" opacity=".25"/><circle cx="1070" cy="170" r="80" fill="#f4c687" opacity=".5"/>
+<rect x="80" y="130" width="140" height="8" rx="4" fill="#f4c687"/>
+<text x="80" y="250" font-family="sans-serif" font-size="64" font-weight="700" fill="#fafafa">LUCKY DRAW</text>
+<text x="80" y="360" font-family="sans-serif" font-size="40" fill="#d4d4d8">· 부스 3곳 이상 방문 시 응모권 지급</text><text x="80" y="430" font-family="sans-serif" font-size="40" fill="#d4d4d8">· 14:00 / 15:30 두 차례 추첨</text><text x="80" y="500" font-family="sans-serif" font-size="40" fill="#d4d4d8">· 경품은 무대 앞에서 수령</text>
+<text x="80" y="1430" font-family="sans-serif" font-size="26" fill="#71717a">Moonhalo Market · MOCKUP</text>
+</svg>

@@ -1,35 +1,9 @@
-// src/lib/supabase/middleware.ts
-import { createServerClient } from "@supabase/ssr";
+// [목업] 세션 갱신 대신 쿠키로 로그인 여부만 판단합니다. (원본: supabase.auth.getUser)
 import { NextResponse, type NextRequest } from "next/server";
+import { AUTH_COOKIE } from "@/src/lib/mock/constants";
 
 export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({ request });
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          response = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
-
-  // 반드시 필요 — 이 호출이 세션 토큰을 갱신함
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const response = NextResponse.next({ request });
+  const user = request.cookies.get(AUTH_COOKIE)?.value === "out" ? null : { id: "mock" };
   return { response, user };
 }

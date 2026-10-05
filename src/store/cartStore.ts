@@ -378,7 +378,7 @@ export const useCartStore = create<CartState>()(
       },
     }),
     {
-      name: "boothspot-cart",
+      name: "moonhalo-cart",
       partialize: (state) => ({
         items: state.items,
         sentBoothIds: state.sentBoothIds,

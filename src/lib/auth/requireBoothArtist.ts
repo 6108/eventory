@@ -1,8 +1,9 @@
 // src/lib/auth/requireBoothArtist.ts
 import { NextResponse } from "next/server";
 import { createClient } from "@/src/lib/supabase/server";
-import type { SupabaseClient } from "@supabase/supabase-js";
-import type { User } from "@supabase/supabase-js";
+import type { MockUser as User } from "@/src/lib/mock/builder";
+
+type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 
 type AuthorizedResult = {
   supabase: SupabaseClient;
